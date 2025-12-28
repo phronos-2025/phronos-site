@@ -1,15 +1,15 @@
 # Phronos Brand Guidelines
 # Voice, tone, visual identity, and positioning
-# Version: 1.1.1 | Date: 2025-12-27 | Status: active
+# Version: 1.2.0 | Date: 2025-12-28 | Status: active
 
 _meta:
-  version: "1.1.1"
-  date: "2025-12-27"
+  version: "1.2.0"
+  date: "2025-12-28"
   codename: "The Field Journal"
   author: "Vishal Patel"
   status: "active"
-  change_summary: "Added 'The Library' section. Restored Instruments to dark mode. Finalized ID naming conventions (TYPE-###)."
-  supersedes: "1.1.0"
+  change_summary: "Fixed grid values to match final mockup (60px light, 40px dark). Clarified rail structure as reference material. Added COMPONENTS.md to living documents."
+  supersedes: "1.1.1"
 
 # =============================================================================
 # POSITIONING
@@ -317,11 +317,11 @@ visual:
     
     grid:
       light_mode:
-        color: "rgba(26, 26, 26, 0.03)"
-        size: "80px 80px"
+        color: "rgba(26, 26, 26, 0.04)"
+        size: "60px 60px"
       dark_mode:
-        color: "rgba(242, 240, 233, 0.03)"
-        size: "20px 20px"
+        color: "rgba(242, 240, 233, 0.015)"
+        size: "40px 40px"
       layout_structures:
         the_rail:
           description: "A 33% width column (desktop) for high-frequency signals."
@@ -537,6 +537,9 @@ site_structure:
       - "CONSTITUTION.md"
       - "BRAND.yaml"
       - "CARD-SYSTEM.md"
+      - "COMPONENTS.md"
+      - "ARCHITECTURE.md"
+      - "DISPATCH-PAGE.md"
 
     versioning: "Semantic versioning (major.minor.patch)"
     changelog: "Maintained in document header"
@@ -709,6 +712,15 @@ reference_implementation:
     }
   
   html_rail_structure: |
+    <!-- 
+      REFERENCE MATERIAL: High-density typographic patterns
+      This snippet demonstrates the visual language for dense, mono-spaced 
+      information displays. Adapt for specific contexts:
+      - Homepage: Use for telemetry panel (see COMPONENTS.md)
+      - Library pages: Use for sticky sidebar TOC
+      - Instruments: Use for status/metadata panels
+      Do NOT use verbatim—adapt content and structure to context.
+    -->
     <aside class="rail-container" style="border-left: 1px solid var(--ink); padding-left: 1.5rem; font-family: var(--font-mono);">
         
         <div class="rail-module" style="margin-bottom: 3rem;">
