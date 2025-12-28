@@ -202,6 +202,14 @@
     grid-template-columns: 1fr;
   }
 
+  .dispatch-header {
+    padding: 2rem 5% 1.5rem;
+  }
+
+  .dispatch-footer {
+    padding: var(--space-lg) 5% 0;
+  }
+
   .dispatch-footer-grid {
     grid-template-columns: 1fr;
     gap: var(--space-md);

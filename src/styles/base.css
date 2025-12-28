@@ -1,6 +1,7 @@
 /* Base Styles */
 html {
   font-size: 16px;
+  overflow-x: hidden; /* Prevent horizontal page scroll */
 }
 
 body {
@@ -12,6 +13,7 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal page scroll */
 }
 
 /* Typography */

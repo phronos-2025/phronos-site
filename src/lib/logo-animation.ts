@@ -22,17 +22,12 @@ export class PhronosLens {
   private rotation: number = 0;
   private animationId: number | null = null;
   private lastTime: number = 0;
-  private frameCount: number = 0;
-  private fpsLogTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, options: { size?: number } = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.size = options.size || canvas.width || 31;
     this.scale = this.size / 31;
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/13335825-0b0d-4322-8319-29fc41586427',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'logo-animation.ts:constructor',message:'PhronosLens initialized',data:{size:this.size,scale:this.scale},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
   }
 
   private scaled(value: number): number {
@@ -99,18 +94,6 @@ export class PhronosLens {
     ctx.arc(centerX, centerY, this.scaled(1.6), 0, Math.PI * 2);
     ctx.fillStyle = COLORS.gold;
     ctx.fill();
-    
-    // #region agent log
-    this.frameCount++;
-    const now = performance.now();
-    if (now - this.fpsLogTime >= 2000) {
-      const fps = Math.round(this.frameCount / ((now - this.fpsLogTime) / 1000));
-      const rotationsPerSecond = ROTATION_SPEED_PER_SECOND / (Math.PI * 2);
-      fetch('http://127.0.0.1:7243/ingest/13335825-0b0d-4322-8319-29fc41586427',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'logo-animation.ts:draw',message:'Animation FPS measured (time-based)',data:{fps,rotationsPerSecond:rotationsPerSecond.toFixed(4),rotationSpeedPerSecond:ROTATION_SPEED_PER_SECOND,currentRotation:this.rotation.toFixed(4),runId:'post-fix'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-      this.frameCount = 0;
-      this.fpsLogTime = now;
-    }
-    // #endregion
   }
 
   private animate(currentTime: number = 0): void {

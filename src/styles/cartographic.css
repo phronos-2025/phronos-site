@@ -5,6 +5,7 @@
   padding: 3rem 5%;
   max-width: 800px;
   margin: 0 auto;
+  overflow-x: hidden; /* Contain any overflow within body */
 }
 
 .dispatch-content {

@@ -16,8 +16,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 2rem;
-    margin: 3rem 5%;
-    max-width: 800px;
+    margin: 3rem auto; /* Center horizontally */
+    max-width: 720px; /* Slightly narrower than footer to align with content */
     background: var(--white);
     border: 1px solid var(--ink);
   }
@@ -55,7 +55,8 @@
       flex-direction: column;
       gap: 1rem;
       text-align: center;
-      margin: 2rem 5%;
+      margin: 2rem 5%; /* Use percentage margin on mobile */
+      max-width: none;
     }
   }
 </style>

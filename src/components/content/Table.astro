@@ -32,6 +32,7 @@ const { caption, tableNumber, footer } = Astro.props;
     border: 1px solid var(--ink);
     box-shadow: 12px 12px 0px rgba(26, 26, 26, 0.05);
     margin: 20px 0;
+    overflow-x: auto; /* H2 fix: enable horizontal scroll on mobile */
   }
 
   .phronos-table-header {
@@ -45,6 +46,19 @@ const { caption, tableNumber, footer } = Astro.props;
     margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
+  }
+
+  /* Mobile: reduce padding, allow scroll */
+  @media (max-width: 768px) {
+    .phronos-table-container {
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 6px 6px 0px rgba(26, 26, 26, 0.05);
+    }
+
+    .phronos-table-wrapper :global(table) {
+      min-width: 500px; /* Force scroll for complex tables */
+    }
   }
 
   /* Target the markdown-generated table */

@@ -58,20 +58,6 @@ const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString(
       <slot />
     </main>
     <slot name="footer" />
-    <script>
-      // #region agent log
-      document.fonts.ready.then(() => {
-        const fontFamilies = [...document.fonts].map(f => ({name: f.family, status: f.status, weight: f.weight}));
-        const computedStyles = {
-          bodyFont: getComputedStyle(document.body).fontFamily,
-          bodyFontSize: getComputedStyle(document.body).fontSize,
-          bodyLineHeight: getComputedStyle(document.body).lineHeight,
-          bodyColor: getComputedStyle(document.body).color,
-        };
-        fetch('http://127.0.0.1:7243/ingest/13335825-0b0d-4322-8319-29fc41586427',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BaseLayout.astro:fonts',message:'Font loading status',data:{fontCount:fontFamilies.length,fonts:fontFamilies.slice(0,10),computedStyles},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3'})}).catch(()=>{});
-      });
-      // #endregion
-    </script>
   </body>
 </html>
 
