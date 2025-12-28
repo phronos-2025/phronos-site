@@ -1,0 +1,132 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/global/Nav.astro';
+import Footer from '../../components/global/Footer.astro';
+import DispatchHeader from '../../components/dispatch/DispatchHeader.astro';
+import AuthorBlock from '../../components/dispatch/AuthorBlock.astro';
+import DispatchFooter from '../../components/dispatch/DispatchFooter.astro';
+import SubscribeCTA from '../../components/dispatch/SubscribeCTA.astro';
+import Table from '../../components/content/Table.astro';
+import Figure from '../../components/content/Figure.astro';
+import Callout from '../../components/content/Callout.astro';
+import Caption from '../../components/content/Caption.astro';
+import PullQuote from '../../components/content/PullQuote.astro';
+import '../../styles/cartographic.css';
+
+export async function getStaticPaths() {
+  const dispatches = await getCollection('dispatches');
+  return dispatches.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// MDX components to pass
+const components = { Table, Figure, Callout, Caption, PullQuote };
+---
+
+<BaseLayout 
+  title={entry.data.title}
+  description={entry.data.subtitle}
+>
+  <Nav slot="nav" />
+  
+  <article class="dispatch-article">
+    <DispatchHeader
+      id={entry.data.id}
+      title={entry.data.title}
+      subtitle={entry.data.subtitle}
+      date={entry.data.date}
+      readingTime={entry.data.reading_time}
+      version={entry.data.version}
+      status={entry.data.status}
+    />
+
+    <AuthorBlock 
+      name={entry.data.author} 
+    />
+
+    <article class="dispatch-body">
+      <div class="dispatch-content">
+        <Content components={components} />
+      </div>
+    </article>
+
+    <DispatchFooter
+      dataSource={entry.data.data_source}
+      references={entry.data.references}
+      topics={entry.data.topics}
+    />
+    
+    <SubscribeCTA />
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style is:global>
+  @import '../../styles/cartographic.css';
+</style>
+
+<script>
+  // #region agent log
+  setTimeout(() => {
+    const dispatchContent = document.querySelector('.dispatch-content');
+    const allParagraphs = document.querySelectorAll('.dispatch-content p');
+    const metaBar = document.querySelector('.dispatch-meta-bar');
+    const authorBlock = document.querySelector('.author-block');
+    const authorPseudo = authorBlock ? window.getComputedStyle(authorBlock, '::after') : null;
+    const h2s = document.querySelectorAll('.dispatch-content h2');
+    
+    const data = {totalParagraphs: allParagraphs.length};
+    
+    // Check first 3 paragraphs for font-weight AND color
+    if (allParagraphs.length > 0) {
+      data.paragraphs = [];
+      for (let i = 0; i < Math.min(3, allParagraphs.length); i++) {
+        const p = allParagraphs[i];
+        const s = getComputedStyle(p);
+        data.paragraphs.push({
+          index:i,
+          fontSize:s.fontSize,
+          fontWeight:s.fontWeight,
+          color:s.color,
+          text:p.textContent.substring(0,25)+'...'
+        });
+      }
+    }
+    
+    // Check body font-weight
+    const bodyStyle = getComputedStyle(document.body);
+    data.bodyFontWeight = bodyStyle.fontWeight;
+    data.bodyColor = bodyStyle.color;
+    
+    // Check author block width and pseudo-element
+    if (authorBlock) {
+      const s = getComputedStyle(authorBlock);
+      data.authorBlockWidth = s.width;
+      data.authorBorderBottom = s.borderBottom;
+    }
+    
+    // Check meta bar width
+    if (metaBar) {
+      const s = getComputedStyle(metaBar);
+      data.metaBarWidth = s.width;
+      data.metaBarBorderBottom = s.borderBottom;
+    }
+    
+    // Check h2 borders
+    if (h2s.length > 0) {
+      const s = getComputedStyle(h2s[0]);
+      data.firstH2BorderTop = s.borderTop;
+    }
+    
+    fetch('http://127.0.0.1:7243/ingest/13335825-0b0d-4322-8319-29fc41586427',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dispatch-slug.astro:styles',message:'Dispatch styles (post-fix-6)',data:data,timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H16,H17',runId:'post-fix-6'})}).catch(()=>{});
+  }, 500);
+  // #endregion
+</script>
+

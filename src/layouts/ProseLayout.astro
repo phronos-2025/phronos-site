@@ -1,0 +1,178 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  version?: string;
+  date?: string;
+  status?: string;
+}
+
+const { title, description, version, date, status } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Nav slot="nav" />
+  
+  <article class="prose-page">
+    <header class="prose-header">
+      <div class="container container-narrow">
+        {(version || date || status) && (
+          <div class="prose-meta">
+            {version && (
+              <span class="prose-meta-item">
+                <span class="prose-meta-label">Version:</span> {version}
+              </span>
+            )}
+            {date && (
+              <span class="prose-meta-item">
+                <span class="prose-meta-label">Updated:</span> {date}
+              </span>
+            )}
+            {status && (
+              <span class="prose-meta-item">
+                <span class="prose-meta-label">Status:</span> {status}
+              </span>
+            )}
+          </div>
+        )}
+        <h1 class="prose-title">{title}</h1>
+      </div>
+    </header>
+
+    <div class="prose-content container container-narrow">
+      <slot />
+    </div>
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .prose-page {
+    padding-bottom: var(--space-2xl);
+  }
+
+  .prose-header {
+    padding: var(--space-xl) 0;
+    border-bottom: 1px solid var(--faded-light);
+    margin-bottom: var(--space-xl);
+  }
+
+  .prose-meta {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .prose-meta-item {
+    display: flex;
+    gap: var(--space-xs);
+  }
+
+  .prose-meta-label {
+    color: var(--gold);
+  }
+
+  .prose-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, var(--text-2xl));
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .prose-content {
+    font-family: var(--font-serif);
+  }
+
+  .prose-content :global(h2) {
+    font-size: var(--text-xl);
+    font-weight: 400;
+    color: var(--ink);
+    margin-top: 3rem;
+    margin-bottom: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--faded-light);
+  }
+
+  .prose-content :global(h3) {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 2rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .prose-content :global(p) {
+    font-size: var(--text-md);
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: var(--space-md);
+  }
+
+  .prose-content :global(strong) {
+    font-weight: 600;
+  }
+
+  .prose-content :global(em) {
+    font-style: italic;
+  }
+
+  .prose-content :global(a) {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose-content :global(a:hover) {
+    color: var(--ink);
+  }
+
+  .prose-content :global(blockquote) {
+    margin: var(--space-lg) 0;
+    padding: var(--space-md) var(--space-lg);
+    border-left: 3px solid var(--gold);
+    background: var(--white);
+    font-style: italic;
+  }
+
+  .prose-content :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  .prose-content :global(hr) {
+    border: none;
+    height: 1px;
+    background: var(--faded-light);
+    margin: var(--space-xl) 0;
+  }
+
+  .prose-content :global(ul),
+  .prose-content :global(ol) {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-lg);
+  }
+
+  .prose-content :global(ul) {
+    list-style: disc;
+  }
+
+  .prose-content :global(ol) {
+    list-style: decimal;
+  }
+
+  .prose-content :global(li) {
+    margin-bottom: var(--space-sm);
+    line-height: 1.7;
+  }
+</style>
+

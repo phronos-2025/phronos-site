@@ -1,9 +1,9 @@
 # Phronos Component Specifications
 
-**Version:** 1.0.0  
-**Date:** 2025-12-28  
+**Version:** 1.1.0  
+**Date:** 2025-12-27  
 **Status:** Ready for implementation  
-**Alignment:** ARCHITECTURE.md v1.2.1, BRAND.yaml v1.1.1, CARD-SYSTEM.md v1.1.0
+**Alignment:** ARCHITECTURE.md v1.3.0, BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0
 
 ---
 
@@ -299,7 +299,7 @@ The footer is a centered, transparent-background element that allows the site gr
 
 **Structure:**
 - Three rows, all centered
-- Row 1: Backronym tagline (serif, italic)
+- Row 1: Backronym tagline (mono, uppercase, faded)
 - Row 2: Links with middot separator (mono)
 - Row 3: Copyright (mono, faded)
 - Generous vertical padding
@@ -316,11 +316,12 @@ The footer is a centered, transparent-background element that allows the site gr
 }
 
 .footer-tagline {
-    font-family: var(--font-serif);
+    font-family: var(--font-mono);
     font-size: var(--text-md);
-    font-style: italic;
-    color: var(--ink);
-    margin-bottom: var(--space-lg);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--faded);
+    margin-bottom: var(--space-md);
 }
 
 .footer-links {
@@ -671,51 +672,46 @@ Section headers introduce major content sections on the homepage. They use a num
 ### Layout
 
 ```
-01 ─────────────────────────────────────────────────────
-   Dispatches from the Observatory
+01  Dispatches from the Observatory
+────────────────────────────────────
 ```
+
+Single-line layout with ID and title on the same line, thick bottom border.
 
 ### Design Tokens
 
 ```css
 .section-header {
-    margin-bottom: var(--space-lg);
-}
-
-.section-header-row {
     display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
+    align-items: baseline;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
 }
 
 .section-id {
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--gold);
 }
 
-.section-line {
-    flex: 1;
-    height: 1px;
-    background: var(--faded-light);
-}
-
 .section-title {
     font-family: var(--font-serif);
-    font-size: var(--text-xl);
+    font-size: 1.6rem;
     font-weight: 400;
+    font-style: italic;
     color: var(--ink);
 }
 
 /* Dark mode variant */
-.instruments-section .section-id {
-    color: var(--gold);
+.instruments-section .section-header {
+    border-bottom-color: var(--faded-light-dark);
 }
 
-.instruments-section .section-line {
-    background: var(--faded-light-dark);
+.instruments-section .section-id {
+    color: var(--gold);
 }
 
 .instruments-section .section-title {
@@ -727,12 +723,25 @@ Section headers introduce major content sections on the homepage. They use a num
 
 ```html
 <div class="section-header">
-    <div class="section-header-row">
-        <span class="section-id">01</span>
-        <span class="section-line"></span>
-    </div>
+    <span class="section-id">01</span>
     <h2 class="section-title">Dispatches from the Observatory</h2>
 </div>
+```
+
+### Frame-Rate Independence (Logo Animation)
+
+The logo animation uses delta-time to ensure consistent rotation speed across different monitor refresh rates (60Hz, 120Hz, 144Hz):
+
+```javascript
+const ROTATION_SPEED = 0.03; // radians per second
+
+function animate(currentTime) {
+    const deltaTime = (currentTime - lastTime) / 1000;
+    lastTime = currentTime;
+    
+    orbitAngle += ROTATION_SPEED * deltaTime;
+    // ... render
+}
 ```
 
 ---
@@ -1407,4 +1416,5 @@ Add to `tokens.css` for consistency across all components:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2025-12-27 | Updated footer tagline (mono/uppercase/faded). Simplified section headers to single-line layout. Added frame-rate independence note for logo animation. Per RECONCILIATION-PLAN.md |
 | 1.0.0 | 2025-12-28 | Initial specification: Nav, Footer, Hero, Section Headers, Iconography, Lab Container, Forms, States |

@@ -1,0 +1,146 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  subtitle?: string;
+  date: Date;
+  readingTime?: number;
+  version?: string;
+  status: string;
+}
+
+const { id, title, subtitle, date, readingTime, version, status } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// Determine status dot class
+const statusClass = status.toLowerCase() === 'published' ? 'published' : 
+                    status.toLowerCase() === 'researching' ? 'researching' : 'planned';
+---
+
+<header class="dispatch-header">
+  <div class="dispatch-meta-bar">
+    <div class="dispatch-meta-row">
+      <span class="dispatch-id">{id}</span>
+      <span class="dispatch-meta-item">{readingTime} min read</span>
+      <div class="dispatch-status">
+        <span class="dispatch-status-text">{status}</span>
+        <span class={`status-dot ${statusClass}`}></span>
+      </div>
+    </div>
+    <div class="dispatch-meta-row">
+      <span class="dispatch-version">{version || 'v1.0'}</span>
+      <span class="dispatch-meta-item">{formattedDate}</span>
+    </div>
+  </div>
+  
+  <h1 class="dispatch-title">{title}</h1>
+  {subtitle && <p class="dispatch-subtitle">{subtitle}</p>}
+</header>
+
+<style>
+  /* Dispatch Header - matches mockup phronos-dispatch-v2.html */
+  .dispatch-header {
+    padding: 4rem 5% 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .dispatch-meta-bar {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    /* Removed border-bottom - only author block should have border */
+  }
+
+  .dispatch-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dispatch-meta-row + .dispatch-meta-row {
+    margin-top: 0.25rem;
+  }
+
+  .dispatch-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .dispatch-version {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dispatch-meta-item {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dispatch-status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .dispatch-status-text {
+    color: var(--faded);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--faded);
+  }
+
+  .status-dot.published {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.researching {
+    background: var(--gold);
+    animation: pulse 3s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .dispatch-title {
+    font-size: clamp(2rem, 4.5vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: var(--ink);
+  }
+
+  .dispatch-subtitle {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--faded);
+    line-height: 1.5;
+    max-width: 640px;
+  }
+</style>
+

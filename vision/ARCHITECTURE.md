@@ -1,10 +1,10 @@
 # Phronos Site Architecture
 
-**Version:** 1.2.1  
-**Date:** 2025-12-28  
+**Version:** 1.3.0  
+**Date:** 2025-12-27  
 **Status:** Ready for implementation  
-**Alignment:** BRAND.yaml v1.1.1, CARD-SYSTEM.md v1.1.0, DISPATCH-PAGE.md v1.0.0  
-**Changes:** Added DISPATCH-PAGE.md reference; updated dispatch page section
+**Alignment:** BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0, DISPATCH-PAGE.md v1.1.0  
+**Changes:** Added Font Loading, MDX Component Registration, CSS Import Order, and Image Path Convention sections per RECONCILIATION-PLAN.md
 
 ---
 
@@ -34,14 +34,65 @@ Deployment:    Vercel or Cloudflare Pages
 ### Fonts
 ```
 Primary (Serif):  Cormorant Garamond — headers, body, narrative
+Body (Serif):     Lora — dispatch body text (more readable for long prose)
 Secondary (Mono): Fira Code — labels, data, navigation, buttons
 Fallback (Sans):  Inter, system-ui — only if serif unavailable
 ```
 
-Load via Google Fonts or self-host for performance:
+---
+
+## Font Loading (V1)
+
+Use Google Fonts CDN for initial release. Self-hosting is a future optimization.
+
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Fira+Code:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
 ```
+
+---
+
+## MDX Component Registration
+
+Astro requires explicit component passing in layouts:
+
+```astro
+---
+import Table from '../components/content/Table.astro';
+import Figure from '../components/content/Figure.astro';
+import Callout from '../components/content/Callout.astro';
+import PullQuote from '../components/content/PullQuote.astro';
+
+const components = { Table, Figure, Callout, PullQuote };
+---
+
+<Content components={components} />
+```
+
+---
+
+## CSS Import Order
+
+In BaseLayout.astro, import stylesheets in this order:
+
+1. `tokens.css` — Design tokens (colors, typography, spacing)
+2. `reset.css` — Browser reset
+3. `base.css` — Element styles
+4. `layout.css` — Grid backgrounds, section layouts
+
+---
+
+## Image Path Convention
+
+Dispatch images are stored in the public folder:
+
+```
+/public/images/dispatches/[slug]/
+├── figure-1.png
+├── figure-2.png
+└── figure-3.png
+```
+
+Referenced in MDX as `/images/dispatches/[slug]/figure-1.png`.
 
 ---
 
@@ -78,6 +129,7 @@ All design tokens should be defined in a central CSS file (`/styles/tokens.css`)
 
   /* === TYPOGRAPHY === */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Lora', Georgia, serif;  /* For dispatch body text */
   --font-mono: 'Fira Code', Consolas, Monaco, monospace;
 
   /* === SCALE === */
@@ -854,6 +906,7 @@ All are living documents maintained alongside this architecture.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2025-12-27 | Added Font Loading (V1), MDX Component Registration, CSS Import Order, and Image Path Convention sections per RECONCILIATION-PLAN.md |
 | 1.2.1 | 2025-12-28 | Added DISPATCH-PAGE.md reference; updated dispatch page section with Cartographic Suite requirement and references schema |
 | 1.2.0 | 2025-12-28 | Aligned homepage with mockup v2; unified card system; updated grid values (60px light, 40px dark); expanded status taxonomy (6 statuses); added navigation order; detailed hero/about/footer specs |
 | 1.1.2 | 2025-12-27 | Formalized Substack custom domain with canonical URL strategy |

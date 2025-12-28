@@ -1,0 +1,82 @@
+---
+interface Props {
+  name: string;
+  credentials?: string;
+}
+
+const { name, credentials = 'MD · PhD (Genetics)' } = Astro.props;
+
+// Generate initials from name
+const initials = name
+  .split(' ')
+  .map(n => n[0])
+  .join('')
+  .toUpperCase();
+---
+
+<div class="author-block">
+  <div class="author-avatar">{initials}</div>
+  <div class="author-info">
+    <span class="author-name">{name}</span>
+    <span class="author-credentials">{credentials}</span>
+  </div>
+</div>
+
+<style>
+  /* Author Block - matches mockup phronos-dispatch-v2.html */
+  .author-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 5%;
+    padding-bottom: calc(1.5rem + 1px); /* Account for pseudo-element border */
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  /* Border that matches content width (inside padding) */
+  .author-block::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: var(--faded-light);
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--gold);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .author-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .author-credentials {
+    font-size: 0.85rem;
+    color: var(--faded);
+    font-style: italic;
+  }
+</style>
+

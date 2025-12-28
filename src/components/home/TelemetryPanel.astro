@@ -1,0 +1,187 @@
+---
+// Power User Activity Sparklines - from DSP-001 analysis
+const powerUsers = [
+  { count: '384,406', bursts: [{ left: 5, width: 8, height: 45 }, { left: 15, width: 12, height: 55 }, { left: 30, width: 15, height: 70 }, { left: 48, width: 12, height: 65 }, { left: 65, width: 10, height: 75 }, { left: 80, width: 15, height: 100 }] },
+  { count: '38,830', bursts: [{ left: 35, width: 20, height: 60 }, { left: 60, width: 35, height: 85 }] },
+  { count: '27,496', bursts: [{ left: 55, width: 15, height: 90 }, { left: 75, width: 10, height: 50 }] },
+  { count: '18,477', bursts: [{ left: 60, width: 12, height: 95 }] },
+  { count: '13,530', bursts: [{ left: 65, width: 10, height: 85 }] },
+  { count: '11,169', bursts: [{ left: 70, width: 12, height: 80 }] },
+  { count: '10,671', bursts: [{ left: 55, width: 8, height: 70 }, { left: 68, width: 10, height: 90 }] },
+  { count: '9,458', bursts: [{ left: 50, width: 15, height: 85 }, { left: 70, width: 8, height: 60 }] },
+  { count: '8,812', bursts: [{ left: 75, width: 12, height: 90 }] },
+  { count: '8,542', bursts: [{ left: 78, width: 10, height: 85 }] },
+  { count: '7,553', bursts: [{ left: 80, width: 8, height: 80 }] },
+  { count: '7,017', bursts: [{ left: 48, width: 15, height: 75 }, { left: 68, width: 8, height: 55 }] },
+];
+---
+
+<a href="/dispatches/dsp-001#figure-4" class="telemetry-panel-link">
+<div class="telemetry-panel">
+  <div class="telemetry-annotation">DSP-001 — Power Users</div>
+  <div class="telemetry-header">
+    <span>Dataset: WildChat (N=4.8M)</span>
+    <span>Top 12 Power Users</span>
+  </div>
+
+  <div class="sparklines-container">
+    {powerUsers.map((user) => (
+      <div class="spark-row">
+        <span class="spark-label">{user.count}</span>
+        <div class="spark-line">
+          {user.bursts.map((burst) => (
+            <div 
+              class="spark-burst" 
+              style={`left: ${burst.left}%; width: ${burst.width}%; height: ${burst.height}%`}
+            />
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="axis-labels">
+    <span>2023-04</span>
+    <span>2024-01</span>
+    <span>2024-10</span>
+    <span>2025-07</span>
+  </div>
+
+  <div class="telemetry-footer">
+    <strong>Observation:</strong> Power users (0.1% of population) engage in concerted bursts, accounting for 26% of all traffic and 36% of toxic conversations.
+  </div>
+</div>
+</a>
+
+<style>
+  .telemetry-panel-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform var(--transition-default), box-shadow var(--transition-default);
+  }
+
+  .telemetry-panel-link:hover {
+    transform: translate(-2px, -2px);
+  }
+
+  .telemetry-panel-link:hover .telemetry-panel {
+    box-shadow: 14px 14px 0px rgba(26, 26, 26, 0.08);
+  }
+
+  .telemetry-panel {
+    background: var(--white);
+    border: 1px solid var(--ink);
+    padding: 1.5rem;
+    box-shadow: 12px 12px 0px rgba(26, 26, 26, 0.05);
+    position: relative;
+    max-width: 480px;
+  }
+
+  .telemetry-annotation {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 2px 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .telemetry-header {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--faded);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.5px;
+  }
+
+  .sparklines-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .spark-row {
+    display: flex;
+    align-items: center;
+    height: 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    position: relative;
+  }
+
+  .spark-row:last-child {
+    border-bottom: none;
+  }
+
+  .spark-label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--faded);
+    width: 52px;
+    text-align: right;
+    padding-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .spark-line {
+    flex-grow: 1;
+    height: 100%;
+    position: relative;
+    background: rgba(0, 0, 0, 0.01);
+  }
+
+  .spark-burst {
+    position: absolute;
+    bottom: 0;
+    background: var(--gold);
+    opacity: 0.7;
+    border-radius: 1px 1px 0 0;
+  }
+
+  .spark-row:hover .spark-burst {
+    opacity: 0.9;
+  }
+
+  .spark-row:hover .spark-label {
+    color: var(--ink);
+  }
+
+  .axis-labels {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 52px;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--faded);
+  }
+
+  .telemetry-footer {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .telemetry-footer strong {
+    font-weight: 600;
+  }
+
+  @media (max-width: 767px) {
+    .telemetry-panel {
+      max-width: 100%;
+    }
+  }
+</style>
+

@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
+import Logo from '../components/global/Logo.astro';
+---
+
+<BaseLayout title="Page Not Found">
+  <Nav slot="nav" />
+  
+  <div class="error-page">
+    <div class="error-content">
+      <div class="error-logo">
+        <Logo size={80} />
+      </div>
+      
+      <div class="error-code">404</div>
+      
+      <h1 class="error-title">Observation Not Found</h1>
+      
+      <p class="error-message">
+        The cognitive coordinate you requested does not exist in our records.
+        Perhaps it has been archived, or perhaps it was never observed.
+      </p>
+      
+      <div class="error-actions">
+        <a href="/" class="error-btn error-btn-primary">Return to Observatory</a>
+        <a href="/dispatches" class="error-btn error-btn-secondary">Browse Dispatches</a>
+      </div>
+      
+      <div class="error-annotation">
+        <span class="error-annotation-label">Field Note:</span>
+        Not all paths lead to data. Some lead to questions.
+      </div>
+    </div>
+  </div>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .error-page {
+    min-height: calc(100vh - 64px - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+  }
+
+  .error-content {
+    max-width: 520px;
+  }
+
+  .error-logo {
+    margin-bottom: var(--space-lg);
+    display: flex;
+    justify-content: center;
+  }
+
+  .error-code {
+    font-family: var(--font-mono);
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 400;
+    color: var(--faded-light);
+    line-height: 1;
+    margin-bottom: var(--space-md);
+  }
+
+  .error-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: var(--space-md);
+  }
+
+  .error-message {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    color: var(--faded);
+    line-height: 1.7;
+    margin-bottom: var(--space-xl);
+  }
+
+  .error-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-xl);
+  }
+
+  .error-btn {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.875rem 1.75rem;
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    transition: all var(--transition-default);
+  }
+
+  .error-btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .error-btn-primary:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .error-btn-secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .error-btn-secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .error-annotation {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--faded);
+    padding: var(--space-md);
+    background: var(--white);
+    border: 1px solid var(--faded-light);
+    font-style: italic;
+  }
+
+  .error-annotation-label {
+    color: var(--gold);
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: var(--text-xs);
+    letter-spacing: 0.5px;
+  }
+</style>
+

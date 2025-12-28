@@ -1,9 +1,9 @@
 # Phronos Card System
 
-**Version:** 1.1.0  
-**Date:** 2025-12-28  
+**Version:** 1.2.0  
+**Date:** 2025-12-27  
 **Status:** Active  
-**Alignment:** BRAND.yaml v1.1.1, ARCHITECTURE.md v1.1.2
+**Alignment:** BRAND.yaml v1.3.0, ARCHITECTURE.md v1.3.0
 
 ---
 
@@ -120,6 +120,8 @@ The status text and dot are grouped together in the upper right corner of the ca
     /* background: rgba(255, 255, 255, 0.5);  Disabled */
     border: 1px solid #1A1A1A;
     padding: 1.5rem;
+    text-decoration: none;  /* Prevent underlines when card is <a> */
+    color: inherit;         /* Inherit color from context */
 }
 
 .card-header {
@@ -452,7 +454,8 @@ import Card from '../components/Card.astro';
 ## Accessibility
 
 - Cards use semantic HTML (`<h3>` for titles)
-- Clickable cards should be wrapped in `<a>` tags in production (with `text-decoration: none; color: inherit;`)
+- Clickable cards should be wrapped in `<a>` tags in production
+- When cards are rendered as `<a>` elements, apply `text-decoration: none` and `color: inherit` to prevent default link styling from affecting card content
 - Status dots have sufficient color contrast
 - Disabled cards are visually distinct (semi-transparent background, muted text)
 - Focus states should match hover states for keyboard navigation
@@ -463,5 +466,6 @@ import Card from '../components/Card.astro';
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2025-12-27 | Added card-as-link styling (text-decoration: none, color: inherit). Updated accessibility section. Per RECONCILIATION-PLAN.md |
 | 1.1.0 | 2025-12-28 | Moved status text + dot to header as grouped element; footer now version only |
 | 1.0.0 | 2025-12-28 | Initial specification |

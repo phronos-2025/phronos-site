@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  id?: string;
+}
+
+const { src, alt, caption, id } = Astro.props;
+---
+
+<figure class="figure" id={id}>
+  <div class="figure-container">
+    <img src={src} alt={alt} loading="lazy" />
+  </div>
+  {caption && <figcaption class="figure-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin: var(--space-xl) 0;
+    scroll-margin-top: 100px; /* Account for sticky nav + some breathing room */
+  }
+
+  .figure-container {
+    background: var(--white);
+    border: 1px solid var(--ink);
+    box-shadow: 10px 10px 0px rgba(26, 26, 26, 0.05);
+    overflow: hidden;
+  }
+
+  .figure-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .figure-caption {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--faded);
+    margin-top: var(--space-sm);
+    padding-left: var(--space-sm);
+    border-left: 2px solid var(--gold);
+  }
+</style>
+

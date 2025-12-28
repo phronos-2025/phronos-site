@@ -1,0 +1,143 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
+import SectionHeader from '../components/global/SectionHeader.astro';
+import Card from '../components/cards/Card.astro';
+import Hero from '../components/home/Hero.astro';
+import AboutSection from '../components/home/AboutSection.astro';
+import SubscribeSection from '../components/home/SubscribeSection.astro';
+
+// Fetch content collections
+const dispatches = await getCollection('dispatches', ({ data }) => 
+  data.status !== 'archived'
+);
+const sortedDispatches = dispatches.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Placeholder data for coming soon sections
+const libraryItems = [
+  { id: 'LIB-001', title: 'Cognitive Effects of LLM Interaction', description: 'A synthesis of peer-reviewed literature on how conversational AI affects human reasoning and decision-making.', status: 'researching' as const },
+];
+
+const methodItems = [
+  { id: 'MTH-001', title: 'Observational Chat Analysis', description: 'Analyzing real-world human-AI chats. Measures effects of AI protest on human responses.', status: 'researching' as const },
+];
+
+const instrumentItems = [
+  { id: 'INS-001', title: 'Semantic Associations', description: 'Maps how your mind connects ideas through word association chains.', status: 'calibrating' as const },
+  { id: 'INS-002', title: 'Reasoning Trace', description: 'Observes your problem-solving approach in real-time.', status: 'planned' as const },
+];
+---
+
+<BaseLayout title="Observatory for Human Cognition">
+  <Nav slot="nav" />
+  
+  <Hero />
+
+  <!-- Dispatches Section -->
+  <section class="section" id="dispatches">
+    <div class="container">
+      <SectionHeader id="01" title="Dispatches from the Observatory" />
+      <div class="card-grid">
+        {sortedDispatches.length > 0 ? (
+          sortedDispatches.map((dispatch) => (
+            <Card
+              id={dispatch.data.id}
+              title={dispatch.data.title}
+              description={dispatch.data.subtitle || dispatch.body.slice(0, 150) + '...'}
+              status={dispatch.data.status}
+              version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
+              href={`/dispatches/${dispatch.slug}`}
+            />
+          ))
+        ) : (
+          <p class="empty-state">First dispatch coming soon.</p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Library Section -->
+  <section class="section" id="library">
+    <div class="container">
+      <SectionHeader id="02" title="The Library" />
+      <div class="card-grid">
+        {libraryItems.map((item) => (
+          <Card
+            id={item.id}
+            title={item.title}
+            description={item.description}
+            status={item.status}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Methods Section -->
+  <section class="section" id="methods">
+    <div class="container">
+      <SectionHeader id="03" title="Methods" />
+      <div class="card-grid">
+        {methodItems.map((item) => (
+          <Card
+            id={item.id}
+            title={item.title}
+            description={item.description}
+            status={item.status}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Instruments Section (Dark Mode) -->
+  <section class="section instruments-section" id="instruments">
+    <div class="container">
+      <SectionHeader id="04" title="Instruments" dark />
+      <div class="card-grid">
+        {instrumentItems.map((item) => (
+          <Card
+            id={item.id}
+            title={item.title}
+            description={item.description}
+            status={item.status}
+            mode="dark"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="section" id="about">
+    <div class="container">
+      <SectionHeader id="05" title="About" />
+    </div>
+    <AboutSection />
+  </section>
+
+  <!-- Subscribe Section -->
+  <section class="section" id="subscribe-section">
+    <div class="container">
+      <SectionHeader id="06" title="Subscribe" />
+    </div>
+    <SubscribeSection />
+  </section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .empty-state {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--faded);
+    text-align: center;
+    padding: var(--space-xl);
+  }
+</style>

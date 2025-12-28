@@ -1,7 +1,7 @@
 # Dispatch Page Specification
 
-**Version:** 1.1.0  
-**Date:** 2025-12-27  
+**Version:** 1.0.0  
+**Date:** 2025-12-28  
 **Status:** Ready for implementation  
 **Reference Mockup:** `phronos-dispatch-v1.html`
 
@@ -78,13 +78,12 @@ Row 2:  v1.0                            December 15, 2025
 ┌──────────────────────────────────────┐
 │ [VP]  Vishal Patel                   │
 │       MD · PhD (Genetics)            │
-├──────────────────────────────────────┤  ← Border via ::after pseudo-element
+└──────────────────────────────────────┘
 ```
 
 - Avatar: 48px circle, gold-dim background, gold border, initials in mono
 - Name: serif, 1rem, medium weight
 - Credentials: serif, 0.85rem, italic, faded
-- Bottom border: Via `::after` pseudo-element with `left: 5%; right: 5%` to match content padding width
 
 ---
 
@@ -96,12 +95,11 @@ Row 2:  v1.0                            December 15, 2025
 
 | Element | Font | Size | Weight | Notes |
 |---------|------|------|--------|-------|
-| Body text | Lora | 1.05rem | 400 | Line-height: 1.8 |
-| H2 | Cormorant Garamond | 1.6rem | 500 | First H2 has NO top border |
-| H3 | Cormorant Garamond | 1.35rem | 500 | Italic |
+| Lead paragraph | Serif | 1.3rem | 400 | First paragraph, larger |
+| Body text | Serif | 1.1rem | 400 | Line-height: 1.85 |
+| H2 | Serif | 1.5rem | 500 | Top border, margin-top: 3rem |
+| H3 | Serif | 1.25rem | 500 | Italic |
 | Links | — | — | — | Gold, underline, turns ink on hover |
-
-**Note:** Lead paragraph styling (larger first paragraph) was removed in V1 for visual consistency. All paragraphs use the same size.
 
 ### Data Table (Cartographic Suite)
 
@@ -206,32 +204,6 @@ Light mode styling for SVG charts:
 
 .template-block-label {
     color: var(--gold);
-}
-```
-
----
-
-## Figure Component
-
-Figures support an `id` prop for anchor linking:
-
-```astro
-<Figure 
-  id="figure-4"
-  src="/images/dispatches/dsp-001/figure-4.png" 
-  alt="Description of the figure"
-  caption="Figure 4: Power User Activity Over Time"
-/>
-```
-
-### Anchor Link Behavior
-
-Figures include `scroll-margin-top: 100px` to account for the sticky navigation when jumping to anchors:
-
-```css
-.figure {
-    margin: var(--space-xl) 0;
-    scroll-margin-top: 100px;
 }
 ```
 
@@ -484,5 +456,4 @@ All Cartographic Suite styles:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.1.0 | 2025-12-27 | Updated typography (Lora 1.05rem, removed lead paragraph styling). Added author block bottom border detail. Added Figure Component section with anchor linking. Per RECONCILIATION-PLAN.md |
 | 1.0.0 | 2025-12-28 | Initial specification |

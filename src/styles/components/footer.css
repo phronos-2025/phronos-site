@@ -1,0 +1,68 @@
+/* Footer Styles */
+.footer {
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  background: transparent;
+  border-top: 1px solid var(--faded-light);
+}
+
+.footer-tagline {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--faded);
+  margin-bottom: var(--space-md);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.footer-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-link:hover {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer-separator {
+  color: var(--faded);
+}
+
+.footer-copyright {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--faded);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Dark mode footer (after instruments section) */
+.footer--dark {
+  background: var(--bg-deep);
+  border-top-color: var(--faded-light-dark);
+}
+
+.footer--dark .footer-tagline,
+.footer--dark .footer-link {
+  color: var(--text-light);
+}
+
+.footer--dark .footer-separator,
+.footer--dark .footer-copyright {
+  color: var(--faded-dark);
+}
+

@@ -1,0 +1,56 @@
+---
+interface Props {
+  dataSource?: string;
+  references?: {
+    methods?: string[];
+    library?: string[];
+    instruments?: string[];
+  };
+  topics?: string[];
+}
+
+const { dataSource, references, topics } = Astro.props;
+
+const allRefs = [
+  ...(references?.methods || []),
+  ...(references?.library || []),
+  ...(references?.instruments || [])
+].filter(Boolean);
+---
+
+<footer class="dispatch-footer">
+  <div class="dispatch-footer-grid">
+    <div class="dispatch-footer-section">
+      <span class="dispatch-footer-label">Data Source</span>
+      <span class="dispatch-footer-value">{dataSource || '—'}</span>
+    </div>
+    
+    <div class="dispatch-footer-section">
+      <span class="dispatch-footer-label">References</span>
+      <span class="dispatch-footer-value">
+        {allRefs.length > 0 ? (
+          allRefs.map((ref, i) => (
+            <>
+              <a href={`/methods/${ref.toLowerCase()}`}>{ref}</a>
+              {i < allRefs.length - 1 && ' · '}
+            </>
+          ))
+        ) : (
+          '—'
+        )}
+      </span>
+    </div>
+    
+    <div class="dispatch-footer-section">
+      <span class="dispatch-footer-label">Topics</span>
+      <span class="dispatch-footer-value">
+        {topics && topics.length > 0 ? topics.join(' · ') : '—'}
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  @import '../../styles/components/dispatch.css';
+</style>
+

@@ -1,0 +1,55 @@
+/* Phronos Design Tokens */
+:root {
+  /* === COLORS: LIGHT MODE === */
+  --paper: #F2F0E9;
+  --ink: #1A1A1A;
+  --gold: #B08D55;
+  --gold-dim: rgba(176, 141, 85, 0.12);
+  --faded: rgba(26, 26, 26, 0.5);
+  --faded-light: rgba(26, 26, 26, 0.08);
+  --white: #FFFFFF;
+  --alert: #CC5544;
+  --success: #44AA77;
+  --warning: #DDAA33;
+
+  /* === COLORS: DARK MODE (Instruments section only) === */
+  --bg-deep: #1A1A1A;
+  --text-light: #F2F0E9;
+  --faded-dark: rgba(242, 240, 233, 0.5);
+  --faded-light-dark: rgba(242, 240, 233, 0.15);
+  --card-bg: #252525;
+
+  /* === TYPOGRAPHY === */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Lora', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif; /* Legacy - use --font-display */
+  --font-mono: 'Fira Code', Consolas, Monaco, monospace;
+
+  /* === SCALE === */
+  --text-xs: 0.65rem;
+  --text-sm: 0.7rem;
+  --text-base: 0.95rem;
+  --text-md: 1rem;
+  --text-lg: 1.3rem;
+  --text-xl: 2rem;
+  --text-2xl: 2.75rem;
+  --text-hero: clamp(2.5rem, 5.5vw, 3.75rem);
+
+  /* === SPACING === */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  /* === MOTION === */
+  --transition-fast: 0.1s ease;
+  --transition-default: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* === BORDERS === */
+  --border-primary: 1px solid var(--ink);
+  --border-divider: 1px solid var(--faded-light);
+}
+

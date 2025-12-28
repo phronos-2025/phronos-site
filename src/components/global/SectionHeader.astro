@@ -1,0 +1,49 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  dark?: boolean;
+}
+
+const { id, title, dark = false } = Astro.props;
+---
+
+<div class:list={['section-header', { 'section-header--dark': dark }]}>
+  <span class="section-id">{id}</span>
+  <span class="section-title">{title}</span>
+</div>
+
+<style>
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .section-id {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* Dark mode (Instruments section) */
+  .section-header--dark {
+    border-bottom-color: rgba(242, 240, 233, 0.3);
+  }
+
+  .section-header--dark .section-title {
+    color: var(--text-light);
+  }
+</style>

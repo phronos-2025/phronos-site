@@ -1,0 +1,123 @@
+---
+import ProseLayout from '../layouts/ProseLayout.astro';
+---
+
+<ProseLayout 
+  title="About Phronos"
+  description="An observatory for human cognition in the era of artificial intelligence"
+>
+  <h2>What Phronos Is</h2>
+  <p>A think tank and a cognitive clinic in one.</p>
+  <p>
+    Phronos is an observatory for human cognition—a place of structured observation 
+    rather than instruction. We develop ways to measure how you think, and we 
+    communicate our observations to show you how your thinking compares to the 
+    machines thinking alongside you.
+  </p>
+
+  <h2>The Founder</h2>
+  <div class="founder-block">
+    <div class="founder-avatar">VP</div>
+    <div class="founder-info">
+      <p class="founder-name">Vishal Patel</p>
+      <p class="founder-credentials">MD · PhD (Genetics)</p>
+    </div>
+  </div>
+  <blockquote>
+    <p>
+      "What I think about most is how people think: how do we know what we know? 
+      How do we believe what we believe?"
+    </p>
+  </blockquote>
+
+  <h2>The Work</h2>
+  <p>
+    Phronos serves as a trusted observatory for global human cognition—delivering 
+    open-source frameworks grounded in science, instruments that reveal how we think 
+    in relation to machines, and a commons where individual insight produces 
+    collective understanding.
+  </p>
+  <p>The observatory produces four kinds of output:</p>
+  <ul>
+    <li><strong>Dispatches</strong> — Essays that report what the observatory detects</li>
+    <li><strong>Methods</strong> — Methodologies for measuring cognition, published openly</li>
+    <li><strong>Instruments</strong> — Tools for measuring cognition</li>
+    <li><strong>Data</strong> — A commons of anonymized observations</li>
+  </ul>
+
+  <h2>The Question</h2>
+  <p>
+    The defining question of this era is not <em>who am I?</em> but 
+    <em>where am I still myself?</em>
+  </p>
+  <p>
+    Our cognition is being actively reshaped by our information environment, but we 
+    lack objective, practical measures to inform our fitness. Meanwhile, a new 
+    intelligence has entered the world. It learns from us, speaks like us, and 
+    thinks alongside us.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    <a href="mailto:hello@phronos.org">hello@phronos.org</a>
+  </p>
+  <p>
+    <a href="https://github.com/phronos" target="_blank" rel="noopener">GitHub</a> · 
+    <a href="https://phronos.substack.com" target="_blank" rel="noopener">Substack</a>
+  </p>
+
+  <hr />
+
+  <p><em>p.h.r.o.n.o.s. · Phenotyping for Human Resilience, Ontological Navigation, & Open Science</em></p>
+</ProseLayout>
+
+<style>
+  .founder-block {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+    padding: var(--space-md) 0;
+    border-top: 1px solid var(--faded-light);
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  .founder-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .founder-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .founder-name {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .founder-credentials {
+    font-family: var(--font-serif);
+    font-size: var(--text-base);
+    font-style: italic;
+    color: var(--faded);
+    margin: 0;
+  }
+</style>
+

@@ -1,0 +1,76 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
+import DispatchHeader from '../components/dispatch/DispatchHeader.astro';
+import AuthorBlock from '../components/dispatch/AuthorBlock.astro';
+import DispatchFooter from '../components/dispatch/DispatchFooter.astro';
+import SubscribeCTA from '../components/dispatch/SubscribeCTA.astro';
+import '../styles/cartographic.css';
+
+interface Props {
+  frontmatter: {
+    id: string;
+    title: string;
+    subtitle?: string;
+    date: Date;
+    status: string;
+    author: string;
+    reading_time?: number;
+    version?: string;
+    data_source?: string;
+    topics?: string[];
+    references?: {
+      methods?: string[];
+      library?: string[];
+      instruments?: string[];
+    };
+  };
+}
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout 
+  title={frontmatter.title}
+  description={frontmatter.subtitle}
+>
+  <Nav slot="nav" />
+  
+  <article class="dispatch-article">
+    <DispatchHeader
+      id={frontmatter.id}
+      title={frontmatter.title}
+      subtitle={frontmatter.subtitle}
+      date={frontmatter.date}
+      readingTime={frontmatter.reading_time}
+      version={frontmatter.version}
+      status={frontmatter.status}
+    />
+
+    <div class="dispatch-body container container-narrow">
+      <AuthorBlock 
+        name={frontmatter.author} 
+      />
+      
+      <div class="dispatch-content">
+        <slot />
+      </div>
+    </div>
+
+    <DispatchFooter
+      dataSource={frontmatter.data_source}
+      references={frontmatter.references}
+      topics={frontmatter.topics}
+    />
+    
+    <SubscribeCTA />
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style is:global>
+  @import '../styles/cartographic.css';
+</style>
+

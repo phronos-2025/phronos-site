@@ -1,0 +1,93 @@
+---
+import Logo from './Logo.astro';
+---
+
+<nav class="nav">
+  <a href="/" class="nav-logo-group">
+    <Logo size={31} />
+    <span class="nav-wordmark">Phronos</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="/dispatches" class="nav-link">Dispatches</a></li>
+    <li><span class="nav-link disabled">Library</span></li>
+    <li><span class="nav-link disabled">Methods</span></li>
+    <li><span class="nav-link disabled">Instruments</span></li>
+  </ul>
+
+  <a href="https://phronos.substack.com/subscribe" class="nav-subscribe nav-subscribe-desktop">
+    Subscribe
+  </a>
+
+  <button class="nav-hamburger" aria-label="Open menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu">
+  <div class="nav-mobile-header">
+    <a href="/" class="nav-logo-group">
+      <Logo size={31} />
+      <span class="nav-wordmark">Phronos</span>
+    </a>
+    <button class="nav-mobile-close" aria-label="Close menu"></button>
+  </div>
+
+  <div class="nav-mobile-links">
+    <a href="/dispatches" class="nav-mobile-link">Dispatches</a>
+    <span class="nav-mobile-link disabled">
+      Library
+      <span class="soon-label">(soon)</span>
+    </span>
+    <span class="nav-mobile-link disabled">
+      Methods
+      <span class="soon-label">(soon)</span>
+    </span>
+    <span class="nav-mobile-link disabled">
+      Instruments
+      <span class="soon-label">(soon)</span>
+    </span>
+  </div>
+
+  <a href="https://phronos.substack.com/subscribe" class="nav-mobile-subscribe">
+    Subscribe
+  </a>
+</div>
+
+<script>
+  function initNav() {
+    const hamburger = document.querySelector('.nav-hamburger');
+    const mobileMenu = document.querySelector('.nav-mobile-menu');
+    const closeBtn = document.querySelector('.nav-mobile-close');
+
+    hamburger?.addEventListener('click', () => {
+      mobileMenu?.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeBtn?.addEventListener('click', () => {
+      mobileMenu?.classList.remove('is-open');
+      document.body.style.overflow = '';
+    });
+
+    // Close menu when clicking a link
+    const mobileLinks = document.querySelectorAll('.nav-mobile-link:not(.disabled)');
+    mobileLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileMenu?.classList.remove('is-open');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  initNav();
+  document.addEventListener('astro:after-swap', initNav);
+</script>
+
+<style>
+  @import '../../styles/components/nav.css';
+</style>
+

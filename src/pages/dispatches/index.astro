@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/global/Nav.astro';
+import Footer from '../../components/global/Footer.astro';
+import SectionHeader from '../../components/global/SectionHeader.astro';
+import Card from '../../components/cards/Card.astro';
+
+const dispatches = await getCollection('dispatches', ({ data }) => 
+  data.status !== 'archived'
+);
+
+const sortedDispatches = dispatches.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout 
+  title="Dispatches"
+  description="Essays from the Phronos Observatory"
+>
+  <Nav slot="nav" />
+
+  <div class="dispatches-page">
+    <header class="dispatches-hero">
+      <div class="container">
+        <h1 class="dispatches-title">Dispatches</h1>
+        <p class="dispatches-intro">
+          Essays reporting what we observe. Each dispatch presents findings 
+          from our instruments, grounded in data and open to scrutiny.
+        </p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="card-grid">
+          {sortedDispatches.length > 0 ? (
+            sortedDispatches.map((dispatch) => (
+              <Card
+                id={dispatch.data.id}
+                title={dispatch.data.title}
+                description={dispatch.data.subtitle || ''}
+                status={dispatch.data.status}
+                version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
+                href={`/dispatches/${dispatch.slug}`}
+              />
+            ))
+          ) : (
+            <p class="empty-state">First dispatch coming soon.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .dispatches-hero {
+    padding: var(--space-2xl) 0;
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  .dispatches-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: var(--space-md);
+  }
+
+  .dispatches-intro {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    color: var(--faded);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .empty-state {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--faded);
+    text-align: center;
+    padding: var(--space-xl);
+  }
+</style>
+

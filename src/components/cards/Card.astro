@@ -1,0 +1,42 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  status: 'published' | 'live' | 'researching' | 'calibrating' | 'planned';
+  version?: string;
+  href?: string;
+  mode?: 'light' | 'dark';
+}
+
+const { id, title, description, status, version, href, mode = 'light' } = Astro.props;
+const isClickable = status === 'published' || status === 'live';
+const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+const Tag = isClickable && href ? 'a' : 'div';
+---
+
+<Tag
+  class:list={[
+    'card',
+    { 'clickable': isClickable },
+    { 'disabled': !isClickable },
+    { 'card--dark': mode === 'dark' }
+  ]}
+  href={isClickable && href ? href : undefined}
+>
+  <div class="card-header">
+    <span class="card-id">{id}</span>
+    <div class="card-status-group">
+      <span class="card-status-text">{statusLabel}</span>
+      <span class:list={['status-dot', status]}></span>
+    </div>
+  </div>
+  <h3 class="card-title">{title}</h3>
+  <p class="card-body">{description}</p>
+  <div class="card-footer">{version || '—'}</div>
+</Tag>
+
+<style>
+  @import '../../styles/components/cards.css';
+</style>
+

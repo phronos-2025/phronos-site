@@ -1,0 +1,112 @@
+---
+interface Props {
+  caption?: string;
+  tableNumber?: string;
+  footer?: string;
+}
+
+const { caption, tableNumber, footer } = Astro.props;
+---
+
+<div class="phronos-table-container">
+  {(tableNumber || caption) && (
+    <div class="phronos-table-header">
+      {tableNumber && <span>{tableNumber}</span>}
+      {caption && <span>{caption}</span>}
+    </div>
+  )}
+  
+  <div class="phronos-table-wrapper">
+    <slot />
+  </div>
+  
+  {footer && (
+    <div class="phronos-table-footer" set:html={footer} />
+  )}
+</div>
+
+<style>
+  .phronos-table-container {
+    background: var(--paper);
+    padding: 24px;
+    border: 1px solid var(--ink);
+    box-shadow: 12px 12px 0px rgba(26, 26, 26, 0.05);
+    margin: 20px 0;
+  }
+
+  .phronos-table-header {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(26, 26, 26, 0.5);
+    border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Target the markdown-generated table */
+  .phronos-table-wrapper :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .phronos-table-wrapper :global(th) {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    padding: 12px 8px;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+  }
+
+  .phronos-table-wrapper :global(td) {
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .phronos-table-wrapper :global(tr:hover) {
+    background: rgba(176, 141, 85, 0.05);
+  }
+
+  /* Column styles by position (for markdown tables) */
+  .phronos-table-wrapper :global(td:first-child) {
+    font-weight: 500;
+  }
+
+  .phronos-table-wrapper :global(td:nth-child(2)),
+  .phronos-table-wrapper :global(th:nth-child(2)) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .phronos-table-wrapper :global(td:nth-child(3)),
+  .phronos-table-wrapper :global(th:nth-child(3)) {
+    text-align: right;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .phronos-table-wrapper :global(td:nth-child(4)) {
+    font-size: 12px;
+    color: rgba(26, 26, 26, 0.6);
+    font-style: italic;
+  }
+
+  .phronos-table-footer {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(26, 26, 26, 0.5);
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(26, 26, 26, 0.1);
+  }
+</style>

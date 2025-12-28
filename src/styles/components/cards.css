@@ -1,0 +1,162 @@
+/* Card Styles */
+.card {
+  background: var(--white);
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-default), box-shadow var(--transition-default);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card.clickable {
+  cursor: pointer;
+}
+
+.card.clickable:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px rgba(26, 26, 26, 0.1);
+}
+
+.card.disabled {
+  background: rgba(255, 255, 255, 0.5);
+  cursor: default;
+}
+
+.card.disabled .card-title,
+.card.disabled .card-body {
+  color: var(--faded);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.card-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--gold);
+}
+
+.card-status-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.card-status-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--faded);
+  transition: color var(--transition-default);
+}
+
+.card.clickable:hover .card-status-text {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Card Content */
+.card-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+
+.card-body {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--ink);
+  flex: 1;
+}
+
+/* Card Footer */
+.card-footer {
+  border-top: 1px solid var(--faded-light);
+  padding-top: 0.75rem;
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--faded);
+}
+
+/* Status Dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot.published,
+.status-dot.live {
+  background: var(--success);
+  animation: pulse 2s infinite;
+}
+
+.status-dot.researching,
+.status-dot.calibrating {
+  background: var(--gold);
+  animation: pulse 3s infinite;
+}
+
+.status-dot.planned {
+  background: var(--faded);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Dark Mode Cards (Instruments) */
+.card--dark {
+  background: var(--card-bg);
+  border-color: var(--faded-light-dark);
+}
+
+.card--dark .card-title {
+  color: var(--text-light);
+}
+
+.card--dark .card-body {
+  color: rgba(242, 240, 233, 0.7);
+}
+
+.card--dark .card-status-text,
+.card--dark .card-footer {
+  color: var(--faded-dark);
+}
+
+.card--dark.disabled {
+  background: rgba(37, 37, 37, 0.7);
+}
+
+.card--dark.disabled .card-title,
+.card--dark.disabled .card-body {
+  color: var(--faded-dark);
+}
+
+.card--dark.clickable:hover {
+  box-shadow: 5px 5px 0px rgba(176, 141, 85, 0.3);
+}
+
+.card--dark .status-dot.planned {
+  background: rgba(242, 240, 233, 0.3);
+}
+

@@ -1,0 +1,220 @@
+/* Dispatch Page Styles */
+
+/* Meta Bar */
+.dispatch-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--faded);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--faded-light);
+}
+
+.dispatch-meta-row {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.dispatch-meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.dispatch-meta-label {
+  color: var(--gold);
+}
+
+/* Header - no bottom margin, author block follows directly */
+.dispatch-header {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 4rem 5% 3rem;
+}
+
+.dispatch-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: var(--space-sm);
+}
+
+.dispatch-subtitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-style: italic;
+  color: var(--faded);
+  line-height: 1.4;
+}
+
+/* Author Block - matches mockup: only border-bottom, no border-top */
+.author-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 5%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--faded-light);
+}
+
+.author-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.author-name {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.author-credentials {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--faded);
+}
+
+/* Dispatch Footer */
+.dispatch-footer {
+  max-width: 800px;
+  margin: var(--space-2xl) auto 0;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--faded-light);
+}
+
+.dispatch-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.dispatch-footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.dispatch-footer-section:nth-child(2) {
+  text-align: center;
+}
+
+.dispatch-footer-section:nth-child(3) {
+  text-align: right;
+}
+
+.dispatch-footer-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--faded);
+}
+
+.dispatch-footer-value {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink);
+}
+
+.dispatch-footer-value a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.dispatch-footer-value a:hover {
+  color: var(--gold);
+}
+
+/* Subscribe CTA */
+.dispatch-subscribe {
+  max-width: 800px;
+  margin: var(--space-2xl) auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: center;
+  padding: var(--space-xl);
+  background: var(--white);
+  border: 1px solid var(--ink);
+  box-shadow: 8px 8px 0px rgba(26, 26, 26, 0.05);
+}
+
+.dispatch-subscribe-content h3 {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: var(--space-sm);
+}
+
+.dispatch-subscribe-content p {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  color: var(--faded);
+  line-height: 1.5;
+}
+
+/* Related Section */
+.dispatch-related {
+  max-width: 1200px;
+  margin: var(--space-2xl) auto;
+  padding: 0 var(--space-lg);
+}
+
+.dispatch-related h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: var(--space-lg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dispatch-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .dispatch-footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .dispatch-footer-section,
+  .dispatch-footer-section:nth-child(2),
+  .dispatch-footer-section:nth-child(3) {
+    text-align: left;
+  }
+
+  .dispatch-subscribe {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,92 @@
+/* Base Styles */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-serif);
+  font-size: 18px; /* Match mockup - larger base for better readability */
+  font-weight: 400; /* Explicit weight to prevent defaulting to 300 */
+  line-height: 1.6;
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: var(--text-2xl);
+}
+
+h2 {
+  font-size: var(--text-xl);
+}
+
+h3 {
+  font-size: var(--text-lg);
+}
+
+p {
+  font-weight: 400; /* Explicit weight to prevent defaulting to 300 */
+  line-height: 1.7;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-default);
+}
+
+a:hover {
+  color: var(--ink);
+}
+
+/* Focus states */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Selection */
+::selection {
+  background: var(--gold-dim);
+  color: var(--ink);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--faded);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink);
+}
+

@@ -1,0 +1,164 @@
+---
+---
+
+<div class="about-grid">
+  <div class="about-founder">
+    <div class="founder-label">Founder</div>
+    <div class="founder-name">
+      Vishal Patel
+      <a href="https://www.linkedin.com/in/vishal-n-patel-md-phd/" target="_blank" rel="noopener" class="linkedin-link" aria-label="LinkedIn Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        </svg>
+      </a>
+    </div>
+    <div class="founder-credentials">MD · PhD (Genetics)</div>
+    <blockquote class="founder-quote">
+      "I've always felt a calling to serve—that's what drew me to medicine—which is why I feel it's not sufficient to merely ponder our epistemology when there is a very real and present threat actively reshaping it."
+    </blockquote>
+  </div>
+
+  <div class="about-content">
+    <h3>A think tank and a cognitive clinic in one.</h3>
+    <p>
+      Phronos builds instruments that observe cognition in action—measuring how you 
+      actually reason, not just what you report believing. The findings are yours to interpret.
+    </p>
+    <p>
+      The methodologies are open. The data becomes a commons. The dispatches translate findings 
+      into something legible.
+    </p>
+    <p>
+      The name comes from <em>phronesis</em>—practical wisdom, the kind that cannot be taught 
+      but must be cultivated through observation and reflection.
+    </p>
+    <a href="/constitution" class="btn btn-secondary">Read the Constitution</a>
+  </div>
+</div>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 4rem;
+    padding: 0 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-founder {
+    border-right: 1px solid var(--faded-light);
+    padding-right: 2rem;
+  }
+
+  .founder-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .founder-name {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .linkedin-link {
+    color: var(--faded);
+    transition: color var(--transition-default);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .linkedin-link:hover {
+    color: #0077b5;
+  }
+
+  .founder-credentials {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--faded);
+    margin-bottom: 1.5rem;
+  }
+
+  .founder-quote {
+    font-family: var(--font-serif);
+    font-size: var(--text-base);
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.65;
+    padding-left: 1rem;
+    border-left: 2px solid var(--gold);
+    margin: 0;
+  }
+
+  .about-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+  }
+
+  .about-content p {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    max-width: 600px;
+  }
+
+  .about-content em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.875rem 1.75rem;
+    border: 1px solid var(--ink);
+    text-decoration: none;
+    transition: all var(--transition-default);
+    cursor: pointer;
+    margin-top: 1.5rem;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .btn-secondary:hover {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  @media (max-width: 900px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .about-founder {
+      border-right: none;
+      border-bottom: 1px solid var(--faded-light);
+      padding-right: 0;
+      padding-bottom: 2rem;
+    }
+  }
+</style>
