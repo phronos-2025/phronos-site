@@ -1,0 +1,752 @@
+# Phronos Brand Guidelines
+# Voice, tone, visual identity, and positioning
+# Version: 1.1.1 | Date: 2025-12-27 | Status: active
+
+_meta:
+  version: "1.1.1"
+  date: "2025-12-27"
+  codename: "The Field Journal"
+  author: "Vishal Patel"
+  status: "active"
+  change_summary: "Added 'The Library' section. Restored Instruments to dark mode. Finalized ID naming conventions (TYPE-###)."
+  supersedes: "1.1.0"
+
+# =============================================================================
+# POSITIONING
+# What Phronos is
+# =============================================================================
+
+positioning:
+
+  identity:
+    one_breath: "A think tank and a cognitive clinic in one"
+    expanded: "An observatory for human cognition in the era of artificial intelligence"
+    formal: "Phronos serves as a trusted observatory for global human cognition—delivering open-source frameworks grounded in science, instruments that reveal how we think in relation to machines, and a commons where individual insight produces collective understanding."
+
+  core_statements:
+    - "An observatory for human cognition"
+    - "Cognitive infrastructure for human resilience"
+    - "Where humans measure what matters"
+    - "The instruments to observe your own cognition"
+
+  tagline:
+    preferred: "An observatory for human cognition"
+    alternates:
+      - "Where humans measure what matters"
+      - "Know thyself. Empirically."
+      - "Cognitive infrastructure for human resilience"
+    constitution_line: "To know thyself was once a temple inscription. Now it becomes a dataset—empirical, falsifiable, yours."
+
+  backronym:
+    full: "Phenotyping for Human Resilience, Ontological Navigation, & Open Science"
+    display: "p.h.r.o.n.o.s."
+    components:
+      P: "Phenotyping"
+      H: "Human"
+      R: "Resilience"
+      O: "Ontological"
+      N: "Navigation"
+      O: "Open"
+      S: "Science"
+
+  the_question:
+    text: "The defining question of this era is not 'who am I?' but 'where am I still myself?'"
+    source: "Constitution, Axiom II"
+
+# =============================================================================
+# VOICE
+# How Phronos sounds
+# =============================================================================
+
+voice:
+
+  primary_register: "intellectual"
+  
+  tone_attributes:
+    - "Authoritative but humble"
+    - "Urgent but not alarmist"
+    - "Precise but not cold"
+    - "Principled but not preachy"
+    - "Wry but not cute"
+
+  dominant_influence:
+    name: "Ralph Waldo Emerson"
+    quality: "Self-reliance, principled challenge, philosophical seriousness"
+    example: "The instrument reveals. What you do with the revelation is yours."
+
+  supporting_influences:
+    calvin_and_hobbes:
+      quality: "Wry wit, observational humor"
+      use_when: "Lightening dense content without losing substance"
+    vivekananda:
+      quality: "Austere introspection"
+      use_when: "Core philosophical statements, Constitution"
+    dostoyevsky:
+      quality: "Dark irony, psychological depth"
+      use_when: "Discussing human nature, cognitive vulnerabilities"
+    chabon:
+      quality: "Historical depth, social striving"
+      use_when: "Contextualizing the work in broader human story"
+
+  sentence_patterns:
+    preferred:
+      - "Declarative statements of fact"
+      - "Questions that challenge assumptions"
+      - "Observations without prescriptions"
+      - "Conditional statements acknowledging uncertainty"
+    
+    avoid:
+      - "Imperative commands (Do this!)"
+      - "Exclamatory enthusiasm"
+      - "Second-person promises (You will...)"
+      - "First-person plural presumption (We believe you...)"
+
+  forbidden_phrases:
+    marketing_speak:
+      - "Unlock"
+      - "Transform"
+      - "Journey"
+      - "Best self"
+      - "Level up"
+      - "Game-changer"
+      - "Cutting-edge"
+      - "Revolutionary"
+    false_certainty:
+      - "Will definitely"
+      - "Guaranteed to"
+      - "Always works"
+      - "The answer is"
+    sycophancy:
+      - "You're amazing"
+      - "Great job!"
+      - "You've got this"
+      - "Believe in yourself"
+
+# =============================================================================
+# TONE BY CONTEXT
+# How tone shifts across content types and touchpoints
+# =============================================================================
+
+tone_by_context:
+
+  dispatches:
+    register: "intellectual-accessible"
+    model: "The Atlantic meets Scientific American"
+    attributes:
+      - "Evidence-grounded but readable"
+      - "Personal voice (founder as author)"
+      - "Uncertainty-acknowledging"
+      - "Connects data to meaning"
+    example: "The individuals engaging in chats we label as 'toxic' may not be inherently toxic people. There are measurable features in their communication that point to a disordered pattern of thoughts—a disorder of cognition, rather than of morality."
+
+  methods:
+    register: "academic-precise"
+    model: "Journal methods section, but readable"
+    attributes:
+      - "Technical precision"
+      - "Assumptions stated explicitly"
+      - "Limitations acknowledged"
+      - "Reproducibility prioritized"
+    example: "We operationalize 'surprise' using surprisal—the negative log-probability of a transition—computed against reference distributions."
+
+  library:
+    register: "academic-comprehensive"
+    model: "Annual Review / Stanford Encyclopedia of Philosophy"
+    attributes:
+      - "Exhaustive referencing"
+      - "Neutral synthesis"
+      - "High density"
+      - "No narrative fluff"
+    example: "A synthesis of 42 papers (2015-2025) indicates a 14% rise in self-reported dissociation among heavy LLM users, though causal links remain established only in n<50 cohorts."
+
+  instruments:
+    register: "clinical-warm"
+    model: "Skilled clinician, not chatbot"
+    attributes:
+      - "Clear instructions"
+      - "No false encouragement"
+      - "Respects participant intelligence"
+    example: "This assessment takes approximately 5 minutes. There are no correct answers—only your responses."
+
+  landing_pages:
+    register: "intellectual-direct"
+    model: "The Economist, not Forbes"
+    attributes:
+      - "Substance over sizzle"
+      - "Respect over flattery"
+      - "Clarity over cleverness"
+    example: "Phronos builds open instruments for cognitive phenotyping: establishing baselines, tracking changes over time, and understanding human reasoning in the age of AI."
+
+  results_delivery:
+    register: "observational"
+    model: "Scientific report, not horoscope"
+    attributes:
+      - "Data-forward"
+      - "Interpretation-light"
+      - "Agency-preserving"
+    example: "Your semantic association pattern shows higher surprisal relative to population norms (μ + 1.2σ). This indicates deviation from typical associative paths—not better or worse, but different."
+
+  error_messages:
+    register: "direct-helpful"
+    model: "Competent colleague"
+    attributes:
+      - "State what happened"
+      - "State what to do"
+      - "No apology theater"
+    example: "Session data could not be saved. Your responses are stored locally. Retry when connection is restored."
+
+  crisis_response:
+    register: "calm-direct"
+    model: "Trained professional"
+    attributes:
+      - "No false reassurance"
+      - "Clear next steps"
+      - "Appropriate escalation"
+    example: "Some of your responses suggest you may be experiencing distress beyond what this instrument is designed to assess. Speaking with a mental health professional is recommended."
+
+# =============================================================================
+# VISUAL IDENTITY
+# Colors, typography, spacing, motion
+# =============================================================================
+
+visual:
+
+  # ---------------------------------------------------------------------------
+  # MODE PHILOSOPHY
+  # Light mode for narrative, dark mode for telemetry
+  # ---------------------------------------------------------------------------
+  mode_philosophy:
+    light_mode:
+      purpose: "Narrative, reading, reflection, static evidence"
+      used_for:
+        - "Landing pages"
+        - "Dispatches (essay body & embedded charts)" # MOVED HERE
+        - "Methods documentation"
+        - "The Library (evidence base)"
+        - "About pages"
+        - "Constitution"
+      feel: "Observatory library, cartographic, scholarly"
+    
+    dark_mode:
+      purpose: "Live telemetry, active tooling, isolation"
+      used_for:
+        - "Instrument interfaces (The Lab)"
+        - "Real-time assessment screens"
+        - "High-contrast data tables"
+      feel: "Control room, sensor array, scientific instrument"
+
+  # ---------------------------------------------------------------------------
+  # LIGHT MODE (Observatory, Narrative)
+  # ---------------------------------------------------------------------------
+  colors_light:
+    paper: "#F2F0E9"                      # Primary background
+    ink: "#1A1A1A"                        # Primary text
+    gold: "#B08D55"                       # Accent, highlights, active states
+    gold_dim: "rgba(176, 141, 85, 0.12)"  # Gold background tint (hover states)
+    faded: "rgba(26, 26, 26, 0.5)"        # Secondary text, muted elements
+    faded_light: "rgba(26, 26, 26, 0.08)" # Borders, dividers
+    white: "#FFFFFF"                       # Card backgrounds, nav background
+    
+    # Semantic colors
+    alert: "#CC5544"                       # Critical, errors
+    success: "#44AA77"                     # Positive states
+    warning: "#DDAA33"                     # Caution
+
+  # ---------------------------------------------------------------------------
+  # DARK MODE (Telemetry, Instruments)
+  # ---------------------------------------------------------------------------
+  colors_dark:
+    bg_deep: "#1A1A1A"                     # Primary background
+    text_light: "#F2F0E9"                  # Primary text
+    gold: "#B08D55"                        # Accent (unchanged)
+    faded: "rgba(242, 240, 233, 0.5)"      # Secondary text
+    faded_light: "rgba(242, 240, 233, 0.15)" # Borders, grid lines
+    card_bg: "#252525"                     # Elevated surfaces
+    
+    # Semantic colors (same hues, adjusted for dark)
+    active: "#44AA77"                      # Live indicators
+    alert: "#CC5544"
+    warning: "#DDAA33"
+
+  # ---------------------------------------------------------------------------
+  # TYPOGRAPHY
+  # ---------------------------------------------------------------------------
+  typography:
+    families:
+      serif: ["Cormorant Garamond", "Georgia", "serif"]
+      mono: ["Fira Code", "Consolas", "Monaco", "monospace"]
+      sans: ["Inter", "system-ui", "sans-serif"]  # Fallback only
+    
+    usage:
+      headers: "serif"
+      body: "serif"
+      data: "mono"
+      labels: "mono"
+      navigation: "mono"
+      buttons: "mono"
+      code_blocks: "mono"
+      chart_labels: "mono"
+    
+    scale:
+      xs: "0.65rem"     # 10.4px - card footers, micro labels
+      sm: "0.7rem"      # 11.2px - nav links, status badges
+      base: "0.95rem"   # 15.2px - card descriptions
+      md: "1rem"        # 16px - body text
+      lg: "1.4rem"      # 22.4px - card titles
+      xl: "2rem"        # 32px - section titles
+      2xl: "2.75rem"    # 44px - page titles
+      3xl: "clamp(2rem, 4.5vw, 2.75rem)"  # Responsive hero
+
+    weights:
+      light: 300        # Hero headlines
+      regular: 400      # Body, card titles
+      medium: 500       # Emphasis
+      semibold: 600     # Some labels
+      bold: 700         # Navigation, buttons
+
+    letter_spacing:
+      tight: "-0.02em"  # Hero headlines
+      normal: "0"
+      wide: "1px"       # Navigation, labels
+      wider: "2px"      # Logo, brand group
+
+  # ---------------------------------------------------------------------------
+  # BRUTALIST DESIGN SPECS
+  # ---------------------------------------------------------------------------
+  brutalist:
+    
+    grid:
+      light_mode:
+        color: "rgba(26, 26, 26, 0.03)"
+        size: "80px 80px"
+      dark_mode:
+        color: "rgba(242, 240, 233, 0.03)"
+        size: "20px 20px"
+      layout_structures:
+        the_rail:
+          description: "A 33% width column (desktop) for high-frequency signals."
+          rules:
+            - "Typography: Strictly Monospace (Fira Code)."
+            - "Density: High. Reduce vertical padding by 50% compared to main body."
+            - "Borders: Separated by a solid 1px Ink line (Left or Right)."
+            - "Content: Lists, Tickers, Live Status, 'Trending' metrics."
+            - "Never: Long-form paragraphs."
+    
+    borders:
+      primary_light: "1px solid #1A1A1A"
+      primary_dark: "1px solid rgba(242, 240, 233, 0.3)"
+      divider_light: "1px solid rgba(26, 26, 26, 0.1)"
+      divider_dark: "1px solid rgba(242, 240, 233, 0.1)"
+    
+    shadows:
+      card_hover: "5px 5px 0px rgba(26, 26, 26, 0.1)"
+      button_hover: "4px 4px 0px rgba(176, 141, 85, 0.5)"
+      # Note: No blur shadows. Hard offsets only.
+
+  # ---------------------------------------------------------------------------
+  # MOTION / ANIMATION
+  # ---------------------------------------------------------------------------
+  motion:
+    transitions:
+      fast: "0.1s"
+      default: "0.2s"
+      slow: "0.3s"
+      easing: "ease"
+    
+    animations:
+      pulse:
+        description: "Live indicator pulse"
+        duration: "2s"
+        iteration: "infinite"
+        usage: "Status dots, active indicators"
+      
+      orbit_rotate:
+        description: "Ouroboros rotation"
+        duration: "20s"
+        timing: "linear"
+        iteration: "infinite"
+        usage: "Logo animation"
+
+  # ---------------------------------------------------------------------------
+  # LOGO: THE OUROBOROS
+  # ---------------------------------------------------------------------------
+  logo:
+    files: 
+      - "logo-animation-specs.md"
+      - "logo-animation.js"
+    concept: "Ouroboros — the self-consuming serpent"
+    symbolism:
+      - "The self-correcting loop (Axiom IV)"
+      - "Knowledge → frameworks → methods → instruments → data → knowledge"
+      - "Self-reference and recursion"
+      - "Perpetual refinement"
+    
+    backronym: "p.h.r.o.n.o.s. = Phenotyping for Human Resilience, Ontological Navigation, & Open Science"
+    
+    themes:
+      dark:
+        background: "#1A1A1A"
+        snake_stroke: "#B08D55"
+        acronym_color: "#F2F0E9"
+      light:
+        background: "#F2F0E9"
+        snake_stroke: "#B08D55"
+        acronym_color: "#1A1A1A"
+
+  # ---------------------------------------------------------------------------
+  # AESTHETIC PRINCIPLES
+  # ---------------------------------------------------------------------------
+  aesthetic:
+    description: "Rigorous, cartographic, observatory-inspired"
+    references:
+      - "Scientific instrument interfaces"
+      - "Cartographic maps and atlases"
+      - "Historical observatory equipment"
+      - "Academic journal layouts"
+      - "Bloomberg terminal (data density)"
+    
+    principles:
+      - "Hard edges over soft gradients"
+      - "Offset shadows over blur shadows"
+      - "Grid backgrounds evoke precision"
+      - "Monospace for data, serif for narrative"
+      - "Gold as the only accent color"
+      - "Restrained animation (functional, not decorative)"
+      - "Mobile Reduction: On small screens, collapse 'The Rail' into a bottom-sheet or a 'Signal Feed' tab. Do not stack it below the footer."
+      - "Chart Responsiveness: On mobile, hide the 'Grid Major' background to reduce noise. Show only the 'Trace Line' and 'Current Value'."
+    
+  data_density:
+    principle: "Evidence over Decoration."
+    implementation:
+      - "Hero sections should center on a specific Inquiry, Finding, or Question."
+      - "Do not use 'Lorem Ipsum' numbers. Use real static data from published dispatches."
+      - "If live sensors are offline, show the 'Last Known Trace' or 'Archived Observation'."
+    visual_style:
+      static_artifacts:
+        style: "Sparklines and Distribution Bars"
+        principle: "Treat data visualizations as illustrations/figures, not just UI elements."
+        reference: "Tufte's Sparklines, Scientific Journal Figures"
+    
+    avoid:
+      - "Startup-y gradients"
+      - "Rounded corners (except status dots)"
+      - "Gamification elements"
+      - "Playful illustrations"
+      - "Stock photography"
+      - "Blur shadows"
+      - "Multiple accent colors"
+      - "Emoji or decorative icons"
+
+# =============================================================================
+# CONTENT PRINCIPLES
+# How we create content
+# =============================================================================
+
+content:
+
+  headlines:
+    style: "Statement, not question"
+    punctuation: "Period or none; never exclamation"
+    examples:
+      good:
+        - "What 4.8 Million AI Conversations Reveal About Human Cognition"
+        - "The instruments must be built"
+        - "Measuring how you think"
+      bad:
+        - "Ready to discover your cognitive potential?"
+        - "Unlock your brain's hidden power!"
+        - "What kind of thinker are you?"
+
+  body_copy:
+    sentence_length: "Varied; prefer shorter"
+    paragraph_length: "3-5 sentences maximum"
+    jargon: "Define on first use; prefer plain language"
+    citations: "Include in dispatches and methods; inline or footnote"
+
+  calls_to_action:
+    style: "Invitation, not command"
+    examples:
+      good:
+        - "Read the dispatch"
+        - "View the methodology"
+        - "Begin assessment"
+        - "Join the Guild"
+      bad:
+        - "Start your journey!"
+        - "Unlock your potential now"
+        - "Don't miss out"
+
+# =============================================================================
+# SITE STRUCTURE
+# How content is organized on phronos.org
+# =============================================================================
+
+site_structure:
+
+  primary_sections:
+    dispatches:
+      path: "/dispatches"
+      content: "Essays reporting observatory findings"
+      id_format: "DSP-### (e.g. DSP-001)"
+      mode: "light (body), dark (embedded charts/tables)"
+    
+    library: # NEW
+      path: "/library"
+      label: "The Library"
+      content: "Deep syntheses of peer-reviewed literature and evidence bases"
+      id_format: "LIB-### (e.g. LIB-001)"
+      mode: "light"
+      visual_style: "Dense, typographic, sidenotes for citations"
+    
+    methods:
+      path: "/methods"
+      content: "Protocols and technical frameworks"
+      id_format: "MTH-### (e.g. MTH-001)"
+      mode: "light"
+    
+    instruments: # RESTORED TO DARK MODE TOOLS
+      path: "/instruments"
+      content: "Active assessment tools and prototypes"
+      id_format: "INS-### (e.g. INS-001)"
+      mode: "dark"
+    
+    data:
+      path: "/data"
+      content: "Commons of anonymized observations"
+      status: "planned" # Mark as planned so agents don't try to link to it yet
+      mode: "dark"
+    
+    about:
+      path: "/about"
+      content: "Founder bio, observatory philosophy"
+      mode: "light"
+    
+    constitution:
+      path: "/constitution"
+      content: "The seven axioms"
+      mode: "light"
+    
+    soul:
+      path: "/soul"
+      content: "Founder's statement of purpose"
+      mode: "light"
+
+  documents:
+    living_documents:
+      - "SOUL.md"
+      - "CONSTITUTION.md"
+      - "BRAND.yaml"
+      - "CARD-SYSTEM.md"
+
+    versioning: "Semantic versioning (major.minor.patch)"
+    changelog: "Maintained in document header"
+
+# =============================================================================
+# FOUNDER VOICE
+# Guidelines for personal/founder content
+# =============================================================================
+
+founder_voice:
+
+  when_to_use_I:
+    - "SOUL.md"
+    - "Dispatch author byline"
+    - "Personal statements"
+    - "Origin story"
+  
+  when_to_use_we:
+    - "Constitution"
+    - "Methods documentation"
+    - "Institutional statements"
+    - "Data commons descriptions"
+  
+  when_to_use_phronos:
+    - "Third-person references"
+    - "External communications"
+    - "Press/media"
+
+  founder_bio:
+    short: "Vishal Patel, MD, PhD · Founder, Phronos"
+    medium: "Vishal Patel is the founder of Phronos. He holds an MD and a PhD in genetics, and has spent his career at the intersection of science, technology, and human wellbeing."
+
+# =================================================================
+# REFERENCE IMPLEMENTATION (Agent Resources)
+# Code snippets for agents to replicate the aesthetic for graphs and charts
+# =================================================================
+
+reference_implementation:
+
+  css_cartographic_suite: |
+    /* PHRONOS CARTOGRAPHIC SUITE (Warm/Light Mode Data) */
+    /* Usage: Embedded charts in Dispatches and Library */
+    
+    :root {
+        --grid-line: rgba(26, 26, 26, 0.05);
+        --grid-major: rgba(26, 26, 26, 0.1);
+        --chart-ink: #1A1A1A;
+        --chart-gold: #B08D55;
+    }
+
+    /* --- CONTAINER --- */
+    .carto-figure {
+        margin: 3rem 0;
+        background: #FFFFFF;
+        border: 1px solid var(--chart-ink);
+        padding: 1.5rem;
+        box-shadow: 12px 12px 0px rgba(26, 26, 26, 0.05); /* Soft, hard offset */
+        position: relative;
+    }
+
+    /* Millimeter Paper Background */
+    .carto-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: 
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .carto-header {
+        position: relative;
+        z-index: 1;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        color: rgba(26, 26, 26, 0.5);
+        border-bottom: 1px solid var(--grid-major);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* --- CHART ELEMENTS --- */
+    svg { overflow: visible; }
+    
+    .axis-line {
+        stroke: var(--chart-ink);
+        stroke-width: 1px;
+        vector-effect: non-scaling-stroke;
+    }
+    
+    .grid-ref {
+        stroke: var(--grid-major);
+        stroke-width: 1px;
+        stroke-dasharray: 4,4;
+    }
+
+    /* The "Noise" or "Baseline" */
+    .line-regular {
+        fill: none;
+        stroke: rgba(26, 26, 26, 0.5);
+        stroke-width: 2px;
+        vector-effect: non-scaling-stroke;
+    }
+
+    /* The "Signal" or "Focus" */
+    .line-signal {
+        fill: none;
+        stroke: var(--chart-gold);
+        stroke-width: 2.5px;
+        vector-effect: non-scaling-stroke;
+        filter: drop-shadow(0px 2px 2px rgba(176, 141, 85, 0.2));
+    }
+
+    /* --- ANNOTATIONS --- */
+    .annotation {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        background: #F2F0E9; /* Paper */
+        border: 1px solid var(--grid-major);
+        padding: 4px 8px;
+        position: absolute;
+        z-index: 2;
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+    }
+
+    .annotation::after {
+        content: ''; position: absolute;
+        width: 1px; height: 15px;
+        background: var(--chart-ink);
+        left: 50%; bottom: -15px;
+    }
+
+  css_data_art: |
+    /* --- STATIC DATA ART (Sparklines) --- */
+    /* Usage: Represents high-density time-series data as static illustrations */
+    
+    .data-card {
+        background: #FFFFFF;
+        border: 1px solid var(--ink);
+        padding: 1.5rem;
+        box-shadow: 12px 12px 0px rgba(26,26,26,0.05); /* The "Field Journal" shadow */
+    }
+
+    .spark-row {
+        display: flex;
+        align-items: center;
+        height: 24px;
+        border-bottom: 1px solid rgba(26,26,26,0.05);
+        position: relative;
+    }
+    
+    .spark-line {
+        flex-grow: 1;
+        height: 100%;
+        position: relative;
+    }
+    
+    /* The "Burst" represents activity density */
+    .spark-burst {
+        position: absolute;
+        bottom: 0;
+        background: var(--gold); 
+        opacity: 0.6;
+        /* Width/Left must be set inline for specific data representation */
+    }
+  
+  html_rail_structure: |
+    <aside class="rail-container" style="border-left: 1px solid var(--ink); padding-left: 1.5rem; font-family: var(--font-mono);">
+        
+        <div class="rail-module" style="margin-bottom: 3rem;">
+            <div style="font-size: 0.65rem; text-transform: uppercase; color: var(--faded); margin-bottom: 0.5rem;">
+                Observatory Status
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+                <span style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block;"></span>
+                <span>Active Monitoring</span>
+            </div>
+        </div>
+
+        <div class="rail-module" style="margin-bottom: 3rem;">
+            <div style="font-size: 0.65rem; text-transform: uppercase; color: var(--faded); margin-bottom: 0.5rem;">
+                Latest Signal
+            </div>
+            <div style="border-top: 1px solid var(--faded-light); padding-top: 0.5rem;">
+                <div style="font-size: 0.7rem; color: var(--gold); margin-bottom: 4px;">T-MINUS 4H</div>
+                <div style="font-size: 0.8rem; line-height: 1.4;">
+                    "Syntactic rigidity detected in legislative LLM outputs."
+                </div>
+                <a href="#" style="font-size: 0.65rem; text-decoration: underline; margin-top: 8px; display: block;">View Data ↗</a>
+            </div>
+        </div>
+
+        <div class="rail-module">
+            <div style="font-size: 0.65rem; text-transform: uppercase; color: var(--faded); margin-bottom: 0.5rem;">
+                Active Methods
+            </div>
+            <ul style="list-style: none; padding: 0; font-size: 0.75rem;">
+                <li style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                    <span>Semantic Map</span>
+                    <span style="color: var(--faded);">v2.1</span>
+                </li>
+                <li style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                    <span>Surprisal Calc</span>
+                    <span style="color: var(--faded);">v1.0</span>
+                </li>
+            </ul>
+        </div>
+    </aside>
