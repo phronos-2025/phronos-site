@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Phronos Constitution — Founding Document</title>
+    <meta name="description" content="The founding document of Phronos. Nine axioms defining cognitive infrastructure for human flourishing in the era of artificial intelligence.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon.svg">
+    <link rel="mask-icon" href="/favicon.svg" color="#B08D55">
+    <meta name="theme-color" content="#F2F0E9">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.phronos.org/constitution">
+    <meta property="og:title" content="The Phronos Constitution">
+    <meta property="og:description" content="Nine axioms defining cognitive infrastructure for human flourishing. An empirical observatory for the mind.">
+    <meta property="og:image" content="https://www.phronos.org/favicon.svg">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="The Phronos Constitution">
+    <meta name="twitter:description" content="The founding document. Nine axioms for cognitive infrastructure in the era of AI.">
+    
+    <!-- Additional SEO -->
+    <meta name="keywords" content="Phronos constitution, cognitive infrastructure, human cognition, AI era, self-knowledge, observatory">
+    <meta name="author" content="Phronos">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.phronos.org/constitution">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --paper: #F2F0E9;
+            --ink: #1A1A1A;
+            --gold: #B08D55;
+            --gold-dim: rgba(176, 141, 85, 0.1);
+            --faded: rgba(26, 26, 26, 0.5);
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(26, 26, 26, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 26, 26, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(242, 240, 233, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--ink);
+            padding: 1rem 5%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.3px;
+            color: var(--ink);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo .period {
+            opacity: 0.4;
+        }
+
+        .nav-back {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--faded);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-back:hover {
+            color: var(--gold);
+        }
+
+        .nav-back::before {
+            content: '←';
+        }
+
+        /* Layout Container */
+        .layout-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+
+        /* Table of Contents - Desktop */
+        .toc-sidebar {
+            position: sticky;
+            top: 100px;
+            width: 220px;
+            height: fit-content;
+            padding: 1.5rem 0 1.5rem 5%;
+            flex-shrink: 0;
+        }
+
+        .toc-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-list a {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--faded);
+            text-decoration: none;
+            display: block;
+            padding: 0.25rem 0;
+            padding-left: 0.75rem;
+            border-left: 1px solid transparent;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .toc-list a:hover {
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .toc-list a.active {
+            color: var(--ink);
+            border-left-color: var(--ink);
+        }
+
+        .toc-list .toc-axiom {
+            color: var(--gold);
+            font-size: 0.55rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Mobile TOC Toggle */
+        .toc-mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--ink);
+            border: none;
+            cursor: pointer;
+            z-index: 99;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .toc-mobile-toggle:hover {
+            background: var(--gold);
+        }
+
+        .toc-mobile-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--paper);
+        }
+
+        /* Mobile TOC Panel */
+        .toc-mobile {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: calc(100% - 40px);
+            max-width: 300px;
+            max-height: 60vh;
+            background: var(--white);
+            border: 1px solid var(--ink);
+            z-index: 98;
+            overflow-y: auto;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+        }
+
+        .toc-mobile.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toc-mobile-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: var(--paper);
+            background: var(--ink);
+            padding: 0.75rem 1rem;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+        }
+
+        .toc-mobile-list {
+            list-style: none;
+            padding: 0.5rem 0;
+        }
+
+        .toc-mobile-list li {
+            border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+        }
+
+        .toc-mobile-list li:last-child {
+            border-bottom: none;
+        }
+
+        .toc-mobile-list a {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--ink);
+            text-decoration: none;
+            display: block;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .toc-mobile-list a:hover,
+        .toc-mobile-list a.active {
+            background: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .toc-mobile-list .toc-axiom {
+            color: var(--gold);
+            font-size: 0.6rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            min-width: 0;
+            padding: 40px 5% 80px;
+        }
+
+        .constitution-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Document Header */
+        .document-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .document-meta {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .document-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .document-meta .status {
+            color: var(--gold);
+        }
+
+        .document-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .document-subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--faded);
+            text-transform: uppercase;
+        }
+
+        /* Content Sections */
+        .constitution-content section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 100px;
+        }
+
+        .constitution-content h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+        }
+
+        .constitution-content h2.axiom {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .constitution-content h2 .axiom-number {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .constitution-content p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+        }
+
+        .constitution-content p em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .constitution-content p strong {
+            font-weight: 600;
+        }
+
+        .constitution-content hr {
+            border: none;
+            border-top: 1px solid rgba(26, 26, 26, 0.15);
+            margin: 3rem 0;
+        }
+
+        /* Vision/Mission Box */
+        .vision-mission {
+            background: var(--white);
+            border: 1px solid var(--ink);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            scroll-margin-top: 100px;
+        }
+
+        .vision-mission::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--ink);
+            z-index: -1;
+        }
+
+        .vision-mission h2 {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .vision-mission p {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        /* Signature */
+        .constitution-signature {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--ink);
+        }
+
+        .constitution-signature .logo-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.3px;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .constitution-signature .logo-text .period {
+            opacity: 0.4;
+        }
+
+        .constitution-signature .full-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 5%;
+            border-top: 1px solid rgba(26, 26, 26, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-left {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.6rem;
+            color: var(--faded);
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .toc-sidebar {
+                display: none;
+            }
+
+            .toc-mobile-toggle {
+                display: flex;
+            }
+
+            .toc-mobile {
+                display: block;
+            }
+
+            .layout-container {
+                display: block;
+            }
+
+            main {
+                padding: 40px 5% 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .document-title {
+                font-size: 2rem;
+            }
+
+            .document-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .constitution-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .constitution-content p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <nav>
+        <a href="/" class="logo">
+            p<span class="period">.</span>h<span class="period">.</span>r<span class="period">.</span>o<span class="period">.</span>n<span class="period">.</span>o<span class="period">.</span>s<span class="period">.</span>
+        </a>
+        <a href="/" class="nav-back">Back to Home</a>
+    </nav>
+
+    <div class="layout-container">
+        <!-- Desktop TOC Sidebar -->
+        <aside class="toc-sidebar">
+            <div class="toc-header">Contents</div>
+            <ul class="toc-list">
+                <li><a href="#vision">Vision</a></li>
+                <li><a href="#mission">Mission</a></li>
+                <li><a href="#prior">Prior</a></li>
+                <li>
+                    <a href="#axiom-i">
+                        <span class="toc-axiom">I</span>
+                        The Observatory
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-ii">
+                        <span class="toc-axiom">II</span>
+                        The Question of This Era
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-iii">
+                        <span class="toc-axiom">III</span>
+                        The Self-Correcting Loop
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-iv">
+                        <span class="toc-axiom">IV</span>
+                        Participants, Not Users
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-v">
+                        <span class="toc-axiom">V</span>
+                        Sovereignty and the Commons
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-vi">
+                        <span class="toc-axiom">VI</span>
+                        Openness as Foundation
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-vii">
+                        <span class="toc-axiom">VII</span>
+                        The Limits of Our Authority
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-viii">
+                        <span class="toc-axiom">VIII</span>
+                        The Ecosystem
+                    </a>
+                </li>
+                <li>
+                    <a href="#axiom-ix">
+                        <span class="toc-axiom">IX</span>
+                        The Invitation
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main>
+            <article class="constitution-container">
+                <header class="document-header">
+                    <div class="document-meta">
+                        <span>VERSION 1.0.4</span>
+                        <span>DECEMBER 2025</span>
+                        <span class="status">STATUS: LIVING</span>
+                    </div>
+                    <h1 class="document-title">The Phronos Constitution</h1>
+                    <p class="document-subtitle">Founding Document</p>
+                </header>
+
+                <div class="constitution-content">
+                    <div class="vision-mission" id="vision">
+                        <h2>Vision</h2>
+                        <p>A future of lucid human-AI symbiosis, where empirical self-knowledge allows humanity to integrate with the digital interface without losing our agency or ability to reason.</p>
+                    </div>
+
+                    <div class="vision-mission" id="mission">
+                        <h2>Mission</h2>
+                        <p>To serve as a trusted observatory for global human cognition in the era of artificial intelligence—delivering open-source frameworks grounded in science, instruments that reveal how we think in relation to machines, and a commons where individual insight produces collective understanding.</p>
+                    </div>
+
+                    <hr>
+
+                    <section id="prior">
+                        <h2>Prior</h2>
+                        <p>For most of human history, <em>know thyself</em> remained an aspiration—inscribed on temple walls, debated in philosophy, pursued through contemplation, but never verifiable. The tools did not exist. Introspection could not observe itself. The mind doing the examining was the same mind being examined, and the circularity was inescapable.</p>
+                        <p>Humanity has not been idle in the face of this challenge. Contemplative traditions developed rigorous practices for self-observation. Philosophers constructed frameworks for understanding the mind. Healers and guides of every kind have helped individuals navigate their inner lives. This work has value, and it continues.</p>
+                        <p>What has been missing is infrastructure—shared instruments grounded in cognitive science, capable of generating structured observations at scale, and open to scrutiny and refinement. The emergence of artificial intelligence has made such infrastructure possible. And the emergence of machine cognition has given humanity, for the first time, a point of comparison—a way for each individual to see their own thinking through the lens of an intelligence that mirrors their own.</p>
+                        <p>The ancient imperative can now be pursued empirically—not as a replacement for contemplative and therapeutic traditions, but as a complement to them. The question is no longer whether self-knowledge is possible, but whether we will build the infrastructure to make it accessible.</p>
+                        <p>Phronos emerged to build that infrastructure.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-i">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM I</span> The Observatory</h2>
+                        <p>Phronos is an observatory—a place of structured observation rather than instruction. We observe, we measure, and we interpret what we find. Our instruments generate telemetry—structured observations of cognition in action—and our analyses translate that telemetry into findings you can examine for yourself.</p>
+                        <p>Our instruments are not surveys in the traditional sense: they are dynamic, conversational assessments built on peer-reviewed frameworks and administered through artificial intelligence, designed to measure not what you report believing but how you actually reason when conditions shift beneath you. Where traditional assessments ask questions and tally answers, our instruments create conditions and observe what emerges.</p>
+                        <p>The distinction matters. Contemplative traditions have long understood that genuine self-knowledge requires discipline, practice, and structures that resist self-deception. We build in that spirit—but with instruments that generate falsifiable data rather than relying on introspection alone. Where traditional methods depend on the integrity of the teacher, our architecture encodes accountability into the system itself. The self-correcting loop ensures that our frameworks answer to data, not to the convictions of their creators.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-ii">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM II</span> The Question of This Era</h2>
+                        <p>The defining question of this era is not <em>who am I?</em> but <em>where am I still myself?</em></p>
+                        <p>A new intelligence has entered the world. It learns from us, speaks like us, and thinks alongside us. The rate of adoption is without precedent, as is the nature of the technology: for the first time in history, humanity is being equipped with conversational companions trained on humanity's own behaviors, beliefs, language, and practices. We do not yet fully understand what this means for the human mind that encounters such an intelligence daily—that delegates to it, collaborates with it, and, increasingly, builds a relationship with it.</p>
+                        <p>Phronos instruments reveal the dimensions where human reasoning is beginning to resemble machine reasoning, and the dimensions where it remains distinctively human.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-iii">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM III</span> The Self-Correcting Loop</h2>
+                        <p>Phronos operates as a self-correcting cycle: peer-reviewed knowledge flows into frameworks, frameworks parametrize instruments, instruments provide telemetry, telemetry yields data, data produces new knowledge, and new knowledge refines frameworks. The loop continues—and this continuity is architectural, not incidental.</p>
+                        <p>We represent this cycle as the ouroboros—the serpent that consumes itself to perpetuate itself. It is both our logo and our operating principle: the loop sustains itself through its own activity.</p>
+                        <p>The design serves a purpose beyond elegance: when our frameworks are wrong, our ecosystem will eventually reveal it. The machine validates itself against reality rather than against the convictions of its creators.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-iv">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM IV</span> Participants, Not Users</h2>
+                        <p>Those who engage with our instruments are participants, not users.</p>
+                        <p>A user consumes a product; a participant contributes to an endeavor. Every completed instrument contributes telemetry that—with explicit consent—joins the Data Commons, a living repository of human cognition at the AI interface. By engaging with Phronos, you are not merely taking an assessment; you are contributing to a baseline for how humanity navigates what lies ahead.</p>
+                        <p>Your individual observations become part of a collective understanding that is greater than the sum of its parts.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-v">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM V</span> Sovereignty and the Commons</h2>
+                        <p>The artificial intelligence now entering our lives learned from humanity's publicly shared words, images, and ideas—most of it contributed unknowingly. This is the condition we inherit. Phronos begins from a different premise.</p>
+                        <p>Your data should be good for you: information about you should deepen self-understanding and support growth, not exploit you. Your data can do good for others: when shared intentionally, it can illuminate paths for those seeking their way. To ensure your data is used for good, it must belong to you.</p>
+                        <p>Consent must be explicit and revocable. Data shared for one purpose will not be repurposed without permission. Your telemetry is never sold. For those who wish to engage our instruments without leaving any trace, local mode exists: processing happens on your device, nothing is transmitted, no account is required. We have built for the participant who trusts no one, because building for that participant forces us to earn trust rather than assume it.</p>
+                        <p>For those who choose to contribute, the Data Commons aggregates anonymized observations into a resource for science, for policy, and for any researcher seeking to understand the human mind in its encounter with artificial intelligence.</p>
+                        <p>Individual sovereignty and collective knowledge are not opposites. Designed correctly, they reinforce each other: your data remains yours, and yet, through aggregation and anonymization, it advances understanding that belongs to everyone.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-vi">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM VI</span> Openness as Foundation</h2>
+                        <p>We are open because openness is the only viable posture toward the systems we seek to understand.</p>
+                        <p>Artificial intelligence was built on the open information of the internet. If we are to coexist with this intelligence—to remain legible to ourselves while engaging with systems that learn from us—we cannot retreat into proprietary enclaves: we must lean into the open.</p>
+                        <p>Our frameworks are published. Our methodologies are transparent. The instruments themselves are free to access.</p>
+                        <p>Our scoring is documented and explainable; we compare your responses to reference distributions that we disclose and document. These distributions may derive from AI-simulated personas, from aggregated participant data, or from a hybrid approach: we will always tell you which, and, in the spirit of epistemic humility, we will always admit the limitations of our measurements and models.</p>
+                        <p>The core observations belong to everyone.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-vii">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM VII</span> The Limits of Our Authority</h2>
+                        <p>Phronos will never claim to know what is best for you.</p>
+                        <p>We will not tell you how to live, what to value, or which path to take. We generate observations, and we provide you with the tools to verify the evidence for yourself. Interpretation—and whatever action follows—belongs to the participant, or to the practitioners and traditions they trust.</p>
+                        <p>We are not therapists, though our instruments may surface material worth exploring with one. We are not coaches, though coaches may find our frameworks useful in their work. We are not spiritual directors, though contemplatives may recognize something familiar in our emphasis on disciplined self-observation. Each of these roles involves guidance, relationship, and wisdom that no instrument can replace.</p>
+                        <p>We build mirrors that also take notes. What you see in them—and what you do next—remains yours.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-viii">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM VIII</span> The Ecosystem</h2>
+                        <p>Phronos is designed to outlast its founders.</p>
+                        <p>The infrastructure we build must sustain itself—not through the generosity of patrons alone, nor through the labor of a few, but through an architecture where individual benefit and collective good reinforce each other.</p>
+                        <p>The core observations are free. Anyone may access our instruments, engage with our frameworks, and receive their own telemetry without cost. What we offer beyond this—comparison to others, membership in a community of peers, deeper analysis, institutional access—sustains the infrastructure that keeps the core open.</p>
+                        <p><strong>The Guild</strong> convenes those who seek more than self-observation: peer comparison, connection with others navigating similar questions, and access to global insights as they emerge. Guild membership is how individuals sustain Phronos while gaining something unavailable elsewhere—a community defined not by profession or affiliation, but by the shared pursuit of cognitive clarity.</p>
+                        <p><strong>Practitioners</strong>—therapists, coaches, consultants, researchers, and others who guide human development—may find our instruments and frameworks useful in their work, and we aim to offer infrastructure that they can build upon.</p>
+                        <p><strong>Institutions</strong>—universities, foundations, enterprises, and policymakers—may draw on the Data Commons for research, may sponsor instrument development in domains they care about, or may adopt our frameworks for their own purposes. We welcome institutional participation that aligns with our principles.</p>
+                        <p><strong>Allied scholars</strong> who develop frameworks grounded in cognitive science may submit them for integration into our instruments. Accepted contributions receive attribution, revenue share, and validation against the telemetry our ecosystem generates. The best ideas should find their way into the infrastructure regardless of their origin.</p>
+                        <p>We have built Phronos so that each participant—whether individual, practitioner, institution, or scholar—receives value proportional to their engagement, while their engagement strengthens the whole. The system sustains itself through use, and grows more valuable as it grows.</p>
+                        <p>This is the economic logic of the ouroboros: the loop feeds itself.</p>
+                    </section>
+
+                    <hr>
+
+                    <section id="axiom-ix">
+                        <h2 class="axiom"><span class="axiom-number">AXIOM IX</span> The Invitation</h2>
+                        <p>We are building cognitive infrastructure for the century ahead, and we cannot build it alone.</p>
+                        <p>If you seek evidence of how your mind differs from machines, we offer instruments that reveal it. If you seek to contribute to science, we offer a commons where your observations join a living record of human cognition. If you seek to support work built for the long term, we offer an ecosystem that grows stronger with each participant.</p>
+                        <p>The ancient imperative remains. The instruments are ready. We invite you to participate.</p>
+                    </section>
+
+                    <div class="constitution-signature">
+                        <p class="logo-text">p<span class="period">.</span>h<span class="period">.</span>r<span class="period">.</span>o<span class="period">.</span>n<span class="period">.</span>o<span class="period">.</span>s<span class="period">.</span></p>
+                        <p class="full-name">Public Hub for Resilient Ontological Navigation via Open Science</p>
+                    </div>
+                </div>
+            </article>
+        </main>
+    </div>
+
+    <!-- Mobile TOC Toggle Button -->
+    <button class="toc-mobile-toggle" id="toc-toggle" aria-label="Toggle table of contents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Mobile TOC Panel -->
+    <div class="toc-mobile" id="toc-mobile">
+        <div class="toc-mobile-header">Contents</div>
+        <ul class="toc-mobile-list">
+            <li><a href="#vision">Vision</a></li>
+            <li><a href="#mission">Mission</a></li>
+            <li><a href="#prior">Prior</a></li>
+            <li><a href="#axiom-i"><span class="toc-axiom">AXIOM I</span> The Observatory</a></li>
+            <li><a href="#axiom-ii"><span class="toc-axiom">AXIOM II</span> The Question of This Era</a></li>
+            <li><a href="#axiom-iii"><span class="toc-axiom">AXIOM III</span> The Self-Correcting Loop</a></li>
+            <li><a href="#axiom-iv"><span class="toc-axiom">AXIOM IV</span> Participants, Not Users</a></li>
+            <li><a href="#axiom-v"><span class="toc-axiom">AXIOM V</span> Sovereignty and the Commons</a></li>
+            <li><a href="#axiom-vi"><span class="toc-axiom">AXIOM VI</span> Openness as Foundation</a></li>
+            <li><a href="#axiom-vii"><span class="toc-axiom">AXIOM VII</span> The Limits of Our Authority</a></li>
+            <li><a href="#axiom-viii"><span class="toc-axiom">AXIOM VIII</span> The Ecosystem</a></li>
+            <li><a href="#axiom-ix"><span class="toc-axiom">AXIOM IX</span> The Invitation</a></li>
+        </ul>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                © 2025 PUBLIC HUB FOR RESILIENT ONTOLOGICAL NAVIGATION VIA OPEN SCIENCE
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile TOC toggle
+        const tocToggle = document.getElementById('toc-toggle');
+        const tocMobile = document.getElementById('toc-mobile');
+
+        tocToggle.addEventListener('click', () => {
+            tocMobile.classList.toggle('open');
+        });
+
+        // Close mobile TOC when clicking a link
+        document.querySelectorAll('.toc-mobile-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                tocMobile.classList.remove('open');
+            });
+        });
+
+        // Close mobile TOC when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!tocMobile.contains(e.target) && !tocToggle.contains(e.target)) {
+                tocMobile.classList.remove('open');
+            }
+        });
+
+        // Highlight active section in TOC
+        const sections = document.querySelectorAll('section[id], .vision-mission[id]');
+        const tocLinks = document.querySelectorAll('.toc-list a, .toc-mobile-list a');
+
+        const observerOptions = {
+            rootMargin: '-100px 0px -66%',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>

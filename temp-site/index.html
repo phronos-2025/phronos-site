@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phronos — Cognitive Infrastructure for Human Flourishing</title>
+    <meta name="description" content="An empirical observatory for the mind. We measure how you think—and how that compares to the machines thinking alongside you. Know thyself. Empirically.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon.svg">
+    <link rel="mask-icon" href="/favicon.svg" color="#B08D55">
+    <meta name="theme-color" content="#F2F0E9">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.phronos.org/">
+    <meta property="og:title" content="Phronos — Cognitive Infrastructure for Human Flourishing">
+    <meta property="og:description" content="An empirical observatory for the mind. We measure how you think—and how that compares to the machines thinking alongside you.">
+    <meta property="og:image" content="https://www.phronos.org/favicon.svg">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Phronos — Know thyself. Empirically.">
+    <meta name="twitter:description" content="Cognitive infrastructure for human flourishing. Where humans measure what matters.">
+    
+    <!-- Additional SEO -->
+    <meta name="keywords" content="cognitive assessment, human cognition, AI comparison, self-knowledge, empirical observatory, cognitive infrastructure">
+    <meta name="author" content="Phronos">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.phronos.org/">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --paper: #F2F0E9;
+            --ink: #1A1A1A;
+            --gold: #B08D55;
+            --gold-dim: rgba(176, 141, 85, 0.1);
+            --faded: rgba(26, 26, 26, 0.5);
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(26, 26, 26, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 26, 26, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(242, 240, 233, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--ink);
+            padding: 1rem 5%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.3px;
+            color: var(--ink);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo .period {
+            opacity: 0.4;
+        }
+
+        .nav-status {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--faded);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero Section */
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 120px 5% 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-label::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--ink);
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .hero-statement {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            max-width: 680px;
+            color: var(--ink);
+            margin-bottom: 3rem;
+        }
+
+        /* Data Panel */
+        .data-panel {
+            background: var(--white);
+            border: 1px solid var(--ink);
+            position: relative;
+            max-width: 560px;
+            margin-bottom: 3rem;
+        }
+
+        .data-panel::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--ink);
+            z-index: -1;
+        }
+
+        .data-panel-header {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 0.75rem 1rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-panel-body {
+            padding: 1.5rem;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--faded);
+        }
+
+        .data-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--ink);
+        }
+
+        .data-value.gold {
+            color: var(--gold);
+        }
+
+        /* CTA */
+        .cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            padding: 0.875rem 1.5rem;
+            border: 1px solid var(--ink);
+            background: var(--ink);
+            color: var(--paper);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Principles Grid */
+        .principles-section {
+            padding: 60px 5%;
+            background: var(--white);
+            border-top: 1px solid var(--ink);
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .full-name-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.925rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.6375rem;
+            letter-spacing: 1px;
+            color: var(--faded);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .section-header::before,
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(26, 26, 26, 0.1);
+        }
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .principle-card {
+            padding: 1.5rem 0;
+        }
+
+        .principle-id {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .principle-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .principle-text {
+            font-size: 0.95rem;
+            color: var(--faded);
+            line-height: 1.6;
+        }
+
+        /* Email Capture */
+        .email-section {
+            padding: 80px 5% 40px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .email-container h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .email-container p {
+            font-size: 1rem;
+            color: var(--faded);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .email-form {
+            display: flex;
+            gap: 0;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .email-input {
+            flex: 1;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            padding: 1rem;
+            border: 1px solid var(--ink);
+            border-right: none;
+            background: var(--white);
+            outline: none;
+        }
+
+        .email-input::placeholder {
+            color: var(--faded);
+        }
+
+        .email-input:focus {
+            border-color: var(--gold);
+        }
+
+        .email-submit {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--ink);
+            background: var(--ink);
+            color: var(--paper);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .email-submit:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .email-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-note {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--faded);
+            margin-top: 1rem;
+        }
+
+        .form-note.success {
+            color: var(--gold);
+        }
+
+        .form-note.error {
+            color: #CC5544;
+        }
+
+        .form-lens {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+            margin-bottom: 0;
+            padding-bottom: 1.5rem;
+        }
+
+        .form-lens canvas {
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 5%;
+            border-top: 1px solid rgba(26, 26, 26, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-left {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.6rem;
+            color: var(--faded);
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--faded);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 100px 5% 40px;
+            }
+
+            h1 {
+                font-size: 2.25rem;
+            }
+
+            .hero-statement {
+                font-size: 1.1rem;
+            }
+
+            .email-form {
+                flex-direction: column;
+            }
+
+            .email-input {
+                border-right: 1px solid var(--ink);
+                border-bottom: none;
+            }
+
+            .nav-status {
+                font-size: 0.6rem;
+            }
+
+            .full-name-header {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* Scroll reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <nav>
+        <a href="/" class="logo">
+            p<span class="period">.</span>h<span class="period">.</span>r<span class="period">.</span>o<span class="period">.</span>n<span class="period">.</span>o<span class="period">.</span>s<span class="period">.</span>
+        </a>
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            <span>CALIBRATING</span>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-label">COGNITIVE INFRASTRUCTURE</div>
+                
+                <h1>Know thyself.<br><em>Empirically.</em></h1>
+                
+                <p class="hero-statement">
+                    We do not tell you what to think. We measure how you think—and how that compares to the machines thinking alongside you.
+                </p>
+                <p class="hero-statement">
+                    Our instruments are dynamic, conversational assessments designed to measure how you actually reason.
+                </p>
+
+                <div class="data-panel">
+                    <div class="data-panel-header">
+                        <span>STATUS</span>
+                        <span>2025</span>
+                    </div>
+                    <div class="data-panel-body">
+                        <div class="data-row">
+                            <span class="data-label">PHASE</span>
+                            <span class="data-value">Pre-launch calibration</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">INSTRUMENTS</span>
+                            <span class="data-value gold">In development</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">FRAMEWORKS</span>
+                            <span class="data-value gold">Review pending</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">DATA COMMONS</span>
+                            <span class="data-value">Architecture complete</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-group">
+                    <a href="#notify" class="btn">Request Early Access</a>
+                    <a href="/constitution" class="btn btn-secondary">Read the Constitution</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="principles-section reveal" id="principles">
+            <div class="full-name-header">PUBLIC HUB FOR RESILIENT ONTOLOGICAL NAVIGATION VIA OPEN SCIENCE</div>
+            <div class="section-header">FROM THE CONSTITUTION</div>
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div class="principle-id">AXIOM I</div>
+                    <div class="principle-title">The Observatory</div>
+                    <p class="principle-text">Phronos is an observatory—a place of structured observation rather than instruction. Our instruments generate telemetry—structured observations of cognition in action—and our analyses translate that telemetry into findings you can examine for yourself.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-id">AXIOM II</div>
+                    <div class="principle-title">The Question of This Era</div>
+                    <p class="principle-text">The defining question of this era is not <em>who am I?</em> but <em>where am I still myself?</em> Our instruments reveal the dimensions where human reasoning remains distinctively human.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-id">AXIOM V</div>
+                    <div class="principle-title">Sovereignty and the Commons</div>
+                    <p class="principle-text">Your data belongs to you. Consent is explicit and revocable. For those who wish to engage without leaving any trace, local mode exists: processing happens on your device, nothing is transmitted, no account is required.</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-id">AXIOM VII</div>
+                    <div class="principle-title">The Limits of Our Authority</div>
+                    <p class="principle-text">Phronos will never claim to know what is best for you. We build mirrors that also take notes. What you see in them—and what you do next—remains yours.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="email-section reveal" id="notify">
+            <div class="email-container">
+                <h2>Empirical self-knowledge is coming.</h2>
+                <p>Join the founding cohort. We are building cognitive infrastructure for the century ahead, and we cannot build it alone.</p>
+                <form class="email-form" id="signup-form">
+                    <input type="email" class="email-input" name="email" placeholder="your@email.com" required>
+                    <button type="submit" class="email-submit">NOTIFY ME</button>
+                </form>
+                <p class="form-note" id="form-note">No spam. Just signal.</p>
+                <div class="form-lens">
+                    <canvas id="form-lens" width="31" height="31"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                © 2025 PUBLIC HUB FOR RESILIENT ONTOLOGICAL NAVIGATION VIA OPEN SCIENCE
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * PHRONOS Lens Animation - scaled for 31px form canvas
+         */
+        const canvas = document.getElementById('form-lens');
+        const ctx = canvas.getContext('2d');
+        
+        // Brand Colors
+        const colorInk = '#1A1A1A';
+        const colorGold = '#B08D55';
+        const colorGoldDim = 'rgba(176, 141, 85, 0.4)';
+        
+        let rotation = 0;
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 11.2;
+
+            // 1. Ouroboros (The Rotating Ring)
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+
+            // The Serpent Body (Arc)
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0.3, Math.PI * 1.9); 
+            ctx.strokeStyle = colorInk;
+            ctx.lineWidth = 2.7;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // The Serpent Head
+            const headAngle = Math.PI * 1.9;
+            const headX = Math.cos(headAngle) * radius;
+            const headY = Math.sin(headAngle) * radius;
+
+            // Head Circle
+            ctx.beginPath();
+            ctx.arc(headX, headY, 3.25, 0, Math.PI * 2);
+            ctx.fillStyle = colorInk;
+            ctx.fill();
+
+            // The Eye (Gold detail inside head)
+            ctx.beginPath();
+            ctx.arc(headX, headY, 1.2, 0, Math.PI * 2);
+            ctx.fillStyle = colorGold;
+            ctx.fill();
+
+            ctx.restore();
+
+            // 2. The Core (Pulsing Center)
+            const pulse = (Math.sin(Date.now() / 400) + 1) / 2;
+
+            // Outer faint ripple
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 3.25 + (pulse * 1.6), 0, Math.PI * 2);
+            ctx.strokeStyle = colorGoldDim;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Inner hard point
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 1.6, 0, Math.PI * 2);
+            ctx.fillStyle = colorGold;
+            ctx.fill();
+
+            // Update Rotation
+            rotation += 0.015;
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+
+        // Scroll reveal
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const revealPoint = 150;
+                
+                if (elementTop < windowHeight - revealPoint) {
+                    el.classList.add('visible');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // Form handling - submits to /api/subscribe
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const emailInput = this.querySelector('.email-input');
+            const button = this.querySelector('.email-submit');
+            const formNote = document.getElementById('form-note');
+            const email = emailInput.value;
+            
+            // Disable form while submitting
+            button.disabled = true;
+            button.textContent = 'SENDING...';
+            
+            try {
+                const response = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    button.textContent = 'RECORDED';
+                    button.style.background = 'var(--gold)';
+                    button.style.borderColor = 'var(--gold)';
+                    formNote.textContent = data.message || 'You are on the list.';
+                    formNote.className = 'form-note success';
+                    emailInput.value = '';
+                } else {
+                    throw new Error(data.error || 'Subscription failed');
+                }
+            } catch (error) {
+                button.textContent = 'NOTIFY ME';
+                button.disabled = false;
+                formNote.textContent = error.message || 'Something went wrong. Please try again.';
+                formNote.className = 'form-note error';
+            }
+        });
+    </script>
+</body>
+</html>

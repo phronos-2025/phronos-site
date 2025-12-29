@@ -1,0 +1,19 @@
+{
+  "name": "phronos-temp-site",
+  "version": "1.0.0",
+  "description": "Temporary landing page for phronos.org",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0",
+    "typescript": "^5.3.0"
+  }
+}
