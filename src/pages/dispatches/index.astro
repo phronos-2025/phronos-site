@@ -36,24 +36,22 @@ const sortedDispatches = dispatches.sort(
       </div>
     </header>
 
-    <section class="section">
-      <div class="container">
-        <div class="card-grid">
-          {sortedDispatches.length > 0 ? (
-            sortedDispatches.map((dispatch) => (
-              <Card
-                id={dispatch.data.id}
-                title={dispatch.data.title}
-                description={dispatch.data.subtitle || ''}
-                status={dispatch.data.status}
-                version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
-                href={`/dispatches/${dispatch.slug}`}
-              />
-            ))
-          ) : (
-            <p class="empty-state">First dispatch coming soon.</p>
-          )}
-        </div>
+    <section class="dispatches-cards">
+      <div class="card-grid">
+        {sortedDispatches.length > 0 ? (
+          sortedDispatches.map((dispatch) => (
+            <Card
+              id={dispatch.data.id}
+              title={dispatch.data.title}
+              description={dispatch.data.subtitle || ''}
+              status={dispatch.data.status}
+              version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
+              href={`/dispatches/${dispatch.slug}`}
+            />
+          ))
+        ) : (
+          <p class="empty-state">First dispatch coming soon.</p>
+        )}
       </div>
     </section>
   </div>
@@ -107,6 +105,12 @@ const sortedDispatches = dispatches.sort(
     color: var(--faded);
     max-width: 600px;
     line-height: 1.7;
+  }
+
+  .dispatches-cards {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
   }
 
   .empty-state {

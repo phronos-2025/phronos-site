@@ -17,13 +17,27 @@ const sortedDispatches = dispatches.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
+const methods = await getCollection('methods', ({ data }) => 
+  data.status !== 'archived'
+);
+const sortedMethods = methods.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Helper to extract first sentence
+function getFirstSentence(text: string): string {
+  if (!text) return '';
+  // If the text doesn't end with sentence-ending punctuation, return it as-is
+  // Otherwise, match up to the first sentence-ending punctuation followed by space or capital letter
+  if (!/[.!?]/.test(text)) return text;
+  // Match sentence ending: period/!/ followed by space and capital letter, or end of string
+  const match = text.match(/^[^.!?]+[.!?](?=\s+[A-Z]|$)/);
+  return match ? match[0].trim() : text;
+}
+
 // Placeholder data for coming soon sections
 const libraryItems = [
   { id: 'LIB-001', title: 'Cognitive Effects of LLM Interaction', description: 'A synthesis of peer-reviewed literature on how conversational AI affects human reasoning and decision-making.', status: 'researching' as const },
-];
-
-const methodItems = [
-  { id: 'MTH-001', title: 'Observational Chat Analysis', description: 'Analyzing real-world human-AI chats. Measures effects of AI protest on human responses.', status: 'researching' as const },
 ];
 
 const instrumentItems = [
@@ -47,7 +61,7 @@ const instrumentItems = [
             <Card
               id={dispatch.data.id}
               title={dispatch.data.title}
-              description={dispatch.data.subtitle || dispatch.body.slice(0, 150) + '...'}
+              description={getFirstSentence(dispatch.data.subtitle || '')}
               status={dispatch.data.status}
               version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
               href={`/dispatches/${dispatch.slug}`}
@@ -82,12 +96,14 @@ const instrumentItems = [
     <div class="container">
       <SectionHeader id="03" title="Methods" />
       <div class="card-grid">
-        {methodItems.map((item) => (
+        {sortedMethods.map((method) => (
           <Card
-            id={item.id}
-            title={item.title}
-            description={item.description}
-            status={item.status}
+            id={method.data.id}
+            title={method.data.title}
+            description={getFirstSentence(method.data.abstract || '')}
+            status={method.data.status}
+            version={method.data.version ? `v${method.data.version}` : undefined}
+            href={method.data.status === 'published' ? `/methods/${method.slug}` : undefined}
           />
         ))}
       </div>

@@ -54,6 +54,12 @@
   line-height: 1.7;
 }
 
+.methods-cards {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
 /* ================================ */
 /* DETAIL PAGE                      */
 /* ================================ */
