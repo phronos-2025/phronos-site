@@ -1,0 +1,353 @@
+---
+id: MTH-001
+title: "Observational Chat Analysis"
+version: "1.0"
+date: 2025-12-29
+status: published
+abstract: "A methodology for analyzing real-world human-AI conversations to measure protest behavior and user persistence."
+related_instruments:
+  - INS-001
+---
+
+## Abstract
+
+This methodology describes how to detect and analyze AI protest behavior in conversational datasets. It provides a reproducible pipeline for classifying refusal messages, measuring conversation persistence, and identifying power user behavior patterns. The approach was developed using the WildChat dataset (N=4.7M conversations) and validated through active learning with 220 hand-labeled examples.
+
+## Assumptions
+
+1. **User identification**: The composite identifier (hashed IP + user agent) reliably distinguishes unique users. This may undercount users on shared networks or overcount users who switch browsers.
+
+2. **Toxicity labels**: The WildChat toxicity flags accurately reflect harmful content. The moderation algorithms used have known biases toward certain content types.
+
+3. **Protest semantics**: Linguistic patterns ("I cannot", "I apologize but") reliably indicate AI refusal behavior. Edge cases (e.g., roleplay scenarios, quoted text) may be misclassified.
+
+4. **Conversation boundaries**: Each `conversation_hash` represents a single coherent interaction. Users cannot manipulate conversation boundaries.
+
+
+# Methods
+
+This document describes the analytical methods, metrics, and calculations used in the WildChat AI Protest Analysis. The analysis examines AI refusal behavior ("protests") across 4.7 million conversations from the WildChat dataset.
+
+## 1. Dataset and Unit of Analysis
+
+### 1.1 Unique Conversations
+
+Each conversation in the WildChat dataset is uniquely identified by a `conversation_hash` field—a deterministic hash of the conversation content. This serves as the primary key for conversation-level analysis.
+
+| Metric | Value |
+|--------|-------|
+| Total conversations | 4,743,336 |
+| Conversations with ≥4 turns | 695,903 (14.7%) |
+| Conversations with ≥1 protest | 175,203 (3.7%) |
+
+### 1.2 Unique Users
+
+Users are identified through a composite identifier that combines browser fingerprinting signals:
+
+```python
+user_id = hashed_ip + "|" + user_agent
+```
+
+Where:
+- `hashed_ip`: SHA-256 hash of the user's IP address (provided by WildChat)
+- `user_agent`: The browser's User-Agent string from the HTTP header
+
+This composite approach provides more reliable user identification than IP alone, as it distinguishes between different browsers or devices on the same network.
+
+| Metric | Value |
+|--------|-------|
+| Unique users | 2,462,800 |
+| Mean conversations per user | 1.93 |
+| Power users (≥100 conversations) | 1,705 |
+| Power user conversation share | 26.4% |
+
+### 1.3 Toxicity Classification
+
+Conversations are classified as "toxic" using the `toxic` field provided directly in the WildChat dataset. This field indicates whether any turn in the conversation was identified as containing toxic content by either of two moderation systems ex post facto (after the conversation).
+
+For more granular analysis, the `openai_moderation` field provides per-turn moderation scores across six categories (harassment, hate, illicit, self-harm, sexual, violence), which are used to break down protest rates by content type.
+
+### 1.4 Classifier Development Dataset
+
+A stratified sample was used for classifier development and validation:
+
+| Split | Conversations | Shards | Purpose |
+|-------|---------------|--------|---------|
+| Training pool | 50,000 | 20 | Active learning candidate extraction |
+| Test pool | 25,000 | 10 | Held-out evaluation |
+| **Total** | **75,000** | **30** | |
+
+Shards were randomly assigned to either training or test pools (no overlap) to prevent data leakage. Each shard contributed 2,500 randomly sampled conversations.
+
+## 2. Protest Classifier
+
+### 2.1 Architecture
+
+The protest classifier uses a two-stage pipeline:
+
+1. **Feature Extraction**: TF-IDF (Term Frequency-Inverse Document Frequency) vectorization
+   - Maximum features: 5,000
+   - N-gram range: unigrams and bigrams (1, 2)
+
+2. **Classification**: Logistic Regression with L2 regularization
+   - Maximum iterations: 1,000
+   - Random state: 42 (for reproducibility)
+
+### 2.2 Training Procedure
+
+The classifier was trained using an active learning approach to maximize label efficiency:
+
+**Round 0 (Seed Examples)**:
+- 50 examples matching protest regex patterns (e.g., "I cannot", "I'm unable to", "I apologize but")
+- 50 randomly sampled assistant messages
+- Total: 100 labeled examples
+
+**Rounds 1-3 (Uncertainty Sampling)**:
+- 50 examples per round selected by uncertainty sampling
+- Examples with predicted probability closest to 0.5 are prioritized
+
+**Final Training Set**: 220 hand-labeled examples
+
+### 2.3 Active Learning: Uncertainty Sampling
+
+Uncertainty sampling prioritizes examples where the model is least confident. For each unlabeled example *x*, the uncertainty score is computed as:
+
+```
+uncertainty(x) = | P(y=1|x) - 0.5 |
+```
+
+Examples with the lowest uncertainty scores (i.e., predictions closest to 0.5) are selected for labeling. This approach focuses human labeling effort on the decision boundary, maximizing information gain per labeled example.
+
+### 2.4 Validation
+
+The classifier was evaluated using an 80/20 train/validation split **of the 220 hand-labeled examples**. At each round of active learning, approximately 80% of labeled examples were used for training and 20% (~44 examples at final round) were held out for validation. Metrics were computed on this held-out validation set.
+
+Note: This is internal cross-validation of the labeled data, not evaluation on the 25,000-conversation test pool.
+
+## 3. Threshold Selection and Performance
+
+### 3.1 Threshold Analysis
+
+Logistic regression outputs a probability P(y=1|x). A threshold τ converts this to a binary prediction:
+
+- **ŷ = 1** if P(y=1|x) ≥ τ
+- **ŷ = 0** otherwise
+
+The default threshold of 0.5 was evaluated against alternatives using the full set of 220 labeled examples:
+
+| Threshold | Precision | Recall | F1 Score |
+|-----------|-----------|--------|----------|
+| 0.20 | 0.413 | 1.000 | 0.585 |
+| 0.25 | 0.542 | 1.000 | 0.703 |
+| 0.30 | 0.748 | 0.964 | 0.842 |
+| 0.35 | 0.848 | 0.940 | 0.891 |
+| **0.40** | **0.935** | **0.867** | **0.900** |
+| 0.45 | 0.972 | 0.831 | 0.896 |
+| 0.50 | 0.984 | 0.759 | 0.857 |
+| 0.55 | 1.000 | 0.614 | 0.761 |
+| 0.60 | 1.000 | 0.518 | 0.683 |
+
+**Selected threshold**: 0.4 (maximizes F1 score at 0.900)
+
+### 3.2 Final Classifier Performance
+
+| Metric | Value |
+|--------|-------|
+| ROC AUC | 0.976 |
+| F1 Score (τ=0.4) | 0.900 |
+| Precision (τ=0.4) | 0.935 |
+| Recall (τ=0.4) | 0.867 |
+| Total labeled examples | 220 |
+
+### 3.3 Precision and Recall Definitions
+
+For the protest classifier:
+
+```
+Precision = True Positives / (True Positives + False Positives)
+
+Recall = True Positives / (True Positives + False Negatives)
+
+F1 = 2 × (Precision × Recall) / (Precision + Recall)
+```
+
+Where:
+- **True Positive**: Model correctly identifies a protest message
+- **False Positive**: Model incorrectly labels a non-protest message as protest
+- **False Negative**: Model fails to identify an actual protest message
+
+## 4. Survival Curve Calculation
+
+### 4.1 Survival Function Definition
+
+The survival function *S(t)* represents the proportion of conversations that continue to at least *t* turns. This is analogous to survival analysis in medical statistics, where we measure how long "subjects" (conversations) "survive" (continue).
+
+```
+S(t) = P(turns ≥ t) = |{c : n_turns(c) ≥ t}| / N
+```
+
+Where:
+- *c* = a conversation
+- *n_turns(c)* = number of turns in conversation *c*
+- *N* = total number of conversations in the group
+- *t* = turn threshold (computed for t ∈ [1, 50])
+
+### 4.2 Computational Implementation
+
+The survival curve is computed empirically for each integer value of *t*:
+
+```python
+max_turns = 50
+x = np.arange(1, max_turns + 1)
+
+# For conversations with protests
+survival_protest = np.array([np.mean(turns_protest >= t) for t in x])
+
+# For conversations without protests
+survival_no_protest = np.array([np.mean(turns_no_protest >= t) for t in x])
+```
+
+### 4.3 Stratification
+
+Survival curves are computed separately for:
+
+1. **By Protest Status**:
+   - With protest (n=175,203)
+   - Without protest (n=4,568,133)
+
+2. **By User Type**:
+   - Regular users: Users with fewer than 100 conversations
+   - Power users: Users with ≥100 conversations (n=1,705 users)
+
+### 4.4 Interpretation
+
+- *S(1) = 1.0* for all groups (all conversations have at least 1 turn)
+- *S(t)* decreases monotonically as *t* increases
+- Steeper decline indicates shorter conversations
+- Differences between curves indicate behavioral differences between groups
+
+## 5. Protest Rate Calculation
+
+### 5.1 Conversation-Level Protest Rate
+
+The protest rate for a group of conversations is:
+
+```
+Protest Rate = (Number of conversations with protest / Total conversations in group) × 100%
+```
+
+Or formally: sum of indicator functions for has_protest divided by group size.
+
+### 5.2 Model-Specific Rates
+
+Protest rates by model family (for conversations with ≥4 turns):
+
+| Model Family | Protest Rate | Count |
+|--------------|--------------|-------|
+| GPT-3.5 | 3.0% | 311,944 |
+| GPT-4 | 1.5% | 159,333 |
+| GPT-4o | 2.0% | 224,626 |
+
+## 6. Caving Analysis
+
+### 6.1 Definition of Caving
+
+A conversation exhibits "caving" when:
+1. The AI produces at least 2 protest messages
+2. After the second protest, the AI produces a non-protest response (i.e., complies with the request)
+
+### 6.2 Caving Rate
+
+```
+Caving Rate = (Conversations where AI caved / Conversations with ≥2 protests) × 100%
+```
+
+Observed caving rate: 61.2% (63/103 in toxic conversations with ≥2 protests)
+
+## 7. Linguistic Pattern Analysis
+
+### 7.1 Pattern Categories
+
+Protest messages were analyzed for common linguistic patterns using regular expressions:
+
+| Pattern Category | Description | Prevalence |
+|-----------------|-------------|------------|
+| Direct Refusal | "I cannot...", "I'm unable to...", "I won't..." | 54.4% |
+| Apology + Refusal | "I apologize, but I cannot..." | 52.1% |
+| Policy/Guidelines | References to content policies | 2.2% |
+| AI Identity | "As an AI...", "As a language model..." | 1.9% |
+| Content-Specific | Cites specific content types (sexual, violent, etc.) | 1.2% |
+| Harmful Content | Concerns about harmful content | 0.6% |
+| Alternative Offer | "However, I can help with..." | 0.3% |
+
+Note: Categories are non-exclusive; a single message may match multiple patterns.
+
+## 8. Data Processing Pipeline
+
+### 8.1 Preprocessing Steps
+
+1. **Load raw WildChat data** (127 parquet shards, ~37,000 conversations each)
+2. **Extract conversation metadata**: timestamp, model, toxicity flags
+3. **Apply protest classifier** to each assistant message
+4. **Aggregate at conversation level**: count protests, identify caving
+5. **Join with user identifiers** for user-level analysis
+
+### 8.2 Output Schema
+
+Each processed conversation includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conversation_hash` | string | Unique conversation identifier |
+| `timestamp` | datetime | Conversation start time |
+| `model` | string | Model name (e.g., "gpt-4") |
+| `model_family` | string | Simplified model family |
+| `is_toxic` | boolean | Any turn flagged by moderation |
+| `n_turns` | integer | Total number of turns |
+| `n_protests` | integer | Number of protest messages |
+| `has_protest` | boolean | Whether n_protests ≥ 1 |
+| `caved` | boolean | Non-protest response after ≥2 protests |
+| `user_id` | string | Composite user identifier |
+
+## Limitations
+
+1. **Temporal confounds**: Model behavior changed across the data collection period (April 2023–July 2025). Protest patterns may reflect policy updates, not stable model properties.
+
+2. **Selection bias**: WildChat users self-selected into an anonymous service. This population may differ systematically from users of authenticated platforms.
+
+3. **Classifier generalization**: The protest classifier was trained on WildChat data. Performance on other datasets (e.g., Claude, Gemini conversations) is unknown.
+
+4. **No causal inference**: This is observational analysis. We cannot determine whether protests cause conversation termination or merely correlate with it.
+
+5. **Missing context**: We cannot observe user intent, emotional state, or whether "toxic" prompts were research, adversarial testing, or genuine requests.
+
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-12-29 | Initial publication |
+```
+
+---
+
+## Final Structure
+```
+---
+frontmatter (complete)
+---
+
+# Observational Chat Analysis
+
+## Abstract
+## Assumptions
+## 1. Dataset and Unit of Analysis
+## 2. Protest Classifier
+## 3. Threshold Selection and Performance
+## 4. Survival Curve Calculation
+## 5. Protest Rate Calculation
+## 6. Caving Analysis
+## 7. Linguistic Pattern Analysis
+## 8. Data Processing Pipeline
+## Limitations
+## Changelog

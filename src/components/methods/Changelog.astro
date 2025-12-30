@@ -1,0 +1,31 @@
+---
+interface ChangelogEntry {
+  version: string;
+  date: string;
+  note: string;
+}
+
+interface Props {
+  entries: ChangelogEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+{entries && entries.length > 0 && (
+  <div class="changelog">
+    <h2 class="changelog-title">Changelog</h2>
+    {entries.map((entry) => (
+      <div class="changelog-entry">
+        <span class="changelog-version">{entry.version}</span>
+        <span class="changelog-date">{entry.date}</span>
+        <span class="changelog-note">{entry.note}</span>
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+  @import '../../styles/components/methods.css';
+</style>
+

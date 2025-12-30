@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/global/Nav.astro';
+import Footer from '../../components/global/Footer.astro';
+import MethodMetaBar from '../../components/methods/MethodMetaBar.astro';
+import MethodHeader from '../../components/methods/MethodHeader.astro';
+import AbstractBlock from '../../components/methods/AbstractBlock.astro';
+import Changelog from '../../components/methods/Changelog.astro';
+import RelatedWork from '../../components/methods/RelatedWork.astro';
+import NotebookLink from '../../components/methods/NotebookLink.astro';
+import Table from '../../components/content/Table.astro';
+import Callout from '../../components/content/Callout.astro';
+import '../../styles/components/methods.css';
+
+export async function getStaticPaths() {
+  const methods = await getCollection('methods');
+  return methods.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// MDX components to pass
+const components = { Table, Callout };
+---
+
+<BaseLayout 
+  title={entry.data.title}
+  description={entry.data.abstract}
+>
+  <Nav slot="nav" />
+  
+  <article class="method-article">
+    <MethodMetaBar
+      id={entry.data.id}
+      version={entry.data.version}
+      date={entry.data.date}
+      status={entry.data.status}
+    />
+
+    <MethodHeader
+      title={entry.data.title}
+      subtitle={entry.data.subtitle}
+    />
+
+    {entry.data.abstract && (
+      <AbstractBlock abstract={entry.data.abstract} />
+    )}
+
+    <article class="method-body">
+      <div class="method-content">
+        <Content components={components} />
+      </div>
+    </article>
+
+    {entry.data.notebook && (
+      <NotebookLink href={entry.data.notebook} />
+    )}
+
+    <Changelog entries={entry.data.changelog || []} />
+
+    <RelatedWork
+      dispatchSlugs={entry.data.related_dispatches || []}
+      instrumentSlugs={entry.data.related_instruments || []}
+      librarySlugs={entry.data.related_library || []}
+    />
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style is:global>
+  @import '../../styles/components/methods.css';
+</style>
+

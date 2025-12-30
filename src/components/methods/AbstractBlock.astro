@@ -1,0 +1,17 @@
+---
+interface Props {
+  abstract: string;
+}
+
+const { abstract } = Astro.props;
+---
+
+<div class="abstract-block">
+  <div class="abstract-label">Abstract</div>
+  <p class="abstract-text">{abstract}</p>
+</div>
+
+<style>
+  @import '../../styles/components/methods.css';
+</style>
+

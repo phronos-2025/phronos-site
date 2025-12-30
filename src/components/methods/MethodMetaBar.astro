@@ -1,0 +1,126 @@
+---
+interface Props {
+  id: string;
+  version?: string;
+  date: Date;
+  status: 'published' | 'researching' | 'planned' | 'archived';
+}
+
+const { id, version, date, status } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+---
+
+<div class="method-meta-bar">
+  <div class="method-meta-row">
+    <span class="method-meta-id">{id}</span>
+    <span class="method-meta-center">Methodology</span>
+    <div class="method-meta-status-group">
+      <span class="method-meta-status-text">{statusLabel}</span>
+      <span class:list={['status-dot', status]}></span>
+    </div>
+  </div>
+  <div class="method-meta-row">
+    <span class="method-meta-version">{version ? `v${version}` : '—'}</span>
+    <span class="method-meta-date">{formattedDate}</span>
+  </div>
+</div>
+
+<style>
+  .method-meta-bar {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  .method-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .method-meta-row + .method-meta-row {
+    margin-top: 0.25rem;
+  }
+
+  .method-meta-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+  }
+
+  .method-meta-center {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .method-meta-status-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .method-meta-status-text {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  :global(.status-dot) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--faded);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  :global(.status-dot.published) {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  :global(.status-dot.researching) {
+    background: var(--gold);
+    animation: pulse 3s infinite;
+  }
+
+  :global(.status-dot.planned) {
+    background: var(--faded);
+  }
+
+  :global(.status-dot.archived) {
+    background: var(--faded-light);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .method-meta-version {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+  }
+
+  .method-meta-date {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+</style>
+
