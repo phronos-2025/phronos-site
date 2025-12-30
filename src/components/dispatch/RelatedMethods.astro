@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import Card from '../cards/Card.astro';
+
+interface Props {
+  methodSlugs?: string[];
+}
+
+const { methodSlugs = [] } = Astro.props;
+
+// Fetch related methods
+const allMethods = await getCollection('methods');
+
+// Match by slug (folder name like "mth-001")
+const relatedMethods = allMethods.filter(m => 
+  methodSlugs.some(slug => slug.toLowerCase() === m.slug.toLowerCase())
+);
+
+// Helper to extract first sentence
+function getFirstSentence(text: string): string {
+  if (!text) return '';
+  const match = text.match(/^[^.!?]*[.!?]/);
+  return match ? match[0].trim() : text.trim();
+}
+---
+
+{relatedMethods.length > 0 && (
+  <div class="related-methods-section">
+    <div class="related-methods-label">Related Methods</div>
+    <div class="related-methods-grid">
+      {relatedMethods.map((method) => (
+        <Card
+          id={method.data.id}
+          title={method.data.title}
+          description={getFirstSentence(method.data.abstract || '')}
+          status={method.data.status}
+          version={method.data.version ? `v${method.data.version}` : undefined}
+          href={`/methods/${method.slug}`}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .related-methods-section {
+    max-width: 720px;
+    margin: 3rem auto;
+    padding: 0 5%;
+  }
+
+  .related-methods-label {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .related-methods-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .related-methods-section {
+      padding: 0;
+    }
+  }
+</style>
+

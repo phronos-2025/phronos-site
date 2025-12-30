@@ -7,6 +7,7 @@ import DispatchHeader from '../../components/dispatch/DispatchHeader.astro';
 import AuthorBlock from '../../components/dispatch/AuthorBlock.astro';
 import DispatchFooter from '../../components/dispatch/DispatchFooter.astro';
 import SubscribeCTA from '../../components/dispatch/SubscribeCTA.astro';
+import RelatedMethods from '../../components/dispatch/RelatedMethods.astro';
 import Table from '../../components/content/Table.astro';
 import Figure from '../../components/content/Figure.astro';
 import Callout from '../../components/content/Callout.astro';
@@ -61,6 +62,10 @@ const components = { Table, Figure, Callout, Caption, PullQuote };
       references={entry.data.references}
       topics={entry.data.topics}
     />
+
+    {entry.data.references?.methods && entry.data.references.methods.length > 0 && (
+      <RelatedMethods methodSlugs={entry.data.references.methods} />
+    )}
     
     <SubscribeCTA />
   </article>
