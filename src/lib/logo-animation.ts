@@ -19,15 +19,27 @@ export class PhronosLens {
   private ctx: CanvasRenderingContext2D;
   private size: number;
   private scale: number;
+  private dpr: number;
   private rotation: number = 0;
   private animationId: number | null = null;
   private lastTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, options: { size?: number } = {}) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
     this.size = options.size || canvas.width || 31;
     this.scale = this.size / 31;
+    
+    // DPR scaling for retina displays
+    this.dpr = window.devicePixelRatio || 1;
+    
+    // Scale canvas for retina
+    canvas.width = this.size * this.dpr;
+    canvas.height = this.size * this.dpr;
+    canvas.style.width = `${this.size}px`;
+    canvas.style.height = `${this.size}px`;
+    
+    this.ctx = canvas.getContext('2d')!;
+    this.ctx.scale(this.dpr, this.dpr);
   }
 
   private scaled(value: number): number {
@@ -120,8 +132,15 @@ export class PhronosLens {
   resize(newSize: number): void {
     this.size = newSize;
     this.scale = newSize / 31;
-    this.canvas.width = newSize;
-    this.canvas.height = newSize;
+    
+    // Apply DPR scaling
+    this.canvas.width = newSize * this.dpr;
+    this.canvas.height = newSize * this.dpr;
+    this.canvas.style.width = `${newSize}px`;
+    this.canvas.style.height = `${newSize}px`;
+    
+    // Reset context scale after resize (canvas resize clears context state)
+    this.ctx.scale(this.dpr, this.dpr);
   }
 }
 
