@@ -1,0 +1,18 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+
+const { title, subtitle } = Astro.props;
+---
+
+<header class="method-header">
+  <h1 class="method-title">{title}</h1>
+  {subtitle && <p class="method-subtitle">{subtitle}</p>}
+</header>
+
+<style>
+  @import '../../styles/components/methods.css';
+</style>
+

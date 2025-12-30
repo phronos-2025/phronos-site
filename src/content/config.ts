@@ -38,11 +38,20 @@ const methods = defineCollection({
   schema: z.object({
     id: z.string(),
     title: z.string(),
+    subtitle: z.string().optional(),
     date: z.date(),
     status: z.enum(['published', 'researching', 'planned', 'archived']),
     abstract: z.string().optional(),
     version: z.string().optional(),
+    notebook: z.string().optional(),
+    related_dispatches: z.array(z.string()).optional(),
     related_instruments: z.array(z.string()).optional(),
+    related_library: z.array(z.string()).optional(),
+    changelog: z.array(z.object({
+      version: z.string(),
+      date: z.string(),
+      note: z.string(),
+    })).optional(),
   }),
 });
 

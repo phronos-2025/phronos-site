@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/global/Nav.astro';
+import Footer from '../../components/global/Footer.astro';
+import Card from '../../components/cards/Card.astro';
+import '../../styles/components/methods.css';
+
+const methods = await getCollection('methods', ({ data }) => 
+  data.status !== 'archived'
+);
+
+const sortedMethods = methods.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout 
+  title="Methods"
+  description="Protocols and technical frameworks for measuring cognition"
+>
+  <Nav slot="nav" />
+
+  <div class="methods-page">
+    <header class="methods-hero">
+      <div class="methods-label">
+        <span class="methods-label-line"></span>
+        <span class="methods-label-text">Methodologies</span>
+      </div>
+      <h1 class="methods-title">Methods</h1>
+      <p class="methods-intro">
+        Protocols and technical frameworks for measuring cognition. Each method 
+        specifies assumptions, procedures, and limitations—open to scrutiny and 
+        replication.
+      </p>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="card-grid">
+          {sortedMethods.length > 0 ? (
+            sortedMethods.map((method) => (
+              <Card
+                id={method.data.id}
+                title={method.data.title}
+                description={method.data.abstract || ''}
+                status={method.data.status}
+                version={method.data.version ? `v${method.data.version}` : undefined}
+                href={method.data.status === 'published' ? `/methods/${method.slug}` : undefined}
+              />
+            ))
+          ) : (
+            <p class="empty-state">First method coming soon.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .empty-state {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--faded);
+    text-align: center;
+    padding: var(--space-xl);
+  }
+</style>
+

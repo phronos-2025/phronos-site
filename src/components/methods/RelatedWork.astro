@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import Card from '../cards/Card.astro';
+
+interface Props {
+  dispatchSlugs?: string[];
+  instrumentSlugs?: string[];
+  librarySlugs?: string[];
+}
+
+const { dispatchSlugs = [], instrumentSlugs = [], librarySlugs = [] } = Astro.props;
+
+// Fetch related content
+const allDispatches = await getCollection('dispatches');
+const allInstruments = await getCollection('instruments');
+// const allLibrary = await getCollection('library');
+
+const relatedDispatches = allDispatches.filter(d => dispatchSlugs.includes(d.slug));
+const relatedInstruments = allInstruments.filter(i => instrumentSlugs.includes(i.data.id.toLowerCase()));
+// const relatedLibrary = allLibrary.filter(l => librarySlugs.includes(l.slug));
+
+const hasRelated = relatedDispatches.length > 0 || relatedInstruments.length > 0;
+---
+
+{hasRelated && (
+  <div class="related-section">
+    <div class="related-label">Related Work</div>
+    <div class="related-grid">
+      {relatedDispatches.map((dispatch) => (
+        <Card
+          id={dispatch.data.id}
+          title={dispatch.data.title}
+          description={dispatch.data.subtitle || ''}
+          status={dispatch.data.status}
+          version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
+          href={`/dispatches/${dispatch.slug}`}
+        />
+      ))}
+      {relatedInstruments.map((instrument) => (
+        <Card
+          id={instrument.data.id}
+          title={instrument.data.title}
+          description={instrument.data.description}
+          status={instrument.data.status}
+          version={instrument.data.version ? `v${instrument.data.version}` : undefined}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  @import '../../styles/components/methods.css';
+</style>
+
