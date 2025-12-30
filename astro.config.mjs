@@ -13,7 +13,24 @@ export default defineConfig({
       remarkPlugins: [remarkMath],
       rehypePlugins: [rehypeKatex],
     }),
-    sitemap(),
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+      serialize: (item) => {
+        // Higher priority for dispatches and methods
+        if (item.url.includes('/dispatches/') && !item.url.endsWith('/dispatches/')) {
+          item.priority = 0.9;
+        } else if (item.url.includes('/methods/') && !item.url.endsWith('/methods/')) {
+          item.priority = 0.8;
+        } else if (item.url.endsWith('/dispatches/') || item.url.endsWith('/methods/')) {
+          item.priority = 0.7;
+        } else if (item.url === 'https://phronos.org/') {
+          item.priority = 1.0;
+        } else {
+          item.priority = 0.5;
+        }
+        return item;
+      },
+    }),
   ],
   markdown: {
     remarkPlugins: [remarkMath],

@@ -8,6 +8,7 @@ import AuthorBlock from '../../components/dispatch/AuthorBlock.astro';
 import DispatchFooter from '../../components/dispatch/DispatchFooter.astro';
 import SubscribeCTA from '../../components/dispatch/SubscribeCTA.astro';
 import RelatedMethods from '../../components/dispatch/RelatedMethods.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
 import Table from '../../components/content/Table.astro';
 import Figure from '../../components/content/Figure.astro';
 import Callout from '../../components/content/Callout.astro';
@@ -33,7 +34,19 @@ const components = { Table, Figure, Callout, Caption, PullQuote };
 <BaseLayout 
   title={entry.data.title}
   description={entry.data.subtitle}
+  ogType="article"
+  publishedTime={entry.data.date.toISOString()}
+  author={entry.data.author}
+  ogImage={`/images/dispatches/${entry.slug}/og.png`}
 >
+  <JsonLd schema={{
+    type: 'Article',
+    headline: entry.data.title,
+    author: entry.data.author,
+    datePublished: entry.data.date.toISOString(),
+    description: entry.data.subtitle,
+    image: `https://phronos.org/images/dispatches/${entry.slug}/og.png`
+  }} />
   <Nav slot="nav" />
   
   <article class="dispatch-article">

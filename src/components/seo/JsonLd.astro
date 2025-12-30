@@ -1,0 +1,88 @@
+---
+interface OrganizationSchema {
+  type: 'Organization';
+  name: string;
+  url: string;
+  logo?: string;
+  description?: string;
+}
+
+interface ArticleSchema {
+  type: 'Article';
+  headline: string;
+  author: string;
+  datePublished: string;
+  dateModified?: string;
+  description?: string;
+  image?: string;
+  publisher?: string;
+}
+
+interface WebSiteSchema {
+  type: 'WebSite';
+  name: string;
+  url: string;
+  description?: string;
+}
+
+type Schema = OrganizationSchema | ArticleSchema | WebSiteSchema;
+
+interface Props {
+  schema: Schema;
+}
+
+const { schema } = Astro.props;
+
+function generateSchema(schema: Schema) {
+  const baseContext = { "@context": "https://schema.org" };
+  
+  switch (schema.type) {
+    case 'Organization':
+      return {
+        ...baseContext,
+        "@type": "Organization",
+        name: schema.name,
+        url: schema.url,
+        ...(schema.logo && { logo: schema.logo }),
+        ...(schema.description && { description: schema.description }),
+      };
+    
+    case 'Article':
+      return {
+        ...baseContext,
+        "@type": "Article",
+        headline: schema.headline,
+        author: {
+          "@type": "Person",
+          name: schema.author,
+        },
+        datePublished: schema.datePublished,
+        ...(schema.dateModified && { dateModified: schema.dateModified }),
+        ...(schema.description && { description: schema.description }),
+        ...(schema.image && { image: schema.image }),
+        publisher: {
+          "@type": "Organization",
+          name: schema.publisher || "Phronos",
+          url: "https://phronos.org",
+        },
+      };
+    
+    case 'WebSite':
+      return {
+        ...baseContext,
+        "@type": "WebSite",
+        name: schema.name,
+        url: schema.url,
+        ...(schema.description && { description: schema.description }),
+      };
+    
+    default:
+      return baseContext;
+  }
+}
+
+const jsonLd = generateSchema(schema);
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+

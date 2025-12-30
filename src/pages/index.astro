@@ -8,6 +8,7 @@ import Card from '../components/cards/Card.astro';
 import Hero from '../components/home/Hero.astro';
 import AboutSection from '../components/home/AboutSection.astro';
 import SubscribeSection from '../components/home/SubscribeSection.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
 
 // Fetch content collections
 const dispatches = await getCollection('dispatches', ({ data }) => 
@@ -47,6 +48,13 @@ const instrumentItems = [
 ---
 
 <BaseLayout title="Observatory for Human Cognition">
+  <JsonLd schema={{
+    type: 'Organization',
+    name: 'Phronos',
+    url: 'https://phronos.org',
+    logo: 'https://phronos.org/favicon.png',
+    description: 'An observatory for human cognition in the era of artificial intelligence.'
+  }} />
   <Nav slot="nav" />
   
   <Hero />
