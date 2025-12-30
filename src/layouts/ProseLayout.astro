@@ -6,12 +6,17 @@ import Footer from '../components/global/Footer.astro';
 interface Props {
   title: string;
   description?: string;
+  id?: string;
   version?: string;
   date?: string;
   status?: string;
+  type?: string;
 }
 
-const { title, description, version, date, status } = Astro.props;
+const { title, description, id, version, date, status, type = 'Document' } = Astro.props;
+
+// Map status to CSS class for the dot
+const statusClass = status?.toLowerCase().replace(/\s+/g, '-') || 'planned';
 ---
 
 <BaseLayout title={title} description={description}>
@@ -19,26 +24,23 @@ const { title, description, version, date, status } = Astro.props;
   
   <article class="prose-page">
     <header class="prose-header">
-      <div class="container container-narrow">
-        {(version || date || status) && (
-          <div class="prose-meta">
-            {version && (
-              <span class="prose-meta-item">
-                <span class="prose-meta-label">Version:</span> {version}
-              </span>
-            )}
-            {date && (
-              <span class="prose-meta-item">
-                <span class="prose-meta-label">Updated:</span> {date}
-              </span>
-            )}
-            {status && (
-              <span class="prose-meta-item">
-                <span class="prose-meta-label">Status:</span> {status}
-              </span>
-            )}
-          </div>
-        )}
+      <div class="prose-meta-bar">
+        <div class="prose-meta-row">
+          {id && <span class="prose-meta-id">{id}</span>}
+          <span class="prose-meta-type">{type}</span>
+          {status && (
+            <div class="prose-meta-status-group">
+              <span class="prose-meta-status">{status}</span>
+              <span class={`status-dot ${statusClass}`}></span>
+            </div>
+          )}
+        </div>
+        <div class="prose-meta-row">
+          {version && <span class="prose-meta-version">v{version}</span>}
+          {date && <span class="prose-meta-date">{date}</span>}
+        </div>
+      </div>
+      <div class="prose-title-container">
         <h1 class="prose-title">{title}</h1>
       </div>
     </header>
@@ -57,55 +59,137 @@ const { title, description, version, date, status } = Astro.props;
   }
 
   .prose-header {
-    padding: var(--space-xl) 0;
-    border-bottom: 1px solid var(--faded-light);
     margin-bottom: var(--space-xl);
   }
 
-  .prose-meta {
+  /* Meta bar - two-row layout like Methods/Dispatches */
+  .prose-meta-bar {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  .prose-meta-row {
     display: flex;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-md);
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prose-meta-row + .prose-meta-row {
+    margin-top: 0.25rem;
+  }
+
+  .prose-meta-id {
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-size: 0.75rem;
+    color: var(--gold);
+  }
+
+  .prose-meta-version {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+  }
+
+  .prose-meta-type {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--faded);
   }
 
-  .prose-meta-item {
+  .prose-meta-status-group {
     display: flex;
-    gap: var(--space-xs);
+    align-items: center;
+    gap: 0.4rem;
   }
 
-  .prose-meta-label {
-    color: var(--gold);
+  .prose-meta-status {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .prose-meta-date {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  /* Status dot with pulse animation */
+  :global(.status-dot) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--faded);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  :global(.status-dot.living) {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  :global(.status-dot.published) {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  :global(.status-dot.draft) {
+    background: var(--gold);
+    animation: pulse 3s infinite;
+  }
+
+  :global(.status-dot.archived) {
+    background: var(--faded-light);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Title section */
+  .prose-title-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-lg) 2rem;
   }
 
   .prose-title {
-    font-family: var(--font-serif);
-    font-size: clamp(2rem, 5vw, var(--text-2xl));
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.5rem);
     font-weight: 400;
     color: var(--ink);
     line-height: 1.2;
   }
 
+  /* Content styles - using Lora for body text */
   .prose-content {
-    font-family: var(--font-serif);
+    font-family: var(--font-body);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
   }
 
   .prose-content :global(h2) {
-    font-size: var(--text-xl);
+    font-family: var(--font-display);
+    font-size: 1.6rem;
     font-weight: 400;
     color: var(--ink);
-    margin-top: 3rem;
+    margin-top: 2.5rem;
     margin-bottom: var(--space-md);
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--faded-light);
   }
 
   .prose-content :global(h3) {
-    font-size: var(--text-lg);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
     font-weight: 500;
     color: var(--ink);
     margin-top: 2rem;
@@ -113,7 +197,9 @@ const { title, description, version, date, status } = Astro.props;
   }
 
   .prose-content :global(p) {
-    font-size: var(--text-md);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
     line-height: 1.8;
     color: var(--ink);
     margin-bottom: var(--space-md);
@@ -171,8 +257,26 @@ const { title, description, version, date, status } = Astro.props;
   }
 
   .prose-content :global(li) {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
     margin-bottom: var(--space-sm);
-    line-height: 1.7;
+    line-height: 1.8;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .prose-meta-bar {
+      padding: 2rem 1rem 1rem;
+    }
+    
+    .prose-title-container {
+      padding: var(--space-md) 1rem;
+    }
+    
+    .prose-content {
+      padding: 0 1rem;
+    }
   }
 </style>
 
