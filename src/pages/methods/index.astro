@@ -35,6 +35,7 @@ const sortedMethods = methods.sort(
       </p>
     </header>
 
+<<<<<<< HEAD
     <section class="methods-cards">
       <div class="card-grid">
         {sortedMethods.length > 0 ? (
@@ -51,6 +52,26 @@ const sortedMethods = methods.sort(
         ) : (
           <p class="empty-state">First method coming soon.</p>
         )}
+=======
+    <section class="section">
+      <div class="container">
+        <div class="card-grid">
+          {sortedMethods.length > 0 ? (
+            sortedMethods.map((method) => (
+              <Card
+                id={method.data.id}
+                title={method.data.title}
+                description={method.data.abstract || ''}
+                status={method.data.status}
+                version={method.data.version ? `v${method.data.version}` : undefined}
+                href={method.data.status === 'published' ? `/methods/${method.slug}` : undefined}
+              />
+            ))
+          ) : (
+            <p class="empty-state">First method coming soon.</p>
+          )}
+        </div>
+>>>>>>> e95cef139f45f9ef6a024af672d4e9af2c14b013
       </div>
     </section>
   </div>
