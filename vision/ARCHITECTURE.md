@@ -1,10 +1,10 @@
 # Phronos Site Architecture
 
-**Version:** 1.3.0  
-**Date:** 2025-12-27  
+**Version:** 1.4.0  
+**Date:** 2026-01-05  
 **Status:** Ready for implementation  
-**Alignment:** BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0, DISPATCH-PAGE.md v1.1.0  
-**Changes:** Added Font Loading, MDX Component Registration, CSS Import Order, and Image Path Convention sections per RECONCILIATION-PLAN.md
+**Alignment:** BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0, DISPATCH-PAGE.md v1.1.0, METHODS-SCHEMA.md v2.0.0  
+**Changes:** Hierarchical methods architecture (families + studies), semantic URLs, updated content schemas
 
 ---
 
@@ -202,21 +202,71 @@ body {
 
 ```
 phronos.org/
-├── /                       # Homepage (Field Journal style)
-├── /dispatches/            # Dispatch listing (card grid)
-│   └── /dispatches/[slug]  # Individual dispatch (DSP-###)
-├── /library/               # The Evidence Base (card grid)
-│   └── /library/[slug]     # Individual synthesis (LIB-###)
-├── /methods/               # Protocols listing (card grid)
-│   └── /methods/[slug]     # Individual method (MTH-###)
-├── /instruments/           # Active Research Tools (Dark Mode)
-│   └── /instruments/[slug] # Individual instrument (INS-###)
-├── /about                  # Founder bio, observatory philosophy
-├── /constitution           # The seven axioms
-└── /soul                   # Founder's statement
+├── /                                    # Homepage (Field Journal style)
+├── /dispatches/                         # Dispatch listing (card grid)
+│   └── /dispatches/[slug]               # Individual dispatch (DSP-###)
+├── /library/                            # The Evidence Base (card grid)
+│   └── /library/[slug]                  # Individual synthesis (LIB-###)
+├── /methods/                            # Methods listing (grouped by family)
+│   ├── /methods/[family-slug]/          # Method family overview (MTH-###)
+│   └── /methods/[family-slug]/[study-slug]/  # Individual study (MTH-###.N)
+├── /instruments/                        # Active Research Tools (Dark Mode)
+│   └── /instruments/[slug]              # Individual instrument (INS-###)
+├── /about                               # Founder bio, observatory philosophy
+├── /constitution                        # The seven axioms
+└── /soul                                # Founder's statement
+```
+
+**Example Methods URLs:**
+```
+/methods/                                              # All families
+/methods/observational-chat-analysis/                  # MTH-001 overview
+/methods/observational-chat-analysis/engagement-prediction/   # MTH-001.1
+/methods/observational-chat-analysis/semantic-exploration/    # MTH-001.2
+/methods/observational-chat-analysis/model-upgrade-impact/    # MTH-001.3
+/methods/observational-chat-analysis/concerning-sessions/     # MTH-001.4
+/methods/conversational-assessment/                    # MTH-002 overview
+/methods/conversational-assessment/verbal-fluency/     # MTH-002.1
 ```
 
 **Navigation Order:** Dispatches · Library · Methods · Instruments · About · [Subscribe]
+
+---
+
+## Methods ID System
+
+Methods use a hierarchical ID system for stable citation and cross-referencing:
+
+| Level | Format | Example | Description |
+|-------|--------|---------|-------------|
+| Family | MTH-NNN | MTH-001 | Methodology framework |
+| Study | MTH-NNN.N | MTH-001.3 | Individual analysis |
+| Version | vX.Y | v1.2 | Revision tracking |
+| Section | #anchor | #toxicity-analysis | Deep link target |
+
+**Citation Examples:**
+```
+MTH-001                          → Observational Chat Analysis (family)
+MTH-001.3                        → Model Upgrade Impact (study)
+MTH-001.3 v1.0                   → Specific version
+MTH-001.3#toxicity-analysis      → Section within study
+```
+
+**Stability Guarantees:**
+- IDs are permanent—`MTH-001.3` always refers to "Model Upgrade Impact"
+- Slugs may evolve (with redirects)—URL could change from `/model-upgrade-impact/` to `/capability-progression/`
+- Dispatches cite IDs, not URLs—robust to restructuring
+
+**Cross-Reference in Dispatch Frontmatter:**
+```yaml
+references:
+  methods:
+    - MTH-001           # Cites entire framework
+    - MTH-001.3         # Cites specific study
+    - MTH-001.4#emergence-timing  # Cites specific section
+```
+
+See **METHODS-SCHEMA.md** for complete specification.
 
 ---
 
@@ -338,40 +388,74 @@ version: "0.1"
 
 ### 6. Method Listing (`/methods/`)
 **Mode:** Light
+**Specification:** See **METHODS-SCHEMA.md** for complete content and authoring guidelines.
 
 **Layout:**
 - Page header with section title
-- Card grid of all methods
-- Cards use unified Card component
+- Method families displayed as grouped sections
+- Each family shows: ID, title, abstract, status, child study count
+- Child studies listed under each family with visual hierarchy
+- Cards use unified Card component with `variant="family"` and `variant="study"`
 
-### 7. Method Page (`/methods/[slug]`)
+**Grouping Behavior:**
+```
+MTH-001 · Observational Chat Analysis
+Framework for analyzing real-world human-AI conversations at scale
+Dataset: WildChat-4.8M · Status: Published · v1.1
+
+   MTH-001.1 · Engagement Prediction from First-Turn Features
+   MTH-001.2 · Semantic Exploration and Sustained Utilization  
+   MTH-001.3 · Model Upgrade Impact on User Engagement
+   MTH-001.4 · Characterizing Concerning Usage Sessions
+
+MTH-002 · Conversational Cognitive Assessment
+Framework for inferring cognitive traits from brief AI conversations
+Status: Researching · v0.1
+
+   MTH-002.1 · Verbal Fluency Assessment (planned)
+   MTH-002.2 · Belief Rigidity Inference (planned)
+```
+
+### 7. Method Family Page (`/methods/[family-slug]/`)
 **Mode:** Light
 
 **Layout:**
-- Meta bar (ID, version, status)
-- Title
+- Meta bar (ID, version, status, date)
+- Title + subtitle
 - Abstract
+- Dataset information block
 - Assumptions section
-- Methodology (detailed, academic-precise)
-- Limitations
-- Related instruments
+- Shared infrastructure (common tools, pipelines, classifiers)
+- Studies listing (auto-generated from child studies)
+- Framework-level limitations
 - Changelog
 
-**Frontmatter:**
-```yaml
----
-id: MTH-001
-title: "Observational Chat Analysis"
-version: "1.0"
-date: 2025-12-10
-status: published  # published | researching | planned | archived
-abstract: "A methodology for analyzing real-world human-AI conversations..."
-related_instruments:
-  - INS-001
----
-```
+**Frontmatter:** See METHODS-SCHEMA.md Section 2.1
 
-### 8. Instrument Listing (`/instruments/`)
+### 8. Method Study Page (`/methods/[family-slug]/[study-slug]/`)
+**Mode:** Light
+**Specification:** See **METHODS-SCHEMA.md** for complete content structure and authoring workflow.
+
+**Layout:**
+- Breadcrumb: Methods > [Family Title] > [Study Title]
+- Meta bar (ID, version, status, date)
+- Title + subtitle
+- Executive summary
+- Table of contents (generated from sections frontmatter)
+- Body: Methodology sections with anchored headers
+- Metrics and calculations (with LaTeX math)
+- Validation documentation
+- Limitations
+- Data artifacts table
+- Sibling navigation (previous/next study in family)
+- Changelog
+
+**Deep Linking:** All H2/H3 headers have explicit anchors for citation:
+- `MTH-001.4#toxicity-analysis` → `/methods/observational-chat-analysis/concerning-sessions/#toxicity-analysis`
+
+**Frontmatter:** See METHODS-SCHEMA.md Section 2.2
+
+### 9. Instrument Listing (`/instruments/`)
 **Mode:** Dark
 
 **Layout:**
@@ -379,7 +463,7 @@ related_instruments:
 - Card grid of all instruments
 - Cards use unified Card component (dark variant)
 
-### 9. Instrument Page (`/instruments/[slug]`)
+### 10. Instrument Page (`/instruments/[slug]`)
 **Mode:** Dark
 
 **Layout:**
@@ -404,7 +488,7 @@ version: "0.1"
 ---
 ```
 
-### 10. Constitution (`/constitution`)
+### 11. Constitution (`/constitution`)
 **Mode:** Light
 
 **Layout:**
@@ -416,7 +500,7 @@ version: "0.1"
 - Footer note about living document
 - Backronym
 
-### 11. Soul (`/soul`)
+### 12. Soul (`/soul`)
 **Mode:** Light
 
 **Layout:**
@@ -424,7 +508,7 @@ version: "0.1"
 - Founder byline
 - Backronym
 
-### 12. About (`/about`)
+### 13. About (`/about`)
 **Mode:** Light
 
 **Layout:**
@@ -750,7 +834,7 @@ const dispatches = defineCollection({
     data_source: z.string().optional(),
     topics: z.array(z.string()).optional(),
     references: z.object({
-      methods: z.array(z.string()).optional(),
+      methods: z.array(z.string()).optional(),      // Can reference MTH-001, MTH-001.3, or MTH-001.3#section
       library: z.array(z.string()).optional(),
       instruments: z.array(z.string()).optional(),
     }).optional(),
@@ -769,16 +853,62 @@ const library = defineCollection({
   }),
 });
 
-const methods = defineCollection({
+// Method Families (MTH-NNN) - Framework-level methodology documents
+const methodFamilies = defineCollection({
   type: 'content',
   schema: z.object({
-    id: z.string(),
+    id: z.string(),                                 // MTH-001
+    slug: z.string(),                               // observational-chat-analysis
+    type: z.literal('family'),
     title: z.string(),
+    subtitle: z.string().optional(),
     date: z.date(),
+    updated: z.date().optional(),
     status: z.enum(['published', 'researching', 'planned', 'archived']),
-    abstract: z.string().optional(),
-    version: z.string().optional(),
+    version: z.string(),
+    abstract: z.string(),
+    dataset: z.object({
+      name: z.string(),
+      source: z.string().optional(),
+      size: z.string().optional(),
+      collection_period: z.string().optional(),
+      url: z.string().optional(),
+    }).optional(),
     related_instruments: z.array(z.string()).optional(),
+    studies: z.array(z.string()).optional(),        // Auto-populated or manual
+    description: z.string(),                        // SEO meta description
+    keywords: z.array(z.string()).optional(),
+    author: z.string().default('Vishal Patel'),
+    contributors: z.array(z.string()).optional(),
+  }),
+});
+
+// Method Studies (MTH-NNN.N) - Individual analyses within a family
+const methodStudies = defineCollection({
+  type: 'content',
+  schema: z.object({
+    id: z.string(),                                 // MTH-001.3
+    slug: z.string(),                               // model-upgrade-impact
+    type: z.literal('study'),
+    family: z.string(),                             // MTH-001
+    family_slug: z.string(),                        // observational-chat-analysis
+    order: z.number(),                              // Position in family
+    title: z.string(),
+    subtitle: z.string().optional(),
+    date: z.date(),
+    updated: z.date().optional(),
+    status: z.enum(['published', 'researching', 'planned', 'archived']),
+    version: z.string(),
+    abstract: z.string(),
+    sections: z.array(z.object({                    // For deep linking
+      anchor: z.string(),
+      title: z.string(),
+    })).optional(),
+    supersedes: z.string().optional(),              // Previous version if major revision
+    notebook: z.string().optional(),                // Source notebook filename
+    description: z.string(),                        // SEO meta description
+    keywords: z.array(z.string()).optional(),
+    author: z.string().default('Vishal Patel'),
   }),
 });
 
@@ -790,13 +920,21 @@ const instruments = defineCollection({
     description: z.string(),
     status: z.enum(['live', 'calibrating', 'planned', 'archived']),
     order: z.number(),
-    related_method: z.string().optional(),
+    related_method: z.string().optional(),          // Can reference MTH-001 or MTH-001.3
     version: z.string().optional(),
   }),
 });
 
-export const collections = { dispatches, library, methods, instruments };
+export const collections = { 
+  dispatches, 
+  library, 
+  methodFamilies,
+  methodStudies,
+  instruments 
+};
 ```
+
+**Note:** See **METHODS-SCHEMA.md** for complete frontmatter specifications and authoring guidelines.
 
 ### Workflow
 
@@ -810,19 +948,31 @@ Status changes propagate automatically. No manual syncing.
 
 ```
 /src/content/
-├── config.ts              # Schema definitions
+├── config.ts                  # Schema definitions
 ├── dispatches/
-│   ├── dsp-001.mdx        # status: published
-│   └── dsp-002.mdx        # status: researching
+│   ├── dsp-001.mdx            # status: published
+│   └── dsp-002.mdx            # status: researching
 ├── library/
-│   └── lib-001.mdx        # status: planned
-├── methods/
-│   ├── mth-001.mdx        # status: published
-│   └── mth-002.mdx        # status: researching
+│   └── lib-001.mdx            # status: planned
+├── method-families/
+│   ├── mth-001-observational-chat-analysis.mdx    # MTH-001
+│   ├── mth-002-conversational-assessment.mdx      # MTH-002
+│   └── mth-003-relationship-dynamics.mdx          # MTH-003
+├── method-studies/
+│   ├── mth-001-1-engagement-prediction.mdx        # MTH-001.1
+│   ├── mth-001-2-semantic-exploration.mdx         # MTH-001.2
+│   ├── mth-001-3-model-upgrade-impact.mdx         # MTH-001.3
+│   ├── mth-001-4-concerning-sessions.mdx          # MTH-001.4
+│   ├── mth-002-1-verbal-fluency.mdx               # MTH-002.1
+│   └── mth-002-2-belief-rigidity.mdx              # MTH-002.2
 └── instruments/
-    ├── ins-001.mdx        # status: calibrating
-    └── ins-002.mdx        # status: calibrating
+    ├── ins-001.mdx            # status: calibrating
+    └── ins-002.mdx            # status: calibrating
 ```
+
+**File Naming Convention:**
+- Families: `mth-[NNN]-[slug].mdx` (e.g., `mth-001-observational-chat-analysis.mdx`)
+- Studies: `mth-[NNN]-[N]-[slug].mdx` (e.g., `mth-001-3-model-upgrade-impact.mdx`)
 
 ---
 
@@ -882,6 +1032,7 @@ These documents provide additional specification detail:
 
 | Document | Purpose |
 |----------|---------|
+| **METHODS-SCHEMA.md** | Methods article schema, frontmatter specs, notebook extraction workflow, authoring guidelines |
 | **CARD-SYSTEM.md** | Complete card component specification |
 | **DISPATCH-PAGE.md** | Dispatch detail page specification |
 | **BRAND.yaml** | Voice, tone, visual identity |
@@ -906,6 +1057,7 @@ All are living documents maintained alongside this architecture.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.4.0 | 2026-01-05 | Hierarchical methods architecture: two-tier structure (families + studies), semantic URLs, updated content schemas, added METHODS-SCHEMA.md reference |
 | 1.3.0 | 2025-12-27 | Added Font Loading (V1), MDX Component Registration, CSS Import Order, and Image Path Convention sections per RECONCILIATION-PLAN.md |
 | 1.2.1 | 2025-12-28 | Added DISPATCH-PAGE.md reference; updated dispatch page section with Cartographic Suite requirement and references schema |
 | 1.2.0 | 2025-12-28 | Aligned homepage with mockup v2; unified card system; updated grid values (60px light, 40px dark); expanded status taxonomy (6 statuses); added navigation order; detailed hero/about/footer specs |
