@@ -1,0 +1,246 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/global/Nav.astro';
+import Footer from '../../components/global/Footer.astro';
+import MethodMetaBar from '../../components/methods/MethodMetaBar.astro';
+import MethodHeader from '../../components/methods/MethodHeader.astro';
+import AbstractBlock from '../../components/methods/AbstractBlock.astro';
+import Changelog from '../../components/methods/Changelog.astro';
+import Table from '../../components/content/Table.astro';
+import Callout from '../../components/content/Callout.astro';
+import '../../styles/components/methods.css';
+
+export async function getStaticPaths() {
+  const families = await getCollection('methodFamilies');
+  return families.map((family) => ({
+    params: { family: family.data.slug },
+    props: { family },
+  }));
+}
+
+const { family } = Astro.props;
+const { Content } = await render(family);
+
+// Get child studies for this family
+const allStudies = await getCollection('methodStudies');
+const childStudies = allStudies
+  .filter((study) => study.data.family === family.data.id)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// MDX components to pass
+const components = { Table, Callout };
+---
+
+<BaseLayout 
+  title={family.data.title}
+  description={family.data.description}
+  ogType="article"
+  publishedTime={family.data.date.toISOString()}
+>
+  <Nav slot="nav" />
+  
+  <article class="method-article">
+    <MethodMetaBar
+      id={family.data.id}
+      version={family.data.version}
+      date={family.data.date}
+      status={family.data.status}
+    />
+
+    <MethodHeader
+      title={family.data.title}
+      subtitle={family.data.subtitle}
+    />
+
+    {family.data.abstract && (
+      <AbstractBlock abstract={family.data.abstract} />
+    )}
+
+    {family.data.dataset && (
+      <section class="dataset-block">
+        <div class="dataset-label">Dataset</div>
+        <div class="dataset-content">
+          <div class="dataset-name">{family.data.dataset.name}</div>
+          {family.data.dataset.source && (
+            <div class="dataset-meta">Source: {family.data.dataset.source}</div>
+          )}
+          {family.data.dataset.size && (
+            <div class="dataset-meta">Size: {family.data.dataset.size}</div>
+          )}
+          {family.data.dataset.collection_period && (
+            <div class="dataset-meta">Period: {family.data.dataset.collection_period}</div>
+          )}
+          {family.data.dataset.url && (
+            <a href={family.data.dataset.url} class="dataset-link" target="_blank" rel="noopener">
+              View Dataset →
+            </a>
+          )}
+        </div>
+      </section>
+    )}
+
+    {childStudies.length > 0 && (
+      <section class="studies-list">
+        <div class="studies-label">Studies in This Family</div>
+        <div class="studies-grid">
+          {childStudies.map((study) => (
+            <a 
+              href={`/methods/${family.data.slug}/${study.data.slug}/`} 
+              class="study-card"
+            >
+              <div class="study-card-header">
+                <span class="study-id">{study.data.id}</span>
+                <span class={`status-dot ${study.data.status}`}></span>
+              </div>
+              <div class="study-card-title">{study.data.title}</div>
+              <div class="study-card-subtitle">{study.data.subtitle}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <article class="method-body">
+      <div class="method-content">
+        <Content components={components} />
+      </div>
+    </article>
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .dataset-block {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+  }
+
+  .dataset-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .dataset-content {
+    background: var(--white);
+    border: 1px solid var(--faded-light);
+    padding: 1.25rem;
+  }
+
+  .dataset-name {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .dataset-meta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--faded);
+    margin-bottom: 0.25rem;
+  }
+
+  .dataset-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .dataset-link:hover {
+    color: var(--ink);
+  }
+
+  .studies-list {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-top: 1px solid var(--faded-light);
+  }
+
+  .studies-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--faded);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .studies-label::before {
+    content: '◈ ';
+    color: var(--gold);
+  }
+
+  .studies-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .study-card {
+    display: block;
+    background: var(--white);
+    border: 1px solid var(--faded-light);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: all var(--transition-default);
+  }
+
+  .study-card:hover {
+    border-color: var(--ink);
+    box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.05);
+  }
+
+  .study-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .study-id {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--gold);
+  }
+
+  .study-card-title {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+
+  .study-card-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--faded);
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .dataset-block {
+      padding: 1rem;
+    }
+
+    .studies-list {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+

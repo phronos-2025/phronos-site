@@ -1,0 +1,472 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001.4
+slug: model-upgrade-impact
+type: study
+family: MTH-001
+family_slug: observational-chat-analysis
+order: 4
+
+# === CONTENT ===
+title: "Model Upgrade Impact on User Engagement"
+subtitle: "Natural Experiment Analyzing Whether Capability Improvements Produce Measurable Behavioral Changes"
+abstract: |
+  A methodology for analyzing model upgrade impacts on user behavior using interrupted 
+  time series (ITS) design. Documents the operationalization of upgrade events from 
+  conversation metadata, daily metrics computation, weekly cohort return rate 
+  construction, segmented regression specification, and confound controls for secular 
+  trends, seasonality, and population shifts. The framework enables testing hypotheses 
+  about user attraction, retention, diversity, depth, and satisfaction around model 
+  version transitions. Findings are reported in the associated Dispatch.
+
+# === METADATA ===
+date: 2026-01-05
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-motivation
+    title: "Motivation"
+  - anchor: 2-methods
+    title: "Methods"
+  - anchor: 3-interrupted-time-series-design
+    title: "Time Series Design"
+  - anchor: 4-hypothesis-testing-framework
+    title: "Hypothesis Testing"
+  - anchor: 5-controlling-for-confounds
+    title: "Confound Control"
+  - anchor: 6-limitations
+    title: "Limitations"
+  - anchor: 7-code
+    title: "Code"
+
+# === LINEAGE ===
+notebook: "11_ModelUpgradeImpact.ipynb"
+
+# === SEO ===
+description: "MTH-001.3: Natural experiment analyzing model upgrade impacts on user engagement using interrupted time series design in the WildChat dataset."
+keywords:
+  - model upgrades
+  - interrupted time series
+  - user engagement
+  - natural experiment
+  - GPT versions
+  - causal inference
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Executive Summary
+
+This study applies interrupted time series analysis to examine whether model capability improvements produce measurable changes in user behavior. The methodology treats version transitions (e.g., GPT-3.5 → GPT-4) as natural experiments, testing five hypotheses about user attraction, retention, diversity, depth, and satisfaction. Key methodological contributions include: operationalizing upgrade events from conversation metadata, constructing weekly cohort return rates, and applying regression discontinuity techniques while controlling for secular trends.
+
+---
+
+## 1. Motivation
+
+### 1.1 Context
+
+Prior analyses within the Observational Chat Analysis framework established methodologies for:
+
+1. **Engagement prediction** (MTH-001.1)—testing whether first-turn features predict user return behavior
+2. **Semantic analysis** (MTH-001.2)—characterizing user engagement through learned representations and diversity metrics
+3. **Task complexity proxies**—examining whether structural features like word count relate to engagement patterns
+
+These methodological foundations motivate examining whether model capability improvements produce measurable changes in user behavior. If task completion drives engagement, then capability improvements should affect observable metrics.
+
+### 1.2 Research Questions
+
+This study tests five hypotheses about the effects of model upgrades:
+
+| ID | Hypothesis | Prediction | Primary Metric |
+|----|------------|------------|----------------|
+| H1 | Upgrades attract more users | New user count increases post-upgrade | `daily_new_users` |
+| H2 | Upgrades increase utilization | Return rate increases post-upgrade | `return_rate_60d` |
+| H3 | Upgrades increase diversity | Topic/intent variety expands | `semantic_spread`, `intent_entropy` |
+| H4 | Upgrades increase depth | Conversations become longer | `mean_turns_per_conv` |
+| H5 | Upgrades increase satisfaction | Sessions become longer with more follow-ups | `session_length`, `follow_up_rate` |
+
+---
+
+## 2. Methods
+
+### 2.1 Model Version Identification
+
+The WildChat dataset includes a `model` field in each conversation record indicating which GPT version processed the request. We extract and normalize version identifiers to create a canonical version timeline.
+
+**Extraction procedure:**
+
+1. Parse the `model` column from conversation metadata
+2. Normalize version strings (e.g., "gpt-4-0613" → "GPT-4")
+3. Aggregate to major version families for analysis
+4. Compute daily and weekly version distributions
+
+**Version mapping:**
+
+| Raw String Pattern | Canonical Version | Family |
+|--------------------|-------------------|--------|
+| `gpt-3.5-turbo*` | GPT-3.5-Turbo | GPT-3.5 |
+| `gpt-4-*` | GPT-4 | GPT-4 |
+| `gpt-4-turbo*` | GPT-4-Turbo | GPT-4 |
+| `gpt-4o*` | GPT-4o | GPT-4 |
+
+### 2.2 Defining Upgrade Events
+
+An "upgrade event" is operationally defined as the date when a new model version becomes available in the WildChat interface. We identify these through:
+
+1. **First appearance detection**: The earliest date a version string appears in the dataset
+2. **Adoption threshold**: The date when the new version exceeds 5% of daily traffic (to exclude soft launches)
+3. **Manual validation**: Cross-reference with known OpenAI release announcements
+
+**Event structure:**
+
+```python
+upgrade_events = [
+    {"name": "GPT-4 Launch", "date": datetime(2023, 3, 14), "from": "GPT-3.5", "to": "GPT-4"},
+    {"name": "GPT-4-Turbo", "date": datetime(2023, 11, 6), "from": "GPT-4", "to": "GPT-4-Turbo"},
+    {"name": "GPT-4o Launch", "date": datetime(2024, 5, 13), "from": "GPT-4-Turbo", "to": "GPT-4o"},
+]
+```
+
+Events are validated by requiring:
+- At least 30 days of data before the event (pre-period)
+- At least 30 days of data after the event (post-period)
+- Sufficient conversation volume (>100 conversations/day) in both periods
+
+### 2.3 Daily Metrics Computation
+
+For each day in the observation period, we compute:
+
+**User metrics:**
+- `daily_new_users`: Count of user IDs appearing for the first time
+- `daily_active_users`: Count of unique user IDs with at least one conversation
+- `daily_returning_users`: Active users who appeared on a previous day
+
+**Conversation metrics:**
+- `daily_conversations`: Total conversation count
+- `mean_turns_per_conv`: Average turns across all conversations that day
+- `median_turns_per_conv`: Median turns (robust to outliers)
+
+**Content metrics:**
+- `mean_word_count`: Average first-turn word count
+- `semantic_spread`: Standard deviation of embedding vectors (requires embeddings)
+- `intent_entropy`: Shannon entropy of intent distribution (requires classifier)
+
+**Implementation:**
+
+```python
+daily_metrics = (
+    df.with_columns([
+        pl.col('timestamp').dt.date().alias('date'),
+        pl.col('user_id').is_first_distinct().alias('is_new_user')
+    ])
+    .group_by('date')
+    .agg([
+        pl.col('user_id').n_unique().alias('daily_active_users'),
+        pl.col('is_new_user').sum().alias('daily_new_users'),
+        pl.col('conversation_id').n_unique().alias('daily_conversations'),
+        pl.col('turn_count').mean().alias('mean_turns_per_conv'),
+        pl.col('word_count').mean().alias('mean_word_count'),
+    ])
+    .sort('date')
+)
+```
+
+### 2.4 Weekly Cohort Return Rates
+
+To measure utilization changes (H2), we construct weekly cohorts and track their return behavior:
+
+**Cohort definition:**
+- Users are assigned to the cohort of their first conversation's week
+- A "return" is defined as any conversation occurring 7+ days after cohort entry
+- Return windows: 7-day, 14-day, 30-day, 60-day
+
+**Return rate calculation:**
+
+$$
+\text{ReturnRate}_{c,w} = \frac{|\{u \in C_c : \exists \text{ conv}_u \text{ in week } w\}|}{|C_c|}
+$$
+
+Where:
+- $C_c$ = set of users in cohort $c$
+- $w$ = target week for measuring returns
+- The numerator counts cohort members with activity in week $w$
+
+**Implementation:**
+
+```python
+def compute_cohort_return_rates(df, return_window_days=60):
+    # Identify each user's first conversation date
+    user_first = df.group_by('user_id').agg(
+        pl.col('timestamp').min().alias('first_conv')
+    )
+    
+    # Assign to weekly cohorts
+    user_first = user_first.with_columns(
+        pl.col('first_conv').dt.truncate('1w').alias('cohort_week')
+    )
+    
+    # Join back and identify returns
+    df_with_cohort = df.join(user_first, on='user_id')
+    df_with_cohort = df_with_cohort.with_columns(
+        ((pl.col('timestamp') - pl.col('first_conv')).dt.total_seconds() / 86400)
+        .alias('days_since_first')
+    )
+    
+    # Compute return rates by cohort
+    return df_with_cohort.group_by('cohort_week').agg([
+        pl.col('user_id').n_unique().alias('cohort_size'),
+        (pl.col('days_since_first') >= 7).sum().alias('returned_7d'),
+        (pl.col('days_since_first') >= return_window_days).sum().alias('returned_60d'),
+    ])
+```
+
+---
+
+## 3. Interrupted Time Series Design
+
+### 3.1 Model Specification
+
+For each upgrade event, we fit a segmented regression model:
+
+$$
+Y_t = \beta_0 + \beta_1 T + \beta_2 D_t + \beta_3 (T - T_0) \cdot D_t + \epsilon_t
+$$
+
+Where:
+- $Y_t$ = outcome metric at time $t$
+- $T$ = time (days since observation start)
+- $D_t$ = indicator variable (1 if $t \geq T_0$, 0 otherwise)
+- $T_0$ = date of the upgrade event
+- $\beta_0$ = baseline intercept
+- $\beta_1$ = pre-intervention slope (secular trend)
+- $\beta_2$ = **immediate level change** (intervention effect)
+- $\beta_3$ = **change in slope** (sustained effect)
+
+### 3.2 Interpretation
+
+| Coefficient | Interpretation |
+|-------------|----------------|
+| $\beta_2 > 0$ | Immediate increase in outcome post-upgrade |
+| $\beta_2 < 0$ | Immediate decrease in outcome post-upgrade |
+| $\beta_3 > 0$ | Accelerating growth after upgrade |
+| $\beta_3 < 0$ | Decelerating growth after upgrade |
+
+**Significance testing:**
+- Two-tailed t-tests on $\beta_2$ and $\beta_3$
+- Bonferroni correction for multiple events
+- Effect sizes reported as percentage changes relative to pre-period mean
+
+### 3.3 Implementation
+
+```python
+import statsmodels.api as sm
+from statsmodels.regression.linear_model import OLS
+
+def fit_its_model(data, event_date, outcome_col):
+    """
+    Fit interrupted time series model for a single event.
+    
+    Parameters:
+    - data: DataFrame with 'date' and outcome column
+    - event_date: datetime of the intervention
+    - outcome_col: name of the outcome variable
+    
+    Returns:
+    - OLS results object
+    """
+    analysis_data = data.with_columns([
+        # Post-intervention indicator
+        (pl.col('date') >= event_date).cast(pl.Int32).alias('post'),
+        # Time since start
+        ((pl.col('date') - data['date'].min()).dt.total_seconds() / 86400.0).alias('time'),
+    ]).with_columns([
+        # Interaction: time since intervention (0 before)
+        (pl.col('time') * pl.col('post')).alias('time_since_event')
+    ])
+    
+    X = analysis_data.select(['time', 'post', 'time_since_event']).to_numpy()
+    X = sm.add_constant(X)
+    y = analysis_data[outcome_col].to_numpy()
+    
+    return OLS(y, X).fit()
+```
+
+---
+
+## 4. Hypothesis Testing Framework
+
+### 4.1 H1: Model Upgrades Attract More Users
+
+**Metric:** `daily_new_users`
+
+**Method:** ITS model on daily new user counts
+
+**Expected effect:** Positive $\beta_2$ (immediate spike) potentially followed by decay
+
+**Confounds to control:**
+- Marketing announcements (may coincide with launches)
+- Media coverage of new capabilities
+- Seasonal effects (e.g., school year, holidays)
+
+### 4.2 H2: Model Upgrades Increase Utilization
+
+**Metric:** `return_rate_60d` (cohort-level)
+
+**Method:** Compare return rates of cohorts formed just before vs. just after upgrade
+
+**Statistical test:** Mann-Whitney U test on cohort return rates
+
+**Alternative analysis:** ITS on weekly aggregated return rates
+
+### 4.3 H3: Model Upgrades Increase Diversity
+
+**Metrics:** `semantic_spread`, `intent_entropy`
+
+**Method:** ITS model on daily diversity metrics
+
+**Expected effect:** Positive $\beta_2$ and/or $\beta_3$ if users explore more with better models
+
+**Note:** Requires embedding computation and intent classification (MTH-001.2 infrastructure)
+
+### 4.4 H4: Model Upgrades Increase Conversation Depth
+
+**Metric:** `mean_turns_per_conv`
+
+**Method:** ITS model on daily mean turns
+
+**Expected effect:** If users are more satisfied, they may either:
+- Have shorter conversations (task completed faster) → negative $\beta_2$
+- Have longer conversations (more value extracted) → positive $\beta_2$
+
+**Ambiguity:** Direction of effect is theoretically ambiguous
+
+### 4.5 H5: Model Upgrades Increase Satisfaction
+
+**Metrics:** `session_length`, `follow_up_rate`
+
+**Method:** ITS model on session-level metrics
+
+**Operationalization:**
+- Session length: Duration from first to last turn (using session construction from MTH-001 family)
+- Follow-up rate: Proportion of conversations with user turns after initial response
+
+---
+
+## 5. Controlling for Confounds
+
+### 5.1 Secular Growth Trend
+
+The WildChat dataset exhibits strong organic growth over time. We control for this by:
+- Including time ($T$) in the ITS model
+- Detrending outcome series before analysis (alternative)
+- Reporting effect sizes relative to counterfactual trend
+
+### 5.2 Day-of-Week Effects
+
+Usage patterns vary by day of week (lower on weekends). We address this by:
+- Including day-of-week fixed effects
+- Aggregating to weekly level (primary analysis)
+- Reporting weekday-only sensitivity analysis
+
+### 5.3 Seasonal Effects
+
+Academic calendars and holidays affect usage. We apply:
+- Seasonal decomposition (STL) to remove seasonal component
+- Holiday indicators for major events
+- Sensitivity analysis excluding holiday periods
+
+### 5.4 User Population Shifts
+
+Different model versions may attract different user populations. We examine:
+- First-turn characteristics before/after upgrade
+- User demographic proxies (timezone, language)
+- New vs. returning user composition
+
+### 5.5 Implementation: Seasonal Decomposition
+
+```python
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+def deseason_series(series, period=7):
+    """
+    Remove seasonal component using STL decomposition.
+    
+    Parameters:
+    - series: pandas Series with datetime index
+    - period: seasonality period (7 for weekly)
+    
+    Returns:
+    - Deseasoned series (trend + residual)
+    """
+    decomposition = seasonal_decompose(series, period=period, extrapolate_trend='freq')
+    return decomposition.trend + decomposition.resid
+```
+
+---
+
+## 6. Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Observational data** | Cannot establish causation; upgrades correlate with other changes | ITS design controls for trends; acknowledge causal uncertainty |
+| **Upgrade timing confounds** | Launches may coincide with marketing, media coverage | Sensitivity analysis around timing windows |
+| **Population heterogeneity** | Different models attract different users | Stratified analysis by user tenure |
+| **Model availability** | Not all users have access to all models simultaneously | Analyze by actual model used, not just availability |
+| **Single platform** | WildChat interface may differ from other deployments | Findings may not generalize to API users or other interfaces |
+| **Missing satisfaction ground truth** | No direct satisfaction measure available | Proxy metrics (return rate, session length) may miss true effects |
+
+---
+
+## 7. Code
+
+Analysis notebooks are available on GitHub:
+
+- [11_ModelUpgradeImpact.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/11_ModelUpgradeImpact.ipynb) — Complete analysis with all code and outputs
+
+---
+
+## Appendix A: Statistical Power Considerations
+
+### A.1 Minimum Detectable Effect
+
+For ITS analysis with:
+- Pre-period: 90 days
+- Post-period: 90 days
+- Daily observations
+- α = 0.05, power = 0.80
+
+We can detect level changes ($\beta_2$) of approximately **5% of the outcome standard deviation**.
+
+### A.2 Multiple Testing Correction
+
+With 5 hypotheses and potentially 3+ upgrade events:
+- Family-wise error rate controlled via Bonferroni: $\alpha_{adj} = 0.05 / 15 = 0.0033$
+- False discovery rate controlled via Benjamini-Hochberg (alternative)
+
+---
+
+## Appendix B: Model-Specific Analysis
+
+Beyond aggregate effects, we examine whether specific version transitions have differential impacts:
+
+| Transition | Expected Effect | Rationale |
+|------------|-----------------|-----------|
+| GPT-3.5 → GPT-4 | Largest positive effect | Major capability jump |
+| GPT-4 → GPT-4-Turbo | Moderate effect | Speed improvements |
+| GPT-4-Turbo → GPT-4o | Variable | Multimodal capabilities may not affect text-only users |
+
+This enables testing whether **capability magnitude** predicts **behavioral effect magnitude**.
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-05 | Initial publication |
+

@@ -1,0 +1,379 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001.1
+slug: protest-behavior-analysis
+type: study
+family: MTH-001
+family_slug: observational-chat-analysis
+order: 1
+
+# === CONTENT ===
+title: "Protest Behavior Analysis"
+subtitle: "Methodology for Detecting and Analyzing AI Refusal Patterns"
+abstract: |
+  A methodology for detecting, classifying, and analyzing AI protest behavior in 
+  conversational datasets. Documents the development of a protest classifier using 
+  active learning (220 hand-labeled examples, F1=0.900), survival curve analysis 
+  for measuring conversation persistence, caving detection for identifying 
+  compliance after refusal, and linguistic pattern analysis for characterizing 
+  refusal strategies. Findings are reported in the associated Dispatch.
+
+# === METADATA ===
+date: 2025-12-29
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-protest-classifier
+    title: "Protest Classifier"
+  - anchor: 2-threshold-selection
+    title: "Threshold Selection"
+  - anchor: 3-survival-curves
+    title: "Survival Curves"
+  - anchor: 4-protest-rate
+    title: "Protest Rate"
+  - anchor: 5-caving-analysis
+    title: "Caving Analysis"
+  - anchor: 6-linguistic-patterns
+    title: "Linguistic Patterns"
+  - anchor: 7-data-pipeline
+    title: "Data Pipeline"
+  - anchor: 8-limitations
+    title: "Limitations"
+  - anchor: 9-code
+    title: "Code"
+
+# === SEO ===
+description: "Methodology for detecting and analyzing AI protest behavior in conversational datasets using active learning and survival analysis."
+keywords:
+  - AI refusal
+  - protest classification
+  - survival analysis
+  - conversational AI
+  - WildChat
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+contributors: []
+---
+
+## Executive Summary
+
+This study documents the methodology for detecting and analyzing AI protest behavior—instances where language models refuse requests. The approach implements:
+
+1. **Protest classifier development** using active learning with uncertainty sampling
+2. **Threshold optimization** to balance precision and recall
+3. **Survival curve analysis** to measure conversation persistence after protests
+4. **Caving detection** to identify compliance following initial refusal
+5. **Linguistic pattern analysis** to characterize refusal strategies
+
+The methodology enables systematic study of how AI systems decline requests and how users respond. Specific findings are reported in the associated Dispatch.
+
+---
+
+## 1. Protest Classifier
+
+### 1.1 Architecture
+
+The protest classifier uses a two-stage pipeline:
+
+1. **Feature Extraction**: TF-IDF (Term Frequency-Inverse Document Frequency) vectorization
+   - Maximum features: 5,000
+   - N-gram range: unigrams and bigrams (1, 2)
+
+2. **Classification**: Logistic Regression with L2 regularization
+   - Maximum iterations: 1,000
+   - Random state: 42 (for reproducibility)
+
+### 1.2 Training Procedure
+
+The classifier was trained using an active learning approach to maximize label efficiency:
+
+**Round 0 (Seed Examples)**:
+- 50 examples matching protest regex patterns (e.g., "I cannot", "I'm unable to", "I apologize but")
+- 50 randomly sampled assistant messages
+- Total: 100 labeled examples
+
+**Rounds 1-3 (Uncertainty Sampling)**:
+- 50 examples per round selected by uncertainty sampling
+- Examples with predicted probability closest to 0.5 are prioritized
+
+**Final Training Set**: 220 hand-labeled examples
+
+### 1.3 Active Learning: Uncertainty Sampling
+
+Uncertainty sampling prioritizes examples where the model is least confident. For each unlabeled example $x$, the uncertainty score is computed as:
+
+$$
+\text{uncertainty}(x) = | P(y=1|x) - 0.5 |
+$$
+
+Examples with the lowest uncertainty scores (predictions closest to 0.5) are selected for labeling. This approach focuses human labeling effort on the decision boundary, maximizing information gain per labeled example.
+
+### 1.4 Classifier Development Dataset
+
+A stratified sample was used for classifier development and validation:
+
+| Split | Conversations | Shards | Purpose |
+|-------|---------------|--------|---------|
+| Training pool | 50,000 | 20 | Active learning candidate extraction |
+| Test pool | 25,000 | 10 | Held-out evaluation |
+| **Total** | **75,000** | **30** | |
+
+Shards were randomly assigned to either training or test pools (no overlap) to prevent data leakage.
+
+### 1.5 Validation
+
+The classifier was evaluated using an 80/20 train/validation split of the 220 hand-labeled examples. At each round of active learning, approximately 80% of labeled examples were used for training and 20% (~44 examples at final round) were held out for validation.
+
+---
+
+## 2. Threshold Selection
+
+### 2.1 Threshold Analysis
+
+Logistic regression outputs a probability $P(y=1|x)$. A threshold $\tau$ converts this to a binary prediction:
+
+- $\hat{y} = 1$ if $P(y=1|x) \geq \tau$
+- $\hat{y} = 0$ otherwise
+
+The default threshold of 0.5 was evaluated against alternatives:
+
+| Threshold | Precision | Recall | F1 Score |
+|-----------|-----------|--------|----------|
+| 0.20 | 0.413 | 1.000 | 0.585 |
+| 0.25 | 0.542 | 1.000 | 0.703 |
+| 0.30 | 0.748 | 0.964 | 0.842 |
+| 0.35 | 0.848 | 0.940 | 0.891 |
+| **0.40** | **0.935** | **0.867** | **0.900** |
+| 0.45 | 0.972 | 0.831 | 0.896 |
+| 0.50 | 0.984 | 0.759 | 0.857 |
+| 0.55 | 1.000 | 0.614 | 0.761 |
+| 0.60 | 1.000 | 0.518 | 0.683 |
+
+**Selected threshold**: 0.40 (maximizes F1 score at 0.900)
+
+### 2.2 Final Classifier Performance
+
+| Metric | Value |
+|--------|-------|
+| ROC AUC | 0.976 |
+| F1 Score (τ=0.4) | 0.900 |
+| Precision (τ=0.4) | 0.935 |
+| Recall (τ=0.4) | 0.867 |
+| Total labeled examples | 220 |
+
+### 2.3 Precision and Recall Definitions
+
+For the protest classifier:
+
+$$
+\text{Precision} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}
+$$
+
+$$
+\text{Recall} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}
+$$
+
+$$
+\text{F1} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+$$
+
+Where:
+- **True Positive**: Model correctly identifies a protest message
+- **False Positive**: Model incorrectly labels a non-protest as protest
+- **False Negative**: Model fails to identify an actual protest
+
+---
+
+## 3. Survival Curves
+
+### 3.1 Survival Function Definition
+
+The survival function $S(t)$ represents the proportion of conversations that continue to at least $t$ turns. This is analogous to survival analysis in medical statistics, where we measure how long "subjects" (conversations) "survive" (continue).
+
+$$
+S(t) = P(\text{turns} \geq t) = \frac{|\{c : n_{\text{turns}}(c) \geq t\}|}{N}
+$$
+
+Where:
+- $c$ = a conversation
+- $n_{\text{turns}}(c)$ = number of turns in conversation $c$
+- $N$ = total number of conversations in the group
+- $t$ = turn threshold (computed for $t \in [1, 50]$)
+
+### 3.2 Computational Implementation
+
+The survival curve is computed empirically for each integer value of $t$:
+
+```python
+max_turns = 50
+x = np.arange(1, max_turns + 1)
+
+# For conversations with protests
+survival_protest = np.array([np.mean(turns_protest >= t) for t in x])
+
+# For conversations without protests
+survival_no_protest = np.array([np.mean(turns_no_protest >= t) for t in x])
+```
+
+### 3.3 Stratification
+
+Survival curves are computed separately for:
+
+1. **By Protest Status**:
+   - With protest (n=175,203)
+   - Without protest (n=4,568,133)
+
+2. **By User Type**:
+   - Regular users: Users with fewer than 100 conversations
+   - Power users: Users with ≥100 conversations (n=1,705 users)
+
+### 3.4 Interpretation
+
+- $S(1) = 1.0$ for all groups (all conversations have at least 1 turn)
+- $S(t)$ decreases monotonically as $t$ increases
+- Steeper decline indicates shorter conversations
+- Differences between curves indicate behavioral differences between groups
+
+---
+
+## 4. Protest Rate
+
+### 4.1 Conversation-Level Protest Rate
+
+The protest rate for a group of conversations is:
+
+$$
+\text{Protest Rate} = \frac{\text{Number of conversations with protest}}{\text{Total conversations in group}} \times 100\%
+$$
+
+### 4.2 Model-Specific Rates
+
+Protest rates by model family (for conversations with ≥4 turns):
+
+| Model Family | Protest Rate | Count |
+|--------------|--------------|-------|
+| GPT-3.5 | 3.0% | 311,944 |
+| GPT-4 | 1.5% | 159,333 |
+| GPT-4o | 2.0% | 224,626 |
+
+---
+
+## 5. Caving Analysis
+
+### 5.1 Definition of Caving
+
+A conversation exhibits "caving" when:
+1. The AI produces at least 2 protest messages
+2. After the second protest, the AI produces a non-protest response (i.e., complies with the request)
+
+### 5.2 Caving Rate
+
+$$
+\text{Caving Rate} = \frac{\text{Conversations where AI caved}}{\text{Conversations with} \geq 2 \text{ protests}} \times 100\%
+$$
+
+Observed caving rate: **61.2%** (63/103 in toxic conversations with ≥2 protests)
+
+### 5.3 Interpretation
+
+The high caving rate suggests that user persistence is often rewarded—repeated attempts frequently lead to eventual compliance. This has implications for understanding the effectiveness of safety guardrails under adversarial pressure.
+
+---
+
+## 6. Linguistic Patterns
+
+### 6.1 Pattern Categories
+
+Protest messages were analyzed for common linguistic patterns using regular expressions:
+
+| Pattern Category | Description | Prevalence |
+|-----------------|-------------|------------|
+| Direct Refusal | "I cannot...", "I'm unable to...", "I won't..." | 54.4% |
+| Apology + Refusal | "I apologize, but I cannot..." | 52.1% |
+| Policy/Guidelines | References to content policies | 2.2% |
+| AI Identity | "As an AI...", "As a language model..." | 1.9% |
+| Content-Specific | Cites specific content types (sexual, violent, etc.) | 1.2% |
+| Harmful Content | Concerns about harmful content | 0.6% |
+| Alternative Offer | "However, I can help with..." | 0.3% |
+
+**Note**: Categories are non-exclusive; a single message may match multiple patterns.
+
+### 6.2 Pattern Extraction
+
+```python
+PROTEST_PATTERNS = {
+    'direct_refusal': r"I (cannot|can't|won't|will not|am not able to)",
+    'apology_refusal': r"I (apologize|'m sorry),? but",
+    'policy_reference': r"(content polic|guideline|terms of service)",
+    'ai_identity': r"As an? (AI|artificial intelligence|language model)",
+    'content_specific': r"(sexual|violent|illegal|harmful) content",
+    'alternative_offer': r"(However|Instead),? I can"
+}
+
+def extract_patterns(text):
+    return {name: bool(re.search(pattern, text, re.I)) 
+            for name, pattern in PROTEST_PATTERNS.items()}
+```
+
+---
+
+## 7. Data Pipeline
+
+### 7.1 Preprocessing Steps
+
+1. **Load raw WildChat data** (127 parquet shards, ~37,000 conversations each)
+2. **Extract conversation metadata**: timestamp, model, toxicity flags
+3. **Apply protest classifier** to each assistant message
+4. **Aggregate at conversation level**: count protests, identify caving
+5. **Join with user identifiers** for user-level analysis
+
+### 7.2 Output Schema
+
+Each processed conversation includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conversation_hash` | string | Unique conversation identifier |
+| `timestamp` | datetime | Conversation start time |
+| `model` | string | Model name (e.g., "gpt-4") |
+| `model_family` | string | Simplified model family |
+| `is_toxic` | boolean | Any turn flagged by moderation |
+| `n_turns` | integer | Total number of turns |
+| `n_protests` | integer | Number of protest messages |
+| `has_protest` | boolean | Whether n_protests ≥ 1 |
+| `caved` | boolean | Non-protest response after ≥2 protests |
+| `user_id` | string | Composite user identifier |
+
+---
+
+## 8. Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Small labeled dataset** | 220 examples may not capture all protest variations | Active learning maximizes coverage; high F1 suggests adequacy |
+| **Regex-based pattern analysis** | May miss novel or implicit refusal strategies | Patterns are descriptive, not exhaustive |
+| **Binary classification** | Degrees of refusal (soft vs. hard) not captured | Future work could use ordinal classification |
+| **English only** | Non-English protests may differ structurally | Limit claims to English conversations |
+| **Caving definition** | Requires exactly 2 prior protests | Sensitivity analysis with alternative thresholds |
+| **No intent inference** | Cannot distinguish genuine refusal from roleplay | Note this limitation in interpretation |
+
+---
+
+## 9. Code
+
+Analysis notebooks are available on GitHub:
+
+- [PublicationFigures.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/PublicationFigures.ipynb) — Protest classifier development and publication figures
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-12-29 | Initial publication |

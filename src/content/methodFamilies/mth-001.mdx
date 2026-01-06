@@ -1,0 +1,153 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001
+slug: observational-chat-analysis
+type: family
+
+# === CONTENT ===
+title: "Observational Chat Analysis"
+subtitle: "Framework for analyzing real-world human-AI conversations at scale"
+abstract: |
+  A methodology for analyzing naturalistic human-AI conversations to measure 
+  engagement patterns, content dynamics, and user behavior. Developed using 
+  the WildChat dataset (N=4.7M conversations, 2.4M users) with validated 
+  classifiers and reproducible pipelines. This framework supports studies of 
+  protest behavior, user persistence, engagement prediction, semantic exploration, 
+  model upgrade impacts, and concerning usage patterns.
+
+# === METADATA ===
+date: 2025-12-29
+updated: 2026-01-05
+version: "1.2"
+status: published
+
+# === DATASET ===
+dataset:
+  name: "WildChat-4.8M"
+  source: "Allen AI Institute"
+  size: "4,743,336 conversations"
+  collection_period: "April 2023 – July 2025"
+  url: "https://huggingface.co/datasets/allenai/WildChat-4.8M"
+
+# === RELATIONSHIPS ===
+related_instruments:
+  - INS-001
+studies:
+  - MTH-001.1
+  - MTH-001.2
+  - MTH-001.3
+  - MTH-001.4
+  - MTH-001.5
+
+# === SEO ===
+description: "Framework for analyzing real-world human-AI conversations at scale using the WildChat dataset. Includes validated classifiers, session analysis, and engagement metrics."
+keywords:
+  - human-AI interaction
+  - conversational AI
+  - WildChat
+  - engagement analysis
+  - observational methods
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+contributors: []
+---
+
+## Assumptions
+
+This methodology rests on several assumptions that should be considered when interpreting results:
+
+1. **User identification**: The composite identifier (hashed IP + user agent) reliably distinguishes unique users. This may undercount users on shared networks or overcount users who switch browsers.
+
+2. **Toxicity labels**: The WildChat toxicity flags accurately reflect harmful content. The moderation algorithms used have known biases toward certain content types.
+
+3. **Protest semantics**: Linguistic patterns ("I cannot", "I apologize but") reliably indicate AI refusal behavior. Edge cases (e.g., roleplay scenarios, quoted text) may be misclassified.
+
+4. **Conversation boundaries**: Each `conversation_hash` represents a single coherent interaction. Users cannot manipulate conversation boundaries.
+
+## Dataset
+
+### Overview
+
+The WildChat dataset provides a large-scale corpus of naturalistic human-AI conversations collected from an anonymous ChatGPT interface. Key characteristics:
+
+| Metric | Value |
+|--------|-------|
+| Total conversations | 4,743,336 |
+| Unique users | 2,462,800 |
+| Collection period | April 2023 – July 2025 |
+| Models represented | GPT-3.5, GPT-4, GPT-4o |
+
+### User Identification
+
+Users are identified through a composite identifier combining browser fingerprinting signals:
+
+```python
+user_id = hashed_ip + "|" + user_agent
+```
+
+This approach provides more reliable identification than IP alone, distinguishing between different browsers or devices on the same network.
+
+### Toxicity Classification
+
+Conversations include toxicity labels from [Detoxify](https://github.com/unitaryai/detoxify), applied during dataset preprocessing. The `openai_moderation` field provides per-turn scores across six categories: harassment, hate, illicit, self-harm, sexual, and violence.
+
+## Shared Infrastructure
+
+### Protest Classifier
+
+A two-stage pipeline for identifying AI refusal behavior:
+
+1. **Feature Extraction**: TF-IDF vectorization (5,000 features, unigrams + bigrams)
+2. **Classification**: Logistic regression with L2 regularization
+
+Trained via active learning with 220 hand-labeled examples. Performance at threshold 0.4:
+- ROC AUC: 0.976
+- F1 Score: 0.900
+- Precision: 0.935
+- Recall: 0.867
+
+### Session Construction
+
+Conversations are grouped into sessions using a 30-minute gap threshold:
+
+```python
+SESSION_GAP_MINUTES = 30
+
+# Conversations within 30 minutes of each other 
+# belong to the same session
+```
+
+### Embedding Pipeline
+
+Sentence embeddings for semantic analysis use all-MiniLM-L6-v2 (384 dimensions) with L2 normalization for cosine similarity calculations.
+
+## Studies in This Family
+
+| Study | Title | Focus |
+|-------|-------|-------|
+| MTH-001.1 | Protest Behavior Analysis | Detecting and analyzing AI refusal patterns |
+| MTH-001.2 | Engagement Prediction from First-Turn Features | Predicting user return from first prompt characteristics |
+| MTH-001.3 | Semantic Exploration and Sustained Utilization | Relationship between topic diversity and engagement |
+| MTH-001.4 | Model Upgrade Impact on User Engagement | Natural experiment analyzing capability improvements |
+| MTH-001.5 | Characterizing Concerning Usage Sessions | Disaggregating extended engagement patterns |
+
+## Limitations
+
+Framework-level limitations that apply to all studies:
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Selection bias** | WildChat users self-selected into an anonymous service | Document population characteristics; limit generalization claims |
+| **Temporal confounds** | Model behavior changed across collection period | Stratify by time period; note policy updates |
+| **No ground truth for intent** | Cannot observe user motivations | Interpret patterns, not causation |
+| **Platform-specific** | Interface differs from authenticated platforms | Note WildChat-specific context |
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.2 | 2026-01-05 | Added MTH-001.1 Protest Behavior Analysis; renumbered existing studies to MTH-001.2–MTH-001.5 |
+| 1.1 | 2026-01-05 | Added studies MTH-001.1–MTH-001.4; restructured as family overview |
+| 1.0 | 2025-12-29 | Initial publication |
+

@@ -1,0 +1,581 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001.3
+slug: semantic-exploration
+type: study
+family: MTH-001
+family_slug: observational-chat-analysis
+order: 3
+
+# === CONTENT ===
+title: "Semantic Exploration and Sustained Utilization"
+subtitle: "From Hand-Crafted Features to Learned Representations"
+abstract: |
+  A methodology for analyzing user engagement through learned semantic representations. 
+  Implements sentence embeddings (all-MiniLM-L6-v2, 384 dimensions), stratified sampling 
+  for utilization spectrum analysis, multi-level embedding aggregation, semantic diversity 
+  metrics, BERTopic topic modeling, and regression-based prediction. Documents the pivot 
+  from hand-crafted features to data-driven representation learning. Findings are reported 
+  in the associated Dispatch.
+
+# === METADATA ===
+date: 2026-01-05
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-motivation-the-pivot-from-hand-crafted-features
+    title: "Motivation"
+  - anchor: 2-embedding-methodology
+    title: "Embedding Methodology"
+  - anchor: 3-continuous-utilization-spectrum
+    title: "Utilization Spectrum"
+  - anchor: 4-stratified-sampling-strategy
+    title: "Stratified Sampling"
+  - anchor: 5-multi-level-embedding-analysis
+    title: "Multi-Level Analysis"
+  - anchor: 6-semantic-diversity-metrics
+    title: "Semantic Diversity"
+  - anchor: 7-topic-modeling-with-bertopic
+    title: "Topic Modeling"
+  - anchor: 8-regression-analysis
+    title: "Regression Analysis"
+  - anchor: 9-temporal-analysis-semantic-drift
+    title: "Temporal Analysis"
+  - anchor: 10-validation
+    title: "Validation"
+  - anchor: 11-limitations
+    title: "Limitations"
+  - anchor: 12-code
+    title: "Code"
+
+# === LINEAGE ===
+notebook: "08_IdentityHypotheses.ipynb, 09_SemanticExploration.ipynb"
+
+# === SEO ===
+description: "MTH-001.2: Methodology for semantic embedding analysis of AI utilization patterns using sentence transformers, BERTopic, and multi-level aggregation."
+keywords:
+  - semantic embeddings
+  - sentence transformers
+  - utilization patterns
+  - topic modeling
+  - BERTopic
+  - UMAP
+  - engagement prediction
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Executive Summary
+
+This study documents a methodology for analyzing user engagement through learned semantic representations rather than hand-crafted linguistic features. The approach implements sentence embeddings to characterize prompt semantics, stratified sampling to ensure coverage of high-utilization users, multi-level embedding aggregation (first-turn, all-turn, user-level, temporal), semantic diversity metrics, BERTopic topic modeling, and regression-based prediction of utilization.
+
+The methodology enables investigation of whether semantic structure—particularly diversity across the embedding space—relates to sustained engagement. Specific findings and statistical results are reported in the associated Dispatch.
+
+---
+
+## 1. Motivation: The Pivot from Hand-Crafted Features
+
+### 1.1 Context: The Identity Hypothesis Investigation
+
+The engagement prediction analysis (MTH-001.1) tested whether psychological identity markers in first-turn prompts could predict user return behavior. Six hypotheses were explored:
+
+| Hypothesis | Core Question |
+|------------|---------------|
+| H1: Efficiency Learning | Do users become more terse over time? |
+| H2: Tool vs Partner Types | Are there distinct user phenotypes? |
+| H3: "You" Collapse | Does direct address decline with use? |
+| H4: "We" Disappearance | Does joint-agency framing decline? |
+| H5: Qualitative Configurations | Can users be classified into identity types? |
+| H6: Content Over Style | Is identity revealed by content, not style? |
+
+Results from these hypothesis tests are documented in the associated Dispatch. Based on those findings, this study pivots to a data-driven approach using learned representations.
+
+### 1.2 The Methodological Pivot
+
+Rather than continue refining hand-crafted features, this study adopts an exploratory, data-driven approach:
+
+| Hand-Crafted Approach | Embedding Approach |
+|----------------------|-------------------|
+| Hypothesis-driven feature selection | Let semantic structure emerge |
+| Discrete categories (pronouns, politeness) | Continuous 384-dimensional space |
+| Interpretation precedes analysis | Analysis precedes interpretation |
+| Risk of confirmation bias | Risk of post-hoc rationalization |
+
+The goal shifts from *predicting* engagement to *characterizing* what high utilizers do differently—then working backwards to interpretable patterns.
+
+### 1.3 Research Questions
+
+1. What semantic structure exists in the space of first-turn prompts?
+2. Do high utilizers occupy distinct regions of semantic space?
+3. Does semantic diversity correlate with sustained engagement?
+4. How do users' semantic territories evolve over time?
+
+---
+
+## 2. Embedding Methodology
+
+### 2.1 Embedding Model Selection
+
+We use **all-MiniLM-L6-v2** from Sentence Transformers:
+
+| Property | Value | Rationale |
+|----------|-------|-----------|
+| Dimensions | 384 | Sufficient expressiveness for semantic similarity |
+| Training | Contrastive learning on 1B+ sentence pairs | Captures semantic similarity, not just lexical overlap |
+| Speed | ~1000 sentences/second on CPU | Tractable for million-scale analysis |
+| Normalization | L2-normalized outputs | Cosine similarity equals dot product |
+
+**Model loading:**
+```python
+from sentence_transformers import SentenceTransformer
+embed_model = SentenceTransformer('all-MiniLM-L6-v2')
+```
+
+### 2.2 Embedding Generation
+
+First-turn prompts are embedded with normalization for cosine similarity:
+
+```python
+embeddings = embed_model.encode(
+    texts,
+    show_progress_bar=True,
+    batch_size=256,
+    convert_to_numpy=True,
+    normalize_embeddings=True  # Cosine similarity = dot product
+)
+```
+
+**Truncation:** Prompts exceeding 5,000 characters are truncated. This affects less than 1% of conversations and primarily impacts very long code submissions.
+
+### 2.3 Why Not Fine-Tune?
+
+We use the pre-trained model without fine-tuning because:
+
+1. **No supervised signal available** — We don't know a priori what semantic distinctions matter for utilization
+2. **Transfer learning sufficiency** — General semantic similarity captures the structure we need
+3. **Reproducibility** — Off-the-shelf model enables replication without custom training
+
+---
+
+## 3. Continuous Utilization Spectrum
+
+### 3.1 Avoiding Arbitrary Cutoffs
+
+Previous analyses defined "power users" as those with 100+ conversations—an arbitrary threshold. This study treats utilization as a **continuous variable**:
+
+$$
+\text{Utilization}_{\text{percentile}} = \frac{\text{rank}(n_{\text{conversations}})}{N_{\text{users}}} \times 100
+$$
+
+**Where:**
+- *rank(n_conversations)* = user's position when sorted by conversation count
+- *N_users* = total users in the training set
+
+### 3.2 Log-Transformation for Regression
+
+For regression targets, we use log-transformed conversation counts to handle extreme skew:
+
+$$
+\text{log\_conversations} = \ln(n_{\text{conversations}} + 1)
+$$
+
+**Training set statistics:**
+- Median conversations: 1
+- Mean conversations: 2.2
+- 90th percentile: 2 conversations
+- 99th percentile: 14 conversations
+- Maximum: 384,406 conversations
+
+The extreme right skew (top 10% of users generate 58% of all conversations) makes log transformation essential for regression stability.
+
+---
+
+## 4. Stratified Sampling Strategy
+
+### 4.1 Oversampling High Utilizers
+
+A uniform random sample would include less than 0.1% high utilizers (≥90th percentile), insufficient for characterization. We use stratified sampling:
+
+| Stratum | Selection | Purpose |
+|---------|-----------|---------|
+| High utilizers (≥90th percentile) | All users (167,774) | Ensure complete coverage of high-engagement patterns |
+| Other users (below 90th percentile) | Random sample (100,000) | Provide comparison baseline |
+
+**Total sample:** 267,774 users with 251,005 valid first-turn embeddings.
+
+### 4.2 Temporal Holdout
+
+To enable holdout validation, we restrict analysis to **training data only**: users whose first conversation occurred before January 1, 2025. This mirrors the temporal split in MTH-001.1.
+
+---
+
+## 5. Multi-Level Embedding Analysis
+
+The analysis operates at four levels, each answering different questions:
+
+### 5.1 Level 1: First-Turn Embeddings
+
+**Purpose:** Predict/locate new users based on their first prompt.
+
+| Property | Value |
+|----------|-------|
+| Scope | One embedding per user (first prompt only) |
+| Size | 251,005 users × 384 dimensions |
+| Use case | Where does a new user land in semantic space? |
+
+### 5.2 Level 2: All-Turn Embeddings
+
+**Purpose:** Map the full semantic territory of high utilizers.
+
+| Property | Value |
+|----------|-------|
+| Scope | Every first-turn from every conversation |
+| Size | 1,569,614 turns × 384 dimensions |
+| Users | 152,990 high utilizers (≥90th percentile) |
+| Use case | What topics do high utilizers explore? |
+
+### 5.3 Level 3: User-Level Aggregates
+
+**Purpose:** Compare users as semantic entities, not individual prompts.
+
+For each user, we compute:
+
+**Centroid (mean embedding):**
+$$
+\mathbf{c}_u = \frac{1}{n_u} \sum_{i=1}^{n_u} \mathbf{e}_i
+$$
+
+**Semantic spread (mean standard deviation across dimensions):**
+$$
+\text{spread}_u = \frac{1}{d} \sum_{j=1}^{d} \sigma_j(\{\mathbf{e}_i\}_{i=1}^{n_u})
+$$
+
+**Semantic diameter (maximum pairwise cosine distance):**
+$$
+\text{diameter}_u = \max_{i,j} \left(1 - \frac{\mathbf{e}_i \cdot \mathbf{e}_j}{\|\mathbf{e}_i\| \|\mathbf{e}_j\|}\right)
+$$
+
+**Where:**
+- *n_u* = number of prompts from user *u*
+- *e_i* = embedding vector for prompt *i*
+- *d* = embedding dimensionality (384)
+
+### 5.4 Level 4: Temporal Embeddings
+
+**Purpose:** Track semantic drift within users over time.
+
+For users with ≥20 conversations, we compare:
+- **Early centroid:** Mean of first 10 conversation embeddings
+- **Late centroid:** Mean of last 10 conversation embeddings
+- **Semantic drift:** Cosine distance between early and late centroids
+- **Spread change:** Difference in semantic spread (late − early)
+
+---
+
+## 6. Semantic Diversity Metrics
+
+### 6.1 Metric Definitions
+
+We compute two primary semantic diversity metrics for each user:
+
+| Metric | Definition | Interpretation |
+|--------|------------|----------------|
+| Semantic spread | Mean standard deviation across embedding dimensions | Higher values indicate prompts spanning more diverse semantic territory |
+| Semantic diameter | Maximum pairwise cosine distance among user's prompts | Captures the extremes of a user's semantic range |
+
+These metrics quantify the breadth of topics a user explores. Correlation results with utilization are reported in the associated Dispatch.
+
+### 6.2 Implementation
+
+```python
+from scipy.stats import pearsonr
+
+spread_corr, spread_p = pearsonr(
+    user_agg_df['semantic_spread'].to_numpy(),
+    user_agg_df['log_conversations'].to_numpy()
+)
+```
+
+### 6.3 Caution: Correlation ≠ Causation
+
+The correlation could reflect:
+1. **Diverse needs → sustained use** (utility hypothesis)
+2. **More conversations → more topics** (mechanical relationship)
+3. **Certain user types → both diversity and persistence** (confounding)
+
+We cannot disambiguate these interpretations without experimental intervention.
+
+---
+
+## 7. Topic Modeling with BERTopic
+
+### 7.1 Two-Stage Topic Discovery
+
+We fit BERTopic at two scales to enable comparison between general population and high-utilizer semantic patterns:
+
+| Analysis | Corpus | Purpose |
+|----------|--------|---------|
+| First-turn sample | First-turn prompts from stratified sample | Characterize topic distribution across utilization spectrum |
+| High-utilizer all-turns | All first-turns from high-utilizer conversations | Map the full semantic territory of sustained users |
+
+The number of topics discovered at each scale is reported in the associated Dispatch.
+
+### 7.2 BERTopic Configuration
+
+```python
+from bertopic import BERTopic
+from sklearn.feature_extraction.text import CountVectorizer
+import hdbscan
+
+vectorizer = CountVectorizer(
+    stop_words='english',
+    ngram_range=(1, 2),
+    min_df=20,  # Higher threshold for larger corpus
+    max_df=0.5
+)
+
+hdbscan_model = hdbscan.HDBSCAN(
+    min_cluster_size=500,  # Larger clusters for 1.5M points
+    min_samples=50,
+    metric='euclidean',
+    cluster_selection_method='eom',
+    prediction_data=True
+)
+
+topic_model = BERTopic(
+    embedding_model=embed_model,
+    umap_model=reducer,
+    hdbscan_model=hdbscan_model,
+    vectorizer_model=vectorizer,
+    nr_topics='auto',
+    top_n_words=10,
+    verbose=True
+)
+```
+
+### 7.3 UMAP Optimization for Large Corpora
+
+Direct UMAP on 1.5M points is computationally prohibitive. We use a **sample-and-transform** strategy:
+
+1. Fit UMAP on 200,000 randomly sampled embeddings
+2. Transform remaining embeddings using fitted reducer
+3. Pass pre-computed 2D embeddings to BERTopic
+
+```python
+# Fit on sample
+sample_indices = np.random.choice(n_total, size=200000, replace=False)
+reducer.fit(embeddings[sample_indices])
+
+# Transform all
+embedding_2d = reducer.transform(embeddings)
+```
+
+### 7.4 Topic Entropy as Diversity Metric
+
+For users with multiple conversations, we compute topic entropy:
+
+$$
+H_u = -\sum_{t=1}^{T} p_t \log(p_t)
+$$
+
+**Where:**
+- *p_t* = proportion of user *u*'s conversations in topic *t*
+- *T* = total number of topics
+
+Higher entropy indicates a user's conversations are distributed across more topics, rather than concentrated in a few. This provides a complementary diversity measure to embedding-level spread. Correlation results are reported in the associated Dispatch.
+
+---
+
+## 8. Regression Analysis
+
+### 8.1 Prediction Framework
+
+We test whether first-turn embeddings can predict future utilization using regression models. The target variable is log-transformed conversation count.
+
+**Models evaluated:**
+
+| Model | Configuration | Rationale |
+|-------|---------------|-----------|
+| Ridge (α=1, 10, 100) | L2-regularized linear regression | Tests linear predictability with varying regularization strength |
+| Random Forest | 100 estimators, max_depth=10 | Captures non-linear relationships in embedding space |
+| Baseline | Predict mean | Establishes floor for comparison |
+
+### 8.2 Evaluation Design
+
+All models are evaluated using 5-fold cross-validation with R² as the primary metric. Performance results are reported in the associated Dispatch.
+
+### 8.3 Implementation
+
+```python
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import cross_val_score, KFold
+
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+y = sample_df['log_conversations'].to_numpy()
+X = embeddings
+
+scores = cross_val_score(
+    RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42),
+    X, y, cv=kfold, scoring='r2'
+)
+```
+
+---
+
+## 9. Temporal Analysis: Semantic Drift
+
+### 9.1 Methodology
+
+For users with ≥20 conversations, we compare semantic spread in their first 10 vs. last 10 conversations to assess whether users specialize or diversify over time.
+
+**Metrics computed:**
+
+| Metric | Definition |
+|--------|------------|
+| Semantic drift | Cosine distance between early and late centroids |
+| Spread change | Difference in semantic spread (late − early) |
+| Trajectory classification | Specialized (spread ↓), Diversified (spread ↑), or No change |
+
+### 9.2 Research Questions
+
+This analysis addresses whether high utilizers systematically narrow their focus over time (specialization) or expand their semantic range (diversification). Results are reported in the associated Dispatch.
+
+### 9.3 Implementation
+
+```python
+# For each user with ≥20 conversations
+early_vecs = sorted_vecs[:N_COMPARE]  # First 10
+late_vecs = sorted_vecs[-N_COMPARE:]   # Last 10
+
+early_spread = early_vecs.std(axis=0).mean()
+late_spread = late_vecs.std(axis=0).mean()
+spread_change = late_spread - early_spread
+```
+
+---
+
+## 10. Validation
+
+### 10.1 Cross-Validation Design
+
+All regression results use 5-fold cross-validation with shuffled splits (random_state=42). This prevents overfitting to the training set.
+
+### 10.2 Holdout Validation Limitation
+
+We intended to validate on users first appearing in 2025, but the filtered training set contained no such users (the 2025 cutoff was applied before sampling). Future analyses should reserve a temporal holdout before filtering.
+
+### 10.3 Statistical Power Considerations
+
+With sample sizes in the hundreds of thousands, statistical significance is effectively guaranteed for any non-trivial effect. The meaningful question in this analysis is **effect size** rather than p-values. Effect sizes and their interpretation are reported in the associated Dispatch.
+
+---
+
+## 11. Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| Correlation ≠ causation | Cannot claim diversity *causes* engagement | Interpret as association; note confounds |
+| Single embedding model | Results may be model-specific | Test with alternative encoders (future work) |
+| First-turn focus | Later prompts may matter more | Level 2 analysis uses all turns |
+| Temporal holdout missing | Cannot assess true out-of-sample performance | Use cross-validation as proxy |
+| Selection bias | WildChat users ≠ all AI users | Interpret as WildChat-specific patterns |
+| Truncation at 5,000 chars | Long prompts underrepresented | Affects less than 1% of conversations |
+
+---
+
+## 12. Code
+
+Analysis notebooks are available on GitHub:
+
+- [08_IdentityHypotheses.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/08_IdentityHypotheses.ipynb) — Identity hypothesis testing
+- [09_SemanticExploration.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/09_SemanticExploration.ipynb) — Semantic exploration and topic modeling
+
+---
+
+## Appendix A: Identity Hypothesis Details
+
+The six identity hypotheses tested in notebook 08:
+
+### A.1 H1: Efficiency Learning
+
+**Prediction:** Early conversations are verbose and social; late conversations are terse and imperative.
+
+**Method:** Compare first 10 vs. last 10 conversations for power users (100+ conversations). Metrics: word count, greeting rate, pronoun rates.
+
+### A.2 H2: Tool vs Partner Types
+
+**Prediction:** Distinct user clusters with different linguistic profiles (tool-oriented vs. relationship-oriented).
+
+**Method:** K-means clustering (k=2,3,4) on linguistic features, PCA visualization.
+
+### A.3 H3: "You" Collapse
+
+**Prediction:** Direct address (second-person pronouns) declines with engagement depth.
+
+**Method:** Compare second-person pronoun rate across engagement tiers (one-shot, moderate, power users).
+
+### A.4 H4: "We" Disappearance
+
+**Prediction:** Joint-agency framing ("we," "us," "our") declines with heavy use.
+
+**Method:** Track first-person plural rate across tiers and within users over time.
+
+### A.5 H5: Qualitative Configurations
+
+**Prediction:** Users cluster into discrete identity configurations (instrumental, relational, hybrid).
+
+**Method:** Regex-based classification of prompt styles into predefined categories.
+
+### A.6 H6: Content Over Style
+
+**Prediction:** Content markers (self-disclosure, anthropomorphization) predict engagement better than style markers.
+
+**Method:** Extract content markers via regex; compare prevalence by engagement tier.
+
+Results for all hypotheses are documented in the associated Dispatch.
+
+---
+
+## Appendix B: Nearest Neighbor Inference
+
+A prototype **personal inference** function locates new prompts in the existing semantic space:
+
+```python
+def personal_inference(prompt_text, sample_df, embeddings, nn_model, embed_model, n_neighbors=50):
+    """
+    Given a new prompt, find similar users and estimate utilization pattern.
+    """
+    # Embed the new prompt
+    new_embedding = embed_model.encode([prompt_text], normalize_embeddings=True)
+    
+    # Find nearest neighbors
+    distances, indices = nn_model.kneighbors(new_embedding, n_neighbors=n_neighbors)
+    
+    # Get neighbor statistics
+    neighbor_percentiles = sample_df['utilization_percentile'].to_numpy()[indices[0]]
+    
+    return {
+        'mean_percentile': neighbor_percentiles.mean(),
+        'median_percentile': np.median(neighbor_percentiles),
+        'std_percentile': neighbor_percentiles.std(),
+        'n_neighbors': n_neighbors,
+    }
+```
+
+This enables the research question: *"Based on your first prompt, where do you land among existing users?"*
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-05 | Initial publication |
+

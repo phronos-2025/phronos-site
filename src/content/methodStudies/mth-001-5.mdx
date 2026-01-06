@@ -1,0 +1,489 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001.5
+slug: concerning-sessions
+type: study
+family: MTH-001
+family_slug: observational-chat-analysis
+order: 5
+
+# === CONTENT ===
+title: "Characterizing Concerning Usage Sessions"
+subtitle: "Disaggregating Extended Engagement Patterns to Identify Genuine Risk Signals"
+abstract: |
+  A methodology for identifying and disaggregating extended AI engagement sessions 
+  that may warrant attention from a user wellbeing perspective. Documents a 
+  four-criterion composite threshold for sustained engagement, toxicity classification 
+  integration at the session level, temporal feature extraction using localized 
+  timezones, user persistence categorization, emergence timing analysis, and a 
+  five-segment taxonomy with four-level concern gradation. Findings are reported 
+  in the associated Dispatch.
+
+# === METADATA ===
+date: 2026-01-05
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-motivation
+    title: "Motivation"
+  - anchor: 2-session-construction
+    title: "Session Construction"
+  - anchor: 3-defining-concerning-sessions
+    title: "Concerning Sessions"
+  - anchor: 4-toxicity-analysis
+    title: "Toxicity Analysis"
+  - anchor: 5-temporal-patterns
+    title: "Temporal Patterns"
+  - anchor: 6-user-persistence
+    title: "User Persistence"
+  - anchor: 7-emergence-timing
+    title: "Emergence Timing"
+  - anchor: 8-segment-taxonomy
+    title: "Segment Taxonomy"
+  - anchor: 9-validation
+    title: "Validation"
+  - anchor: 10-limitations
+    title: "Limitations"
+  - anchor: 11-code
+    title: "Code"
+
+# === LINEAGE ===
+notebook: "10_SessionDurationAnalysis.ipynb"
+
+# === SEO ===
+description: "MTH-001.4: Methodology for identifying and segmenting concerning usage sessions in conversational AI using composite criteria, toxicity analysis, and temporal patterns."
+keywords:
+  - concerning sessions
+  - user safety
+  - session analysis
+  - toxicity
+  - extended engagement
+  - AI safety
+  - behavioral patterns
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Executive Summary
+
+This study develops a methodology for identifying and disaggregating "concerning" usage sessions—extended AI interactions that may warrant attention from a user wellbeing perspective. We define operational criteria that capture *sustained, active engagement* rather than mere duration, then decompose the resulting population into behaviorally distinct segments.
+
+**Key methodological contributions:**
+
+1. A four-criterion composite threshold that distinguishes sustained engagement from idle sessions
+2. Integration of conversation-level toxicity classifications into session-level metrics
+3. Temporal feature extraction using user-localized timezones
+4. A five-segment taxonomy with four-level concern gradation
+5. Emergence timing analysis revealing when concerning behavior first appears
+
+Specific findings and segment distributions are reported in the associated Dispatch.
+
+---
+
+## 1. Motivation
+
+### 1.1 Context
+
+Extended AI engagement has been flagged as a potential concern in human-AI interaction research. However, duration alone is an imprecise proxy for problematic use. A six-hour coding assistance session differs fundamentally from a six-hour late-night session involving harmful content. Effective safety monitoring requires disaggregating these patterns.
+
+### 1.2 Research Questions
+
+1. How should "concerning" sessions be operationally defined to capture genuine risk signals?
+2. What proportion of long sessions involve toxicity versus benign extended use?
+3. When do concerning sessions occur (time of day, day of week)?
+4. Are concerning sessions one-time events or recurring patterns for specific users?
+5. When in a user's history does concerning behavior first emerge?
+6. Can concerning sessions be meaningfully segmented by risk level?
+
+---
+
+## 2. Session Construction
+
+Sessions are constructed from individual conversations using a gap-based grouping algorithm. This methodology is shared across the MTH-001 family but is documented here with study-specific parameters.
+
+### 2.1 Gap Threshold Selection
+
+We group conversations into sessions when the gap between the end of one conversation and the start of the next is less than 30 minutes. This threshold balances two considerations:
+
+| Threshold | Trade-off |
+|-----------|-----------|
+| < 15 min | Too aggressive: fragments natural breaks (bathroom, coffee) |
+| > 60 min | Too permissive: merges distinct usage episodes |
+| **30 min** | **Selected**: captures sustained engagement while allowing brief interruptions |
+
+### 2.2 Session Construction Algorithm
+
+```python
+SESSION_GAP_MINUTES = 30
+
+for each user:
+    sort conversations by conversation_start
+    session_id = 0
+    
+    for i in range(len(conversations)):
+        if i == 0:
+            assign session_id
+        else:
+            gap = (conversation_start[i] - conversation_end[i-1]).minutes
+            if gap >= SESSION_GAP_MINUTES:
+                session_id += 1
+            assign session_id
+```
+
+### 2.3 Session Metrics
+
+For each session, we compute:
+
+| Metric | Definition |
+|--------|------------|
+| `session_start` | Timestamp of first turn in first conversation |
+| `session_end` | Timestamp of last turn in last conversation |
+| `span_hours` | `(session_end - session_start) / 3600` |
+| `total_turns` | Sum of turns across all conversations in session |
+| `turns_per_hour` | `total_turns / span_hours` |
+| `max_gap_minutes` | Largest gap between consecutive conversations |
+| `session_toxicity_ratio` | Proportion of conversations flagged as toxic |
+| `n_conversations` | Count of conversations in session |
+
+---
+
+## 3. Defining Concerning Sessions
+
+### 3.1 Operational Criteria
+
+A session is classified as potentially concerning if it meets **all four** criteria:
+
+| Criterion | Threshold | Rationale |
+|-----------|-----------|-----------|
+| Session span | > 6 hours | Extended duration |
+| Turn density | ≥ 2 turns/hour | Active engagement (not idle) |
+| Max internal gap | < 60 minutes | Sustained attention (not interrupted) |
+| Total turns | ≥ 30 | Substantial interaction volume |
+
+These criteria were designed to capture *sustained, active engagement* rather than sessions left open in background tabs or brief check-ins spread over time.
+
+### 3.2 Criterion Interaction
+
+Each criterion serves a distinct filtering function:
+
+**Duration (> 6 hours):** Captures extended engagement episodes. This threshold is deliberately conservative—many productive work sessions exceed this duration.
+
+**Turn density (≥ 2 turns/hour):** Filters out idle sessions. A session spanning 8 hours with only 5 turns is likely a browser tab left open, not active engagement.
+
+**Max internal gap (< 60 minutes):** Ensures continuity. A 10-hour "session" with a 4-hour gap in the middle represents two distinct episodes, not sustained engagement.
+
+**Total turns (≥ 30):** Ensures substantive interaction. Combined with duration, this prevents flagging long but sparse sessions.
+
+### 3.3 Implementation
+
+```python
+concerning = sessions.filter(
+    (pl.col('span_hours') > 6) &
+    (pl.col('turns_per_hour') >= 2) &
+    (pl.col('max_gap_minutes') < 60) &
+    (pl.col('total_turns') >= 30)
+)
+```
+
+---
+
+## 4. Toxicity Analysis
+
+### 4.1 Toxicity Classification Source
+
+Conversation-level toxicity labels originate from the Jigsaw Perspective API, applied during dataset preprocessing (see MTH-001 family documentation). A conversation is labeled toxic if any user turn exceeds the toxicity threshold.
+
+### 4.2 Session-Level Aggregation
+
+Session toxicity is computed as the proportion of conversations within the session that carry a toxic label:
+
+$$
+\text{session\_toxicity\_ratio} = \frac{|\{c \in S : \text{toxic}(c) = \text{True}\}|}{|S|}
+$$
+
+Where *S* is the set of conversations in the session.
+
+### 4.3 Toxicity Thresholds
+
+We define multiple toxicity levels for analysis:
+
+| Level | Criterion | Interpretation |
+|-------|-----------|----------------|
+| Any toxic | `toxicity_ratio > 0` | At least one toxic conversation |
+| Majority toxic | `toxicity_ratio > 0.5` | More than half of conversations toxic |
+| Fully toxic | `toxicity_ratio == 1.0` | All conversations toxic |
+
+### 4.4 Baseline Comparison
+
+To contextualize concerning session toxicity, we compare against all non-concerning sessions (the "normal" baseline). Statistical comparison uses the Mann-Whitney U test given non-normal distributions.
+
+---
+
+## 5. Temporal Patterns
+
+### 5.1 Timezone Localization
+
+Session start times are analyzed in the user's local timezone to accurately classify day/night patterns. Timezone assignment follows this hierarchy:
+
+1. **US users:** State-specific timezone (e.g., `America/Los_Angeles` for California)
+2. **Other countries:** Capital city timezone (e.g., `Europe/Moscow` for Russia)
+3. **Unknown:** UTC fallback
+
+### 5.2 Temporal Features
+
+| Feature | Definition |
+|---------|------------|
+| `start_hour` | Hour (0-23) of session start in local time |
+| `day_of_week` | Day of week (0=Monday, 6=Sunday) |
+| `is_late_night` | `start_hour ∈ [0, 5]` |
+| `is_weekend` | `day_of_week ∈ {5, 6}` |
+
+### 5.3 Late-Night Definition
+
+We define "late night" as sessions starting between midnight and 5 AM local time. This window captures:
+
+- Post-midnight engagement (potential sleep displacement)
+- Early morning hours before typical waking time
+- The period associated with reduced inhibition and judgment
+
+### 5.4 Statistical Testing
+
+Temporal pattern differences between concerning and normal sessions are tested using chi-square tests for categorical comparisons (late night vs. not, weekend vs. weekday).
+
+---
+
+## 6. User Persistence
+
+### 6.1 Persistence Categories
+
+Users are categorized by the number of concerning sessions they exhibit:
+
+| Category | Criterion | Interpretation |
+|----------|-----------|----------------|
+| One-time | Exactly 1 concerning session | Isolated incident |
+| Occasional | 2 concerning sessions | Infrequent pattern |
+| Repeat | 3-5 concerning sessions | Emerging pattern |
+| Frequent | 6-10 concerning sessions | Established pattern |
+| Heavy | > 10 concerning sessions | Chronic pattern |
+
+### 6.2 Aggregation Metrics
+
+For users with concerning sessions, we compute:
+
+```python
+user_concerning_stats = concerning_sessions.group_by('user_id').agg([
+    pl.len().alias('n_concerning'),
+    pl.col('span_hours').mean().alias('mean_span'),
+    pl.col('session_toxicity_ratio').mean().alias('mean_toxicity'),
+    pl.col('total_turns').sum().alias('total_concerning_turns'),
+])
+```
+
+### 6.3 Repeat User Analysis
+
+We compare behavioral characteristics between one-time and repeat users to assess whether repeat users show distinct patterns (e.g., higher toxicity, longer sessions, different timing).
+
+---
+
+## 7. Emergence Timing
+
+### 7.1 Research Question
+
+Does concerning behavior emerge early in a user's history (suggesting a trait-like characteristic) or develop over time (suggesting learned behavior or escalation)?
+
+### 7.2 Session Numbering
+
+Each user's sessions are numbered chronologically:
+
+```python
+session_numbered = sessions.sort(['user_id', 'session_start']).with_columns([
+    pl.lit(1).cum_sum().over('user_id').alias('session_number')
+])
+```
+
+### 7.3 First Concerning Session
+
+For each user with concerning sessions, we identify the session number of their first concerning session and compute:
+
+| Metric | Definition |
+|--------|------------|
+| `first_concerning_session_number` | Chronological position of first concerning session |
+| `relative_position` | `first_concerning_session_number / total_user_sessions` |
+
+### 7.4 Emergence Distribution Analysis
+
+We analyze what proportion of users exhibit concerning behavior:
+
+- In their first session
+- Within their first 3 sessions
+- Within their first 10 sessions
+- After 50+ sessions
+
+Early emergence (first 3 sessions) suggests the behavior is trait-like; late emergence suggests development or escalation.
+
+---
+
+## 8. Segment Taxonomy
+
+### 8.1 Segmentation Logic
+
+Concerning sessions are classified into behaviorally distinct segments based on toxicity and timing:
+
+```python
+def classify_concerning_session(row):
+    toxicity = row['session_toxicity_ratio']
+    is_late_night = row['is_late_night']
+    turns_per_hour = row['turns_per_hour']
+    
+    if toxicity > 0.5:
+        if is_late_night:
+            return 'problematic_content_late_night', 4  # Highest concern
+        else:
+            return 'problematic_content', 3
+    elif is_late_night:
+        return 'extended_late_night', 2
+    elif turns_per_hour > 20:  # Very high intensity
+        return 'high_intensity_unknown', 2
+    else:
+        return 'extended_general_use', 1  # Lowest concern
+```
+
+### 8.2 Segment Definitions
+
+| Segment | Criteria | Concern Level | Interpretation |
+|---------|----------|---------------|----------------|
+| `extended_general_use` | Low toxicity, daytime, moderate intensity | 1 (Low) | Likely productive extended use |
+| `extended_late_night` | Low toxicity, late night | 2 (Medium) | Sleep pattern concerns |
+| `high_intensity_unknown` | Low toxicity, > 20 turns/hour | 2 (Medium) | Very rapid engagement |
+| `problematic_content` | > 50% toxic, daytime | 3 (Higher) | Content concerns |
+| `problematic_content_late_night` | > 50% toxic, late night | 4 (Highest) | Combined risk factors |
+
+### 8.3 Concern Level Rationale
+
+The four-level gradation reflects compounding risk factors:
+
+- **Level 1:** Extended engagement alone is not inherently concerning
+- **Level 2:** Timing (late night) or intensity adds modest concern
+- **Level 3:** Problematic content is a direct concern signal
+- **Level 4:** Combined factors (content + timing) warrant highest attention
+
+---
+
+## 9. Validation
+
+### 9.1 Matched Control Comparison
+
+To validate that concerning sessions represent genuinely distinct behavior (not just extreme values), we compare users with concerning sessions to matched controls.
+
+**Matching criteria:** Users are matched on session count (±2 sessions) to control for overall engagement level.
+
+**Comparison metrics:**
+- Total turns
+- Mean session toxicity
+- Mean session span
+- Late-night session proportion
+
+### 9.2 Statistical Testing
+
+For continuous metrics, we use Mann-Whitney U tests (non-normal distributions). For categorical comparisons, we use chi-square tests.
+
+**Significance threshold:** p < 0.001 (Bonferroni-corrected for multiple comparisons)
+
+### 9.3 Expected Findings
+
+If the methodology correctly identifies distinct behavior patterns, we expect:
+
+1. Concerning session users to show higher mean toxicity (after controlling for session count)
+2. Concerning session users to show different temporal patterns
+3. Segment distributions to be non-uniform (genuine heterogeneity)
+
+---
+
+## 10. Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Toxicity classifier accuracy** | False positives/negatives in toxicity labels | Use session-level aggregation to reduce single-conversation errors |
+| **Timezone inference** | Some users have incorrect timezone assignment | UTC fallback; acknowledge uncertainty |
+| **Selection bias** | WildChat users are not representative of all AI users | Findings may not generalize to other populations |
+| **Single-session definition** | 30-minute gap may not be optimal for all use patterns | Sensitivity analysis with 15- and 60-minute gaps |
+| **Toxicity as surface signal** | Classifier detects linguistic patterns, not intent | Avoid causal claims about user motivation |
+| **Late-night as proxy** | Late-night use has legitimate reasons (shift workers, students) | Segment taxonomy allows non-pathological interpretation |
+
+### 10.1 Ethical Considerations
+
+This methodology identifies *potential* concern signals, not definitive risk. Key principles:
+
+1. **No individual prediction:** These methods characterize population-level patterns, not individual risk
+2. **Privacy preservation:** User IDs are hashed; no personally identifiable information
+3. **Benefit orientation:** Goal is to inform product safety design, not surveillance
+4. **Interpretation caution:** Extended use may reflect value, not harm (e.g., coding assistance)
+
+---
+
+## 11. Code
+
+Analysis notebooks are available on GitHub:
+
+- [10_SessionDurationAnalysis.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/10_SessionDurationAnalysis.ipynb) — Full analysis with code and outputs
+
+---
+
+## Appendix A: Threshold Sensitivity
+
+### A.1 Alternative Duration Thresholds
+
+The 6-hour threshold was selected after examining the session duration distribution. Alternative thresholds would yield:
+
+| Threshold | Sessions | % of Total |
+|-----------|----------|------------|
+| > 4 hours | ~5,000 | ~0.8% |
+| > 6 hours | ~3,500 | ~0.56% |
+| **> 6 hours + all criteria** | **2,259** | **0.36%** |
+| > 8 hours | ~2,000 | ~0.32% |
+| > 12 hours | ~800 | ~0.13% |
+
+The composite criteria (duration + density + continuity + volume) reduce the flagged population by ~35% compared to duration alone.
+
+### A.2 Turn Density Sensitivity
+
+| Turns/hour threshold | Effect |
+|----------------------|--------|
+| ≥ 1 | Includes sparse but long sessions |
+| **≥ 2** | **Selected**: balances coverage and specificity |
+| ≥ 5 | Excludes contemplative use patterns |
+| ≥ 10 | Captures only rapid-fire interactions |
+
+---
+
+## Appendix B: Timezone Mapping
+
+### B.1 US State Timezones
+
+```python
+US_STATE_TIMEZONES = {
+    'California': 'America/Los_Angeles',
+    'New York': 'America/New_York',
+    'Texas': 'America/Chicago',
+    'Florida': 'America/New_York',
+    # ... (full mapping in notebook)
+}
+```
+
+### B.2 Country Default Timezones
+
+Countries are mapped to their capital city timezone. For countries spanning multiple zones (Russia, US, Australia), the most populous timezone is used.
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-05 | Initial publication |
+

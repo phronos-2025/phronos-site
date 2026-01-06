@@ -1,0 +1,448 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/global/Nav.astro';
+import Footer from '../../../components/global/Footer.astro';
+import MethodMetaBar from '../../../components/methods/MethodMetaBar.astro';
+import MethodHeader from '../../../components/methods/MethodHeader.astro';
+import AbstractBlock from '../../../components/methods/AbstractBlock.astro';
+import Changelog from '../../../components/methods/Changelog.astro';
+import Table from '../../../components/content/Table.astro';
+import Callout from '../../../components/content/Callout.astro';
+import '../../../styles/components/methods.css';
+
+export async function getStaticPaths() {
+  const studies = await getCollection('methodStudies');
+  const families = await getCollection('methodFamilies');
+  
+  return studies.map((study) => {
+    const parentFamily = families.find(f => f.data.id === study.data.family);
+    return {
+      params: { 
+        family: study.data.family_slug,
+        study: study.data.slug 
+      },
+      props: { study, parentFamily },
+    };
+  });
+}
+
+const { study, parentFamily } = Astro.props;
+const { Content } = await render(study);
+
+// Get sibling studies for navigation
+const allStudies = await getCollection('methodStudies');
+const siblingStudies = allStudies
+  .filter((s) => s.data.family === study.data.family)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const currentIndex = siblingStudies.findIndex(s => s.data.id === study.data.id);
+const prevStudy = currentIndex > 0 ? siblingStudies[currentIndex - 1] : null;
+const nextStudy = currentIndex < siblingStudies.length - 1 ? siblingStudies[currentIndex + 1] : null;
+
+// MDX components to pass
+const components = { Table, Callout };
+
+// Generate table of contents from sections
+const toc = study.data.sections || [];
+
+// Family info for the meta bar
+const familyName = parentFamily?.data.title || study.data.family;
+const familyHref = `/methods/${study.data.family_slug}/`;
+---
+
+<BaseLayout 
+  title={study.data.title}
+  description={study.data.description}
+  ogType="article"
+  publishedTime={study.data.date.toISOString()}
+>
+  <Nav slot="nav" />
+  
+  <article class="method-article study-article">
+    {/* Header section */}
+    <header class="study-header">
+      <MethodMetaBar
+        id={study.data.id}
+        version={study.data.version}
+        date={study.data.date}
+        status={study.data.status}
+        familyName={familyName}
+        familyHref={familyHref}
+      />
+
+      <MethodHeader
+        title={study.data.title}
+        subtitle={study.data.subtitle}
+      />
+
+      {study.data.abstract && (
+        <AbstractBlock abstract={study.data.abstract} />
+      )}
+    </header>
+
+    {/* Content with TOC - uses flexbox for proper sticky behavior */}
+    <div class="study-content-outer">
+      <div class="study-content-inner">
+        {/* TOC Sidebar */}
+        {toc.length > 0 && (
+          <aside class="toc-sidebar">
+            <nav class="toc-nav" aria-label="Table of contents">
+              <div class="toc-label">Contents</div>
+              <ol class="toc-list">
+                {toc.map((section) => (
+                  <li class="toc-item">
+                    <a href={`#${section.anchor}`}>{section.title}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </aside>
+        )}
+
+        {/* Main content */}
+        <div class="study-main">
+          <article class="method-body">
+            <div class="method-content">
+              <Content components={components} />
+            </div>
+          </article>
+
+          {(prevStudy || nextStudy) && (
+            <nav class="study-navigation">
+              <div class="study-nav-label">Navigate Studies</div>
+              <div class="study-nav-grid">
+                {prevStudy ? (
+                  <a href={`/methods/${study.data.family_slug}/${prevStudy.data.slug}/`} class="study-nav-link prev">
+                    <span class="study-nav-direction">← Previous</span>
+                    <span class="study-nav-id">{prevStudy.data.id}</span>
+                    <span class="study-nav-title">{prevStudy.data.title}</span>
+                  </a>
+                ) : (
+                  <div class="study-nav-placeholder"></div>
+                )}
+                {nextStudy ? (
+                  <a href={`/methods/${study.data.family_slug}/${nextStudy.data.slug}/`} class="study-nav-link next">
+                    <span class="study-nav-direction">Next →</span>
+                    <span class="study-nav-id">{nextStudy.data.id}</span>
+                    <span class="study-nav-title">{nextStudy.data.title}</span>
+                  </a>
+                ) : (
+                  <div class="study-nav-placeholder"></div>
+                )}
+              </div>
+            </nav>
+          )}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  /* ============================================
+     HEADER SECTION - Centered like dispatch
+     ============================================ */
+  .study-header {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ============================================
+     CONTENT OUTER - Full width container for flexbox layout
+     ============================================ */
+  .study-content-outer {
+    width: 100%;
+  }
+
+  /* ============================================
+     CONTENT INNER - Flexbox layout for TOC + content
+     On wide screens: TOC on left, content on right, both centered as a unit
+     ============================================ */
+  .study-content-inner {
+    display: flex;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ============================================
+     TOC SIDEBAR - Fixed width, stretches to match content height for sticky to work
+     ============================================ */
+  .toc-sidebar {
+    flex: 0 0 180px;
+    order: -1; /* Ensure TOC is always on the left */
+    /* Don't use align-self: flex-start - let it stretch to match content height */
+    padding-top: 0.25rem; /* Align with Executive Summary heading */
+  }
+
+  .toc-nav {
+    position: sticky;
+    top: 5rem;
+    padding-top: 0.5rem;
+  }
+
+  .toc-list {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--faded-light);
+    margin-top: 1.9rem; /* Align with Executive Summary heading baseline */
+  }
+
+  .toc-item {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .toc-item a {
+    color: var(--faded);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    display: block;
+    padding: 0.5rem 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid transparent;
+  }
+
+  .toc-item a:hover {
+    color: var(--ink);
+    border-left-color: var(--gold);
+  }
+
+  /* ============================================
+     MAIN CONTENT - matches header width
+     ============================================ */
+  .study-main {
+    flex: 0 1 800px;
+    min-width: 0;
+    max-width: 800px;
+  }
+
+  /* Fix anchor scrolling - account for sticky nav bar */
+  .study-main :global(h2),
+  .study-main :global(h3),
+  .study-main :global(h4) {
+    scroll-margin-top: 5rem;
+  }
+
+  /* ============================================
+     STUDY NAVIGATION
+     ============================================ */
+  .study-navigation {
+    padding: 3rem 0;
+    border-top: 1px solid var(--faded-light);
+    margin-top: 2rem;
+  }
+
+  .study-nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--faded);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .study-nav-label::before {
+    content: '◈ ';
+    color: var(--gold);
+  }
+
+  .study-nav-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .study-nav-link {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    background: var(--white);
+    border: 1px solid var(--faded-light);
+    text-decoration: none;
+    transition: all var(--transition-default);
+  }
+
+  .study-nav-link:hover {
+    border-color: var(--ink);
+    box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.05);
+  }
+
+  .study-nav-link.prev {
+    text-align: left;
+  }
+
+  .study-nav-link.next {
+    text-align: right;
+  }
+
+  .study-nav-direction {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+    margin-bottom: 0.5rem;
+  }
+
+  .study-nav-id {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+
+  .study-nav-title {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  .study-nav-placeholder {
+    /* Empty placeholder to maintain grid layout */
+  }
+
+  /* ============================================
+     RESPONSIVE DESIGN
+     ============================================ */
+  @media (max-width: 1100px) {
+    .study-content-inner {
+      flex-direction: column;
+      max-width: 800px;
+      padding: 0 5%;
+    }
+
+    .toc-sidebar {
+      flex: none;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      padding-top: 0;
+      order: 0; /* Reset order for mobile */
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--paper);
+      padding-top: 0.75rem;
+      padding-bottom: 0.5rem;
+      margin-left: -5%;
+      margin-right: -5%;
+      padding-left: 5%;
+      padding-right: 5%;
+      border-bottom: 1px solid var(--faded-light);
+    }
+
+    .toc-nav {
+      position: static;
+    }
+
+    .toc-label {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+      max-height: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.75rem;
+      margin: 0 -5%; /* Extend to edges */
+      padding-left: 5%;
+      padding-right: 5%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--faded) transparent;
+    }
+
+    .toc-list::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .toc-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .toc-list::-webkit-scrollbar-thumb {
+      background: var(--faded);
+      border-radius: 2px;
+    }
+
+    .toc-item {
+      flex: 0 0 auto;
+    }
+
+    .toc-item a {
+      display: inline-block;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--faded-light);
+      border-left: 1px solid var(--faded-light);
+      border-radius: 2rem;
+      background: var(--paper);
+      font-size: 0.7rem;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .toc-item a:hover {
+      border-color: var(--gold);
+      border-left-color: var(--gold);
+      background: var(--warm-white);
+      color: var(--ink);
+    }
+
+    .study-main {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .study-content-inner {
+      padding: 0 1rem;
+    }
+
+    .toc-sidebar {
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .toc-list {
+      margin: 0 -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .study-nav-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .study-nav-link.next {
+      text-align: left;
+    }
+  }
+</style>

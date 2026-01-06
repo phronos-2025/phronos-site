@@ -3,16 +3,37 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/global/Nav.astro';
 import Footer from '../../components/global/Footer.astro';
-import Card from '../../components/cards/Card.astro';
 import '../../styles/components/methods.css';
+import '../../styles/components/cards.css';
 
-const methods = await getCollection('methods', ({ data }) => 
+// Get all families and studies
+const families = await getCollection('methodFamilies', ({ data }) => 
   data.status !== 'archived'
 );
 
-const sortedMethods = methods.sort(
+const studies = await getCollection('methodStudies', ({ data }) => 
+  data.status !== 'archived'
+);
+
+// Sort families by date (newest first)
+const sortedFamilies = families.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
+
+// Group studies by family
+const studiesByFamily = studies.reduce((acc, study) => {
+  const familyId = study.data.family;
+  if (!acc[familyId]) {
+    acc[familyId] = [];
+  }
+  acc[familyId].push(study);
+  return acc;
+}, {} as Record<string, typeof studies>);
+
+// Sort studies within each family by order
+Object.keys(studiesByFamily).forEach(familyId => {
+  studiesByFamily[familyId].sort((a, b) => a.data.order - b.data.order);
+});
 ---
 
 <BaseLayout 
@@ -37,19 +58,51 @@ const sortedMethods = methods.sort(
 
     <section class="methods-cards">
       <div class="card-grid">
-        {sortedMethods.length > 0 ? (
-          sortedMethods.map((method) => (
-            <Card
-              id={method.data.id}
-              title={method.data.title}
-              description={method.data.abstract || ''}
-              status={method.data.status}
-              version={method.data.version ? `v${method.data.version}` : undefined}
-              href={method.data.status === 'published' ? `/methods/${method.slug}` : undefined}
-            />
-          ))
+        {sortedFamilies.length > 0 ? (
+          sortedFamilies.map((family) => {
+            const childStudies = studiesByFamily[family.data.id] || [];
+            return (
+              <article class="method-card">
+                <a href={`/methods/${family.data.slug}/`} class="method-card-header">
+                  <div class="card-meta">
+                    <span class="card-id">{family.data.id}</span>
+                    <div class="card-status-group">
+                      <span class="card-status-text">{family.data.status}</span>
+                      <span class={`status-dot ${family.data.status}`}></span>
+                    </div>
+                  </div>
+                  <h3 class="card-title">{family.data.title}</h3>
+                  <p class="card-description">{family.data.subtitle}</p>
+                  {family.data.dataset && (
+                    <div class="card-dataset">
+                      Dataset: {family.data.dataset.name}
+                    </div>
+                  )}
+                </a>
+
+                {childStudies.length > 0 && (
+                  <div class="studies-compact">
+                    {childStudies.map((study) => (
+                      <a 
+                        href={`/methods/${family.data.slug}/${study.data.slug}/`}
+                        class="study-compact-row"
+                      >
+                        <span class="study-compact-id">{study.data.id}</span>
+                        <span class="study-compact-title">{study.data.title}</span>
+                        <span class={`status-dot small ${study.data.status}`}></span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <div class="card-footer">
+                  <span>v{family.data.version}</span>
+                </div>
+              </article>
+            );
+          })
         ) : (
-          <p class="empty-state">First method coming soon.</p>
+          <p class="empty-state">Methods coming soon.</p>
         )}
       </div>
     </section>
@@ -59,6 +112,148 @@ const sortedMethods = methods.sort(
 </BaseLayout>
 
 <style>
+  .methods-cards {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+
+  /* Method Card - similar to dispatch card but with studies */
+  .method-card {
+    background: var(--white);
+    border: 1px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-default), box-shadow var(--transition-default);
+  }
+
+  .method-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px rgba(26, 26, 26, 0.1);
+  }
+
+  .method-card-header {
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .method-card-header:hover .card-title {
+    color: var(--gold);
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+  }
+
+  .card-status-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .card-status-text {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    transition: color var(--transition-fast);
+  }
+
+  .card-description {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--faded);
+    margin: 0;
+  }
+
+  .card-dataset {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+    margin-top: 0.75rem;
+  }
+
+  /* Compact Studies List */
+  .studies-compact {
+    border-top: 1px solid var(--faded-light);
+  }
+
+  .study-compact-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--faded-light);
+    transition: background var(--transition-fast);
+  }
+
+  .study-compact-row:last-child {
+    border-bottom: none;
+  }
+
+  .study-compact-row:hover {
+    background: rgba(176, 141, 85, 0.05);
+  }
+
+  .study-compact-id {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    min-width: 55px;
+    flex-shrink: 0;
+  }
+
+  .study-compact-title {
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    color: var(--ink);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .status-dot.small {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* Card Footer */
+  .card-footer {
+    border-top: 1px solid var(--faded-light);
+    padding: 0.75rem 1.5rem;
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
   .empty-state {
     font-family: var(--font-serif);
     font-size: var(--text-lg);
@@ -67,5 +262,30 @@ const sortedMethods = methods.sort(
     text-align: center;
     padding: var(--space-xl);
   }
-</style>
 
+  @media (max-width: 768px) {
+    .methods-cards {
+      padding: 0 1rem 3rem;
+    }
+
+    .method-card-header {
+      padding: 1.25rem 1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .study-compact-row {
+      padding: 0.5rem 1rem;
+    }
+
+    .study-compact-title {
+      font-size: 0.8rem;
+    }
+
+    .card-footer {
+      padding: 0.6rem 1rem;
+    }
+  }
+</style>

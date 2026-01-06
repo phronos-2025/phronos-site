@@ -1,0 +1,536 @@
+---
+# === IDENTIFICATION ===
+id: MTH-001.2
+slug: engagement-prediction
+type: study
+family: MTH-001
+family_slug: observational-chat-analysis
+order: 2
+
+# === CONTENT ===
+title: "Engagement Prediction from First-Turn Features"
+subtitle: "Methodology for Predicting User Return from Initial Prompt Characteristics"
+abstract: |
+  A methodology for predicting user return behavior from first-prompt features alone. 
+  Implements strict temporal holdout validation with new-user restriction to ensure 
+  genuine out-of-sample evaluation. Documents feature engineering for linguistic 
+  markers, ablation procedures for isolating feature contributions, and permutation 
+  importance for quantifying feature effects. Findings are reported in the associated 
+  Dispatch.
+
+# === METADATA ===
+date: 2026-01-05
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-motivation
+    title: "Motivation"
+  - anchor: 2-temporal-holdout-design
+    title: "Temporal Holdout Design"
+  - anchor: 3-outcome-variable
+    title: "Outcome Variable"
+  - anchor: 4-feature-engineering
+    title: "Feature Engineering"
+  - anchor: 5-model-architecture
+    title: "Model Architecture"
+  - anchor: 6-ablation-procedure
+    title: "Ablation Procedure"
+  - anchor: 7-permutation-importance-procedure
+    title: "Permutation Importance"
+  - anchor: 8-random-feature-comparison
+    title: "Random Feature Comparison"
+  - anchor: 9-validation-design
+    title: "Validation Design"
+  - anchor: 10-identity-marker-testing-procedure
+    title: "Identity Marker Testing"
+  - anchor: 11-limitations
+    title: "Limitations"
+  - anchor: 12-code
+    title: "Code"
+
+# === LINEAGE ===
+notebook: "07_EngagementPrediction.ipynb"
+
+# === SEO ===
+description: "MTH-001.1: Methodology for predicting user return behavior from first-prompt features using temporal holdout, ablation studies, and permutation importance."
+keywords:
+  - engagement prediction
+  - user retention
+  - first-prompt features
+  - temporal holdout
+  - ablation study
+  - permutation importance
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Executive Summary
+
+This study documents a methodology for predicting user return behavior based solely on first-prompt characteristics. The approach implements strict temporal holdout with new-user restriction, extracts linguistic features from first prompts, and quantifies feature contributions through ablation and permutation importance procedures. The methodology enables investigation of which first-prompt characteristics—structural, stylistic, or semantic—contribute to predicting return behavior. Specific findings and interpretations are reported in the associated Dispatch.
+
+---
+
+## 1. Motivation
+
+### 1.1 Context
+
+Predicting user engagement with conversational AI systems from first-interaction features presents several methodological challenges:
+
+1. **Temporal leakage**: Training on future data and testing on past data inflates performance estimates
+2. **User contamination**: Including the same user in both train and test sets creates information leakage
+3. **Feature circularity**: Using features that require observing multiple conversations (e.g., intent diversity) prevents prospective prediction
+4. **Confounding**: Prompt length may correlate with task complexity, which independently drives return behavior
+
+This methodology addresses each concern with specific design choices documented below.
+
+### 1.2 Research Questions
+
+The methodology enables investigation of:
+
+1. Whether first-prompt features can predict return behavior at levels exceeding chance
+2. Which feature categories contribute most to prediction: structural (word count), stylistic (pronouns, politeness), or semantic (intent)
+3. Whether predictive signal comes from genuine linguistic markers or is confounded with prompt length
+4. Whether predictive relationships generalize from training period to genuinely new users
+
+---
+
+## 2. Temporal Holdout Design
+
+### 2.1 Split Definition
+
+We implement a strict temporal holdout with new-user restriction:
+
+| Split | Definition | Purpose |
+|-------|------------|---------|
+| **Training** | Users whose first-ever conversation occurred before the cutoff date | Model development and exploratory analysis |
+| **Test** | Users whose first-ever conversation occurred on or after the cutoff date | Confirmatory evaluation (single use) |
+
+### 2.2 New-User Restriction
+
+The test set contains *only* users who did not exist in the training period. This is stricter than a simple date cutoff on conversations:
+
+- A date cutoff on conversations would allow the same user to appear in both splits (e.g., early conversations in training, later conversations in test)
+- The new-user restriction ensures complete user-level separation
+
+### 2.3 Follow-Up Window Constraint
+
+To ensure all test users have sufficient observation time for outcome measurement, test set inclusion requires:
+
+$$
+t_{\text{first}} \leq t_{\text{data\_end}} - w
+$$
+
+Where:
+- $t_{\text{first}}$ = timestamp of user's first conversation
+- $t_{\text{data\_end}}$ = end of data collection period
+- $w$ = follow-up window (e.g., 60 days)
+
+This prevents right-censoring bias from users who joined near the end of data collection.
+
+### 2.4 Contamination Verification
+
+The implementation verifies zero overlap between training and test user sets:
+
+$$
+|\mathcal{U}_{\text{train}} \cap \mathcal{U}_{\text{test}}| = 0
+$$
+
+---
+
+## 3. Outcome Variable
+
+### 3.1 Definition
+
+A user is classified as "returned" if they initiated at least two conversations within a fixed time window of their first conversation:
+
+$$
+\text{returned}_{w}(u) = \mathbf{1}\left[n_{\text{conv}}(u) \geq 2 \land (t_2(u) - t_1(u)) \leq w\right]
+$$
+
+Where:
+- $u$ = user
+- $n_{\text{conv}}(u)$ = total number of conversations for user $u$
+- $t_1(u)$ = timestamp of user's first conversation
+- $t_2(u)$ = timestamp of user's second conversation
+- $w$ = return window in days
+- $\mathbf{1}[\cdot]$ = indicator function
+
+### 3.2 Rationale for Fixed Window
+
+Using a fixed time window (rather than unbounded "ever returned") standardizes the outcome across users with different observation periods. This is particularly important given the temporal holdout design, where test users necessarily have shorter maximum observation periods.
+
+### 3.3 Days-to-Return vs. Active Span
+
+We use days between first and second conversation ($t_2 - t_1$) rather than days between first and last conversation ($t_{\text{last}} - t_1$). The latter conflates return timing with usage intensity and is more susceptible to right-censoring.
+
+---
+
+## 4. Feature Engineering
+
+### 4.1 Extraction Scope
+
+Features are extracted from the **first user message only** in each user's first conversation. This ensures:
+
+- Predictions could be made at the moment of first interaction
+- No information leakage from subsequent messages or conversations
+- Consistent feature space across all users
+
+### 4.2 Structural Features
+
+| Feature | Definition | Formula |
+|---------|------------|---------|
+| Word count | Number of whitespace-separated tokens | $n_w = \|\text{text.split()}\|$ |
+| Character count | Total characters including whitespace | $n_c = \|\text{text}\|$ |
+| Average word length | Mean characters per word | Mean of character counts per word |
+
+### 4.3 Pronoun Rate Features
+
+Pronoun rates are computed as counts per 100 words to normalize across prompt lengths:
+
+$$
+r_{\text{pronoun}} = \frac{100 \times |\{w \in W : w \in P\}|}{n_w}
+$$
+
+Where:
+- $W$ = set of words in the prompt (lowercased)
+- $P$ = target pronoun set
+- $n_w$ = total word count
+
+| Feature | Pronoun Set $P$ |
+|---------|-----------------|
+| First-person singular rate | (i, me, my, mine, myself) |
+| First-person plural rate | (we, us, our, ours, ourselves) |
+| Second-person rate | (you, your, yours, yourself, yourselves) |
+
+### 4.4 Politeness Rate
+
+Politeness rate uses the same normalization:
+
+$$
+r_{\text{polite}} = \frac{100 \times |\{w \in W : w \in M\}|}{n_w}
+$$
+
+Where *M* = (please, thank, thanks, appreciate, kindly)
+
+### 4.5 Binary Structural Features
+
+| Feature | Definition | Trigger Conditions |
+|---------|------------|-------------------|
+| Has question | Prompt contains interrogative markers | Contains "?" OR starts with interrogative word (what, how, why, when, where, who, can, could, would, is, are, do, does) |
+| Is imperative | Prompt begins with command verb | First word (after lowercasing and stripping punctuation) is in (write, create, make, generate, list, explain, tell, show, find, help, give) |
+| Is greeting | Prompt begins with greeting | Starts with: hi, hello, hey, good morning, good afternoon, good evening, greetings |
+
+### 4.6 Intent Features
+
+Intent indicators are binary features derived from keyword pattern matching on the full prompt text. These serve as confounder controls rather than primary predictors.
+
+| Intent | Description | Example Patterns |
+|--------|-------------|------------------|
+| Coding | Programming-related requests | code, python, javascript, function, error, debug, algorithm |
+| Roleplay | Persona or scenario requests | act as, you are a, pretend, roleplay, scenario |
+| Creative writing | Generative creative content | write a story, write a poem, fiction, compose |
+| Emotional support | Support-seeking or personal distress | i feel, anxious, depressed, lonely, advice, help me cope |
+
+Full pattern lists are documented in the source notebook.
+
+---
+
+## 5. Model Architecture
+
+### 5.1 Model Selection
+
+We use logistic regression with L2 regularization for the following reasons:
+
+- **Interpretability**: Coefficients have direct interpretation as log-odds effects; odds ratios quantify effect magnitudes
+- **Calibration**: Logistic regression produces well-calibrated probability estimates without additional post-hoc calibration
+- **Regularization**: L2 penalty provides implicit regularization against overfitting
+- **Efficiency**: Fast training enables multiple ablation experiments
+
+### 5.2 Class Imbalance Handling
+
+Given imbalanced outcome distribution (most users do not return), we apply balanced class weighting:
+
+$$
+w_c = \frac{n_{\text{total}}}{k \times n_c}
+$$
+
+Where:
+- $w_c$ = weight for class $c$
+- $n_{\text{total}}$ = total samples
+- $k$ = number of classes (2)
+- $n_c$ = samples in class $c$
+
+This upweights the minority class (returners) during training.
+
+### 5.3 Feature Standardization
+
+All features are standardized to zero mean and unit variance before model fitting:
+
+$$
+x'_j = \frac{x_j - \mu_j}{\sigma_j}
+$$
+
+Where $\mu_j$ and $\sigma_j$ are computed from the training set only. The same transformation parameters are applied to test data to prevent leakage.
+
+### 5.4 Missing Value Treatment
+
+Missing values (e.g., when word count is zero, preventing rate calculation) are imputed with zero.
+
+---
+
+## 6. Ablation Procedure
+
+### 6.1 Purpose
+
+Ablation studies quantify the marginal contribution of feature categories by comparing model performance across nested feature sets.
+
+### 6.2 Feature Set Hierarchy
+
+We define feature sets of increasing complexity:
+
+| Set Name | Features Added | Cumulative Features |
+|----------|---------------|---------------------|
+| Baseline | word_count | 1 |
+| + Pronouns | first_person_singular_rate, first_person_plural_rate, second_person_rate | 4 |
+| + Style | politeness_rate, has_question, is_imperative, avg_word_length | 8 |
+| + Greeting | is_greeting | 9 |
+| + Intent | intent_coding, intent_roleplay, intent_creative_writing, intent_emotional_support | 13 |
+
+Alternative groupings (e.g., baseline + style without pronouns) are also evaluated to isolate pronoun vs. style contributions.
+
+### 6.3 Cross-Validation Procedure
+
+For each feature set, we estimate performance using $k$-fold stratified cross-validation on training data:
+
+1. Partition training users into $k$ stratified folds (preserving outcome class proportions)
+2. For each fold $i \in \{1, ..., k\}$:
+   - Hold out fold $i$ as validation set
+   - Fit standardizer and model on remaining $k-1$ folds
+   - Apply standardizer to validation set
+   - Compute predicted probabilities on validation set
+   - Calculate ROC AUC for fold $i$
+3. Report mean and standard deviation of AUC across folds
+
+Stratification ensures each fold maintains the class balance of the full training set.
+
+### 6.4 Interpretation
+
+Comparing AUC across feature sets reveals:
+
+- **Baseline performance**: Predictive value of the simplest model (word count alone)
+- **Marginal gains**: Incremental improvement from adding feature categories
+- **Diminishing returns**: Whether complex feature sets substantially outperform simple ones
+
+---
+
+## 7. Permutation Importance Procedure
+
+### 7.1 Purpose
+
+Permutation importance quantifies the contribution of each feature to model performance by measuring the decrease in performance when that feature's relationship with the outcome is destroyed.
+
+### 7.2 Algorithm
+
+For each feature $j$:
+
+1. Compute baseline performance metric $M_0$ (e.g., AUC) on the evaluation set
+2. Randomly permute the values of feature $j$ across samples, breaking its relationship with both other features and the outcome
+3. Compute performance metric $M_j^{(\pi)}$ on the permuted data
+4. Repeat steps 2-3 $K$ times with different random permutations
+5. Compute importance as the mean decrease in performance:
+
+$$
+I_j = \frac{1}{K} \sum_{k=1}^{K} \left[ M_0 - M_j^{(\pi_k)} \right]
+$$
+
+### 7.3 Interpretation
+
+- **Positive importance**: Permuting the feature hurts performance; the feature carries predictive signal
+- **Near-zero importance**: The feature does not contribute to prediction
+- **Negative importance**: Permuting the feature improves performance; the feature may be introducing noise
+
+### 7.4 Relative Importance
+
+To compare feature contributions, we compute the proportion of total positive importance attributable to each feature:
+
+$$
+\text{RelImp}_j = \frac{\max(I_j, 0)}{\sum_{j'} \max(I_{j'}, 0)}
+$$
+
+---
+
+## 8. Random Feature Comparison
+
+### 8.1 Purpose
+
+Comparing real features against random noise features guards against spurious performance claims. If real features perform no better than random Gaussian noise, the predictive signal is likely artifactual.
+
+### 8.2 Procedure
+
+1. Generate *m* random features from a standard normal distribution (mean 0, variance 1)
+2. Evaluate three models using cross-validation:
+   - **Real features only**: Original feature set
+   - **Random features only**: $m$ random Gaussian features
+   - **Real + random features**: Concatenation of both
+
+### 8.3 Statistical Test
+
+Compare cross-validation AUC distributions between real and random feature conditions using a two-sample t-test:
+
+$$
+H_0: \mu_{\text{real}} = \mu_{\text{random}}
+$$
+
+Rejection of $H_0$ (with $\mu_{\text{real}} > \mu_{\text{random}}$) confirms genuine predictive signal.
+
+---
+
+## 9. Validation Design
+
+### 9.1 Single-Use Holdout Principle
+
+The test set is evaluated **exactly once** after all exploratory analysis and model selection is complete. This prevents:
+
+- Selection bias from repeated testing
+- Implicit hyperparameter tuning on test data
+- Inflated performance estimates
+
+### 9.2 Evaluation Metrics
+
+| Metric | Purpose |
+|--------|---------|
+| ROC AUC | Discrimination ability across all probability thresholds |
+| Precision/Recall | Class-specific performance at chosen threshold |
+| Calibration curve | Agreement between predicted probabilities and observed rates |
+
+### 9.3 Calibration Assessment
+
+Calibration is assessed by binning predictions and comparing mean predicted probability to observed outcome rate within each bin:
+
+$$
+\text{Calibration error}_b = \left| \bar{p}_b - \bar{y}_b \right|
+$$
+
+Where:
+- Mean predicted probability in bin *b*
+- Observed outcome rate in bin *b*
+
+### 9.4 Train-Test Comparison
+
+Comparing cross-validation performance (training) to holdout performance (test) quantifies overfitting:
+
+$$
+\Delta_{\text{overfit}} = \text{AUC}_{\text{train-CV}} - \text{AUC}_{\text{test}}
+$$
+
+Small $\Delta$ indicates the model generalizes well to new users.
+
+---
+
+## 10. Identity Marker Testing Procedure
+
+### 10.1 Hypothesis
+
+LIWC-style identity markers in first prompts may predict engagement. Users who express personal identity (e.g., "I am a programmer", "As a teacher...") may exhibit different engagement patterns.
+
+### 10.2 Features Tested
+
+| Feature Category | Examples |
+|------------------|----------|
+| First-person pronoun rates | I, me, my, mine, myself rates |
+| Self-disclosure markers | Statements about personal attributes |
+| Identity claim patterns | "I am a [role]", "As a [profession]" |
+| Relationship terminology | "my wife", "my friend", "my boss" |
+
+### 10.3 Evaluation Procedure
+
+Identity marker features are evaluated using the same ablation and permutation importance procedures documented above. The contribution of these features is quantified relative to structural features (word count).
+
+### 10.4 Documentation
+
+Full implementation details are in notebook `08_IdentityHypotheses.ipynb`. Results regarding whether identity markers provide predictive value are reported in the associated Dispatch.
+
+---
+
+## 11. Limitations
+
+| Limitation | Methodological Impact | Mitigation |
+|------------|----------------------|------------|
+| **Ecological fallacy** | Group-level patterns may not apply to individuals | Effect sizes reported; individual-level claims avoided |
+| **Temporal confounds** | Model capability improvements over time may affect behavior | Sensitivity analysis stratified by model family |
+| **Intent circularity** | Intent features based on keyword matching, not validated intent taxonomy | Intent used only as confounder control, not primary predictor |
+| **Population specificity** | WildChat users (anonymous, specific interface) may not represent other AI user populations | Reference class documented; generalization claims limited |
+| **Outcome window sensitivity** | Fixed return window (e.g., 60 days) is arbitrary | Sensitivity analyses with alternative windows recommended |
+| **Word count confounding** | Word count may proxy for task complexity rather than user characteristics | Interpretation acknowledges this confound |
+
+---
+
+## 12. Code
+
+Analysis notebooks are available on GitHub:
+
+- [06_WildChatEDA_PartII.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/06_WildChatEDA_PartII.ipynb) — Exploratory data analysis
+- [07_EngagementPrediction.ipynb](https://github.com/phronos-2025/phronos-site/blob/main/content/methods/MTH-001/07_EngagementPrediction.ipynb) — Engagement prediction implementation
+
+---
+
+## Appendix A: Feature Set Specifications
+
+### A.1 Baseline Set
+
+Contains only the structural complexity indicator:
+- `word_count`
+
+### A.2 Pronoun Extension
+
+Adds normalized pronoun usage rates:
+- `first_person_singular_rate`
+- `first_person_plural_rate`
+- `second_person_rate`
+
+### A.3 Style Extension
+
+Adds stylistic markers:
+- `politeness_rate`
+- `has_question`
+- `is_imperative`
+- `avg_word_length`
+
+### A.4 Greeting Extension
+
+Adds conversational opener detection:
+- `is_greeting`
+
+### A.5 Intent Extension
+
+Adds task category indicators:
+- `intent_coding`
+- `intent_roleplay`
+- `intent_creative_writing`
+- `intent_emotional_support`
+
+---
+
+## Appendix B: Model Family Sensitivity Analysis Design
+
+To address temporal confounds, the analysis can be stratified by GPT model family (GPT-3.5, GPT-4, GPT-4o). For each family:
+
+1. Filter to conversations using that model family
+2. Apply the same temporal holdout and feature extraction
+3. Evaluate cross-validated performance
+
+Consistency of feature importance patterns across model families would suggest findings are not artifacts of temporal trends in model capability.
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-05 | Initial publication |
+

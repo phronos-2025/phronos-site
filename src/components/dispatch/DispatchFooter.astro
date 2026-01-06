@@ -1,4 +1,6 @@
 ---
+import { getCollection } from 'astro:content';
+
 interface Props {
   dataSource?: string;
   references?: {
@@ -16,6 +18,27 @@ const allRefs = [
   ...(references?.library || []),
   ...(references?.instruments || [])
 ].filter(Boolean);
+
+// Look up method URLs
+const methodFamilies = await getCollection('methodFamilies');
+const methodStudies = await getCollection('methodStudies');
+
+function getMethodUrl(refId: string): string {
+  // Check if it's a study (e.g., MTH-001.1)
+  const study = methodStudies.find(s => s.data.id.toUpperCase() === refId.toUpperCase());
+  if (study) {
+    return `/methods/${study.data.family_slug}/${study.data.slug}/`;
+  }
+  
+  // Check if it's a family (e.g., MTH-001)
+  const family = methodFamilies.find(f => f.data.id.toUpperCase() === refId.toUpperCase());
+  if (family) {
+    return `/methods/${family.data.slug}/`;
+  }
+  
+  // Fallback to lowercase ID
+  return `/methods/${refId.toLowerCase()}/`;
+}
 ---
 
 <footer class="dispatch-footer">
@@ -31,7 +54,7 @@ const allRefs = [
         {allRefs.length > 0 ? (
           allRefs.map((ref, i) => (
             <>
-              <a href={`/methods/${ref.toLowerCase()}`}>{ref}</a>
+              <a href={getMethodUrl(ref)}>{ref}</a>
               {i < allRefs.length - 1 && ' · '}
             </>
           ))

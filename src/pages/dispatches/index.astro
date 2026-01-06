@@ -46,7 +46,7 @@ const sortedDispatches = dispatches.sort(
               description={dispatch.data.subtitle || ''}
               status={dispatch.data.status}
               version={dispatch.data.version ? `v${dispatch.data.version}` : undefined}
-              href={`/dispatches/${dispatch.slug}`}
+              href={`/dispatches/${dispatch.data.slug}/`}
             />
           ))
         ) : (

@@ -8,12 +8,17 @@ interface Props {
 
 const { methodSlugs = [] } = Astro.props;
 
-// Fetch related methods
-const allMethods = await getCollection('methods');
+// Fetch method families and studies
+const allFamilies = await getCollection('methodFamilies');
+const allStudies = await getCollection('methodStudies');
 
-// Match by slug (folder name like "mth-001")
-const relatedMethods = allMethods.filter(m => 
-  methodSlugs.some(slug => slug.toLowerCase() === m.slug.toLowerCase())
+// Match by ID (e.g., "MTH-001" or "MTH-001.1")
+const relatedFamilies = allFamilies.filter(f => 
+  methodSlugs.some(slug => slug.toUpperCase() === f.data.id.toUpperCase())
+);
+
+const relatedStudies = allStudies.filter(s => 
+  methodSlugs.some(slug => slug.toUpperCase() === s.data.id.toUpperCase())
 );
 
 // Helper to extract first sentence
@@ -24,18 +29,28 @@ function getFirstSentence(text: string): string {
 }
 ---
 
-{relatedMethods.length > 0 && (
+{(relatedFamilies.length > 0 || relatedStudies.length > 0) && (
   <div class="related-methods-section">
     <div class="related-methods-label">Related Methods</div>
     <div class="related-methods-grid">
-      {relatedMethods.map((method) => (
+      {relatedFamilies.map((method) => (
         <Card
           id={method.data.id}
           title={method.data.title}
           description={getFirstSentence(method.data.abstract || '')}
           status={method.data.status}
           version={method.data.version ? `v${method.data.version}` : undefined}
-          href={`/methods/${method.slug}`}
+          href={`/methods/${method.data.slug}/`}
+        />
+      ))}
+      {relatedStudies.map((study) => (
+        <Card
+          id={study.data.id}
+          title={study.data.title}
+          description={getFirstSentence(study.data.abstract || '')}
+          status={study.data.status}
+          version={study.data.version ? `v${study.data.version}` : undefined}
+          href={`/methods/${study.data.family_slug}/${study.data.slug}/`}
         />
       ))}
     </div>
@@ -71,4 +86,3 @@ function getFirstSentence(text: string): string {
     }
   }
 </style>
-

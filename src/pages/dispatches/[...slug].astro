@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/global/Nav.astro';
 import Footer from '../../components/global/Footer.astro';
@@ -19,13 +19,13 @@ import '../../styles/cartographic.css';
 export async function getStaticPaths() {
   const dispatches = await getCollection('dispatches');
   return dispatches.map((entry) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.data.slug },
     props: { entry },
   }));
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 
 // MDX components to pass
 const components = { Table, Figure, Callout, Caption, PullQuote };
@@ -37,7 +37,7 @@ const components = { Table, Figure, Callout, Caption, PullQuote };
   ogType="article"
   publishedTime={entry.data.date.toISOString()}
   author={entry.data.author}
-  ogImage={`/images/dispatches/${entry.slug}/og.png`}
+  ogImage={`/images/dispatches/${entry.data.slug}/og.png`}
 >
   <JsonLd schema={{
     type: 'Article',
@@ -45,7 +45,7 @@ const components = { Table, Figure, Callout, Caption, PullQuote };
     author: entry.data.author,
     datePublished: entry.data.date.toISOString(),
     description: entry.data.subtitle,
-    image: `https://phronos.org/images/dispatches/${entry.slug}/og.png`
+    image: `https://phronos.org/images/dispatches/${entry.data.slug}/og.png`
   }} />
   <Nav slot="nav" />
   

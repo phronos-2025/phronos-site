@@ -18,10 +18,10 @@ const sortedDispatches = dispatches.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
-const methods = await getCollection('methods', ({ data }) => 
+const methodFamilies = await getCollection('methodFamilies', ({ data }) => 
   data.status !== 'archived'
 );
-const sortedMethods = methods.sort(
+const sortedMethods = methodFamilies.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
@@ -111,7 +111,7 @@ const instrumentItems = [
             description={getFirstSentence(method.data.abstract || '')}
             status={method.data.status}
             version={method.data.version ? `v${method.data.version}` : undefined}
-            href={method.data.status === 'published' ? `/methods/${method.slug}` : undefined}
+            href={method.data.status === 'published' ? `/methods/${method.data.slug}/` : undefined}
           />
         ))}
       </div>
