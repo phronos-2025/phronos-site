@@ -64,7 +64,7 @@ These paradoxes share a common thread, one that became clearer as the analysis p
 
 ### II.A The Intuition
 
-The expectation that identity markers should predict engagement has deep roots in cognitive psychology. The self-reference effect is one of psychology's reliable findings: we remember what we connect to ourselves. When people think about how information relates to them—"Is this word like me?"—they encode it more durably than when they process it abstractly—"Is this word abstract?" The self, in this framework, is a privileged node in cognitive architecture, a mental structure that confers processing advantages on anything connected to it.
+We remember what we connect to ourselves, i.e. the self-reference effect. When people judge whether a word describes them ("Is this word like me?"), they encode it more durably than when processing it abstractly ("Is this word abstract?"). The self, in this framework, is a privileged node in cognitive architecture, a mental structure that confers processing advantages on anything connected to it.
 
 IT-identity theory extends this logic to technological artifacts. People form identity relationships with their tools, experiencing technology not merely as useful but as self-expressive. A smartphone is not just a communication device; it becomes "my" phone, part of how I navigate and represent myself in the world. If this framework applies to AI assistants, then users with the strongest identity relationships should interact differently—more personally, more expressively, with more markers of self-involvement.
 
@@ -97,7 +97,7 @@ The baseline model, using word count alone, achieved an ROC AUC of 0.757 on the 
 
 Adding the full battery of identity markers, politeness indicators, and structural features raised the AUC to 0.769. The gain was 0.012—statistically detectable but substantively trivial. The gap is the sound of a hypothesis collapsing. Everything we thought would matter, didn't.
 
-Permutation importance analysis revealed the brutal concentration of predictive power. Word count accounted for approximately 96% of the model's total importance. All identity features combined—every pronoun, every politeness marker, every signal of self-involvement that the literature suggested should matter—contributed roughly 4%.
+Permutation importance analysis made the concentration visible. Word count accounted for approximately 96% of the model's total importance. All identity features combined—every pronoun, every politeness marker, every signal of self-involvement that the literature suggested should matter—contributed roughly 4%.
 
 <Figure 
   src="/images/dispatches/dsp-002/figure-1.png" 
@@ -293,7 +293,7 @@ Only 7.5% of sessions meeting 'concerning' criteria showed the pattern we'd most
 
 The segment taxonomy illustrates a fundamental problem with duration-based risk detection: the base rate problem.
 
-When the true rate of concerning behavior is low—which it is; even among flagged sessions, only 7.5% met multiple risk criteria—any detection system will produce more false positives than true positives. The mathematics is unforgiving. A flag that is 80% accurate sounds reliable, but if concerning cases constitute 1% of flagged sessions, then 80% accuracy still means that false positives outnumber true positives by a wide margin. The test catches most of the concerning cases, but it also catches many more non-concerning ones.
+The true rate of concerning behavior is low. Even among flagged sessions, only 7.5% met multiple risk criteria. Any detection system will produce more false positives than true positives. A flag that is 80% accurate sounds reliable, but if concerning cases constitute 1% of flagged sessions, then 80% accuracy still means that false positives outnumber true positives by a wide margin. The test catches most of the concerning cases, but it also catches many more non-concerning ones.
 
 The phenomenon is well-documented in medical screening, criminal justice, and fraud detection. When you search for rare events using imperfect indicators, you find mostly false alarms. The intuition that "extended use is concerning" may be correct for some cases, but when extended use is far more common among the curious than among the distressed, the indicator becomes misleading.
 
@@ -387,7 +387,7 @@ Four findings emerged from this analysis, each unexpected, each pointing toward 
 
 Cognitive offloading provides a unifying lens for these findings.
 
-The offloading framework posits that people use external tools—notes, calculators, AI—to reduce cognitive load. This is not new; Socrates worried that writing would weaken memory. What is new is the scale: billions of people, reaching for the same tool, delegating the same classes of cognitive work. The prosthesis has become infrastructure.
+The offloading framework posits that people use external tools—notes, calculators, AI—to reduce cognitive load. This is not new. Socrates worried that writing would weaken memory; he was not entirely wrong. What is new is the scale: billions of people are reaching for the same tool, delegating the same classes of cognitive work. The prosthesis has become infrastructure.
 
 The decision to offload is task-driven: when the task exceeds internal capacity, we reach for support. If AI use is primarily task-driven, then identity markers—which capture *who* the user is—should poorly predict engagement. This is what the data show. The identity hypothesis assumed that AI use expresses something about the self; the offloading framework suggests it expresses something about the task.
 
