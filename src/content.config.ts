@@ -20,6 +20,10 @@ const dispatches = defineCollection({
       library: z.array(z.string()).optional(),
       instruments: z.array(z.string()).optional(),
     }).optional(),
+    sections: z.array(z.object({
+      anchor: z.string(),
+      title: z.string(),
+    })).optional(),
   }),
 });
 

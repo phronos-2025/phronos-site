@@ -6,7 +6,6 @@ import Footer from '../../components/global/Footer.astro';
 import DispatchHeader from '../../components/dispatch/DispatchHeader.astro';
 import AuthorBlock from '../../components/dispatch/AuthorBlock.astro';
 import DispatchFooter from '../../components/dispatch/DispatchFooter.astro';
-import SubscribeCTA from '../../components/dispatch/SubscribeCTA.astro';
 import RelatedMethods from '../../components/dispatch/RelatedMethods.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import Table from '../../components/content/Table.astro';
@@ -29,6 +28,9 @@ const { Content } = await render(entry);
 
 // MDX components to pass
 const components = { Table, Figure, Callout, Caption, PullQuote };
+
+// Generate table of contents from sections
+const toc = entry.data.sections || [];
 ---
 
 <BaseLayout 
@@ -50,44 +52,314 @@ const components = { Table, Figure, Callout, Caption, PullQuote };
   <Nav slot="nav" />
   
   <article class="dispatch-article">
-    <DispatchHeader
-      id={entry.data.id}
-      title={entry.data.title}
-      subtitle={entry.data.subtitle}
-      date={entry.data.date}
-      readingTime={entry.data.reading_time}
-      version={entry.data.version}
-      status={entry.data.status}
-    />
+    {/* Header section - centered */}
+    <header class="dispatch-header-section">
+      <DispatchHeader
+        id={entry.data.id}
+        title={entry.data.title}
+        subtitle={entry.data.subtitle}
+        date={entry.data.date}
+        readingTime={entry.data.reading_time}
+        version={entry.data.version}
+        status={entry.data.status}
+      />
 
-    <AuthorBlock 
-      name={entry.data.author} 
-    />
+      <AuthorBlock 
+        name={entry.data.author} 
+      />
+    </header>
 
-    <article class="dispatch-body">
-      <div class="dispatch-content">
-        <Content components={components} />
+    {/* Content with TOC - uses flexbox for proper sticky behavior */}
+    <div class="dispatch-content-outer">
+      <div class="dispatch-content-inner">
+        {/* TOC Sidebar */}
+        {toc.length > 0 && (
+          <aside class="toc-sidebar">
+            <nav class="toc-nav" aria-label="Table of contents">
+              <div class="toc-label">Contents</div>
+              <ol class="toc-list">
+                {toc.map((section) => (
+                  <li class="toc-item">
+                    <a href={`#${section.anchor}`}>{section.title}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </aside>
+        )}
+
+        {/* Main content */}
+        <div class="dispatch-main">
+          <article class="dispatch-body">
+            <div class="dispatch-content">
+              <Content components={components} />
+            </div>
+          </article>
+        </div>
       </div>
-    </article>
+    </div>
 
-    <DispatchFooter
-      dataSource={entry.data.data_source}
-      references={entry.data.references}
-      topics={entry.data.topics}
-    />
+    {/* Footer sections - centered */}
+    <div class="dispatch-footer-section">
+      <DispatchFooter
+        dataSource={entry.data.data_source}
+        references={entry.data.references}
+        topics={entry.data.topics}
+      />
 
-    {entry.data.references?.methods && entry.data.references.methods.length > 0 && (
-      <RelatedMethods methodSlugs={entry.data.references.methods} />
-    )}
-    
-    <SubscribeCTA />
+      {entry.data.references?.methods && entry.data.references.methods.length > 0 && (
+        <RelatedMethods methodSlugs={entry.data.references.methods} />
+      )}
+      
+    </div>
   </article>
 
-  <Footer slot="footer" />
+  <Footer slot="footer" showSubscribe={true} />
 </BaseLayout>
 
 <style is:global>
   @import '../../styles/cartographic.css';
+  
+  /* Smooth scrolling for TOC navigation */
+  html {
+    scroll-behavior: smooth;
+  }
 </style>
 
+<style>
+  /* ============================================
+     HEADER SECTION - Centered
+     ============================================ */
+  .dispatch-header-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
 
+  /* ============================================
+     CONTENT OUTER - Full width container for flexbox layout
+     ============================================ */
+  .dispatch-content-outer {
+    width: 100%;
+  }
+
+  /* ============================================
+     CONTENT INNER - Flexbox layout for TOC + content
+     On wide screens: TOC on left, content on right, both centered as a unit
+     ============================================ */
+  .dispatch-content-inner {
+    display: flex;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ============================================
+     TOC SIDEBAR - Fixed width, stretches to match content height for sticky to work
+     ============================================ */
+  .toc-sidebar {
+    flex: 0 0 180px;
+    order: -1; /* Ensure TOC is always on the left */
+    padding-top: 0.25rem;
+  }
+
+  .toc-nav {
+    position: sticky;
+    top: 5rem;
+    padding-top: 0.5rem;
+  }
+
+  .toc-list {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--faded-light);
+    margin-top: 1.9rem;
+  }
+
+  .toc-item {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .toc-item a {
+    color: var(--faded);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    display: block;
+    padding: 0.5rem 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid transparent;
+  }
+
+  .toc-item a:hover {
+    color: var(--ink);
+    border-left-color: var(--gold);
+  }
+
+  /* ============================================
+     MAIN CONTENT - matches header width
+     ============================================ */
+  .dispatch-main {
+    flex: 0 1 800px;
+    min-width: 0;
+    max-width: 800px;
+  }
+
+  /* Fix anchor scrolling - account for sticky nav bar */
+  .dispatch-main :global(h2),
+  .dispatch-main :global(h3),
+  .dispatch-main :global(h4) {
+    scroll-margin-top: 5rem;
+  }
+
+  /* ============================================
+     FOOTER SECTION - Centered
+     ============================================ */
+  .dispatch-footer-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ============================================
+     RESPONSIVE DESIGN
+     ============================================ */
+  @media (max-width: 1100px) {
+    .dispatch-content-inner {
+      flex-direction: column;
+      max-width: 800px;
+      padding: 0 5%;
+    }
+
+    .toc-sidebar {
+      flex: none;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      padding-top: 0;
+      order: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--paper);
+      padding-top: 0.75rem;
+      padding-bottom: 0.5rem;
+      margin-left: -5%;
+      margin-right: -5%;
+      padding-left: 5%;
+      padding-right: 5%;
+      border-bottom: 1px solid var(--faded-light);
+    }
+
+    .toc-nav {
+      position: static;
+    }
+
+    .toc-label {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+      max-height: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.75rem;
+      margin: 0 -5%;
+      padding-left: 5%;
+      padding-right: 5%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--faded) transparent;
+    }
+
+    .toc-list::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .toc-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .toc-list::-webkit-scrollbar-thumb {
+      background: var(--faded);
+      border-radius: 2px;
+    }
+
+    .toc-item {
+      flex: 0 0 auto;
+    }
+
+    .toc-item a {
+      display: inline-block;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--faded-light);
+      border-left: 1px solid var(--faded-light);
+      border-radius: 2rem;
+      background: var(--paper);
+      font-size: 0.7rem;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .toc-item a:hover {
+      border-color: var(--gold);
+      border-left-color: var(--gold);
+      background: var(--warm-white);
+      color: var(--ink);
+    }
+
+    .dispatch-main {
+      flex: none;
+      width: 100%;
+    }
+
+    .dispatch-header-section,
+    .dispatch-footer-section {
+      padding: 0 5%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .dispatch-content-inner {
+      padding: 0 1rem;
+    }
+
+    .toc-sidebar {
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .toc-list {
+      margin: 0 -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .dispatch-header-section,
+    .dispatch-footer-section {
+      padding: 0 1rem;
+    }
+  }
+</style>
