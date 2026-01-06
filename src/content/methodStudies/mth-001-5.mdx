@@ -21,7 +21,7 @@ abstract: |
 
 # === METADATA ===
 date: 2026-01-05
-version: "1.0"
+version: "1.1"
 status: published
 
 # === SECTIONS (for deep linking) ===
@@ -196,7 +196,7 @@ concerning = sessions.filter(
 
 ### 4.1 Toxicity Classification Source
 
-Conversation-level toxicity labels originate from the Jigsaw Perspective API, applied during dataset preprocessing (see MTH-001 family documentation). A conversation is labeled toxic if any user turn exceeds the toxicity threshold.
+Conversation-level toxicity labels originate from Detoxify, applied during dataset preprocessing (see MTH-001 family documentation). A conversation is labeled toxic if any user turn exceeds the toxicity threshold.
 
 ### 4.2 Session-Level Aggregation
 
@@ -436,21 +436,7 @@ Analysis notebooks are available on GitHub:
 
 ## Appendix A: Threshold Sensitivity
 
-### A.1 Alternative Duration Thresholds
-
-The 6-hour threshold was selected after examining the session duration distribution. Alternative thresholds would yield:
-
-| Threshold | Sessions | % of Total |
-|-----------|----------|------------|
-| > 4 hours | ~5,000 | ~0.8% |
-| > 6 hours | ~3,500 | ~0.56% |
-| **> 6 hours + all criteria** | **2,259** | **0.36%** |
-| > 8 hours | ~2,000 | ~0.32% |
-| > 12 hours | ~800 | ~0.13% |
-
-The composite criteria (duration + density + continuity + volume) reduce the flagged population by ~35% compared to duration alone.
-
-### A.2 Turn Density Sensitivity
+### A.1 Turn Density Sensitivity
 
 | Turns/hour threshold | Effect |
 |----------------------|--------|
@@ -485,5 +471,6 @@ Countries are mapped to their capital city timezone. For countries spanning mult
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2026-01-06 | Corrected toxicity classifier reference (Detoxify, not Jigsaw Perspective); removed erroneous threshold table |
 | 1.0 | 2026-01-05 | Initial publication |
 
