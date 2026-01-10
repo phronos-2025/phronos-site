@@ -71,7 +71,7 @@ const toc = entry.data.sections || [];
 
     {/* Content with TOC - uses flexbox for proper sticky behavior */}
     <div class="dispatch-content-outer">
-      <div class="dispatch-content-inner">
+      <div class:list={["dispatch-content-inner", { "no-toc": toc.length === 0 }]}>
         {/* TOC Sidebar */}
         {toc.length > 0 && (
           <aside class="toc-sidebar">
@@ -153,6 +153,12 @@ const toc = entry.data.sections || [];
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 2rem;
+  }
+
+  /* When no TOC, center the content at 800px */
+  .dispatch-content-inner.no-toc {
+    max-width: 800px;
+    justify-content: center;
   }
 
   /* ============================================
