@@ -42,7 +42,7 @@ const libraryItems = [
 ];
 
 const instrumentItems = [
-  { id: 'INS-001', title: 'Semantic Associations', description: 'Maps how your mind connects ideas through word association chains.', status: 'calibrating' as const },
+  { id: 'INS-001', title: 'Semantic Associations', description: 'Maps how your mind connects ideas through word association chains.', status: 'live' as const, href: 'https://instruments.phronos.org/ins-001/' },
   { id: 'INS-002', title: 'Reasoning Trace', description: 'Observes your problem-solving approach in real-time.', status: 'planned' as const },
 ];
 ---
@@ -129,6 +129,7 @@ const instrumentItems = [
             title={item.title}
             description={item.description}
             status={item.status}
+            href={'href' in item ? item.href : undefined}
             mode="dark"
           />
         ))}
