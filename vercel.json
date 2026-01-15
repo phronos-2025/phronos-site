@@ -9,6 +9,14 @@
       "destination": "https://phronos-library.vercel.app/"
     },
     {
+      "source": "/library/:path",
+      "destination": "https://phronos-library.vercel.app/:path/"
+    },
+    {
+      "source": "/library/:path/",
+      "destination": "https://phronos-library.vercel.app/:path/"
+    },
+    {
       "source": "/library/:path*",
       "destination": "https://phronos-library.vercel.app/:path*"
     }
