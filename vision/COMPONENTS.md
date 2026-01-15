@@ -1036,7 +1036,7 @@ The Lab container is a centered, elevated box within the full-width dark section
             <div class="lab-header-left">
                 <span class="lab-id">INS-001</span>
                 <span class="lab-separator">·</span>
-                <span class="lab-title">Semantic Associations</span>
+                <span class="lab-title">Semantic Cartography</span>
             </div>
             <div class="lab-header-right">
                 <span class="lab-version">v0.1</span>

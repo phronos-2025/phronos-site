@@ -9,6 +9,7 @@ import Hero from '../components/home/Hero.astro';
 import AboutSection from '../components/home/AboutSection.astro';
 import SubscribeSection from '../components/home/SubscribeSection.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
+import '../styles/components/cards.css';
 
 // Fetch content collections
 const dispatches = await getCollection('dispatches', ({ data }) => 
@@ -41,9 +42,25 @@ const libraryItems = [
   { id: 'LIB-001', title: 'Cognitive Effects of LLM Interaction', description: 'A synthesis of peer-reviewed literature on how conversational AI affects human reasoning and decision-making.', status: 'researching' as const },
 ];
 
-const instrumentItems = [
-  { id: 'INS-001', title: 'Semantic Associations', description: 'Maps how your mind connects ideas through word association chains.', status: 'live' as const, href: 'https://instruments.phronos.org/ins-001/' },
-  { id: 'INS-002', title: 'Reasoning Trace', description: 'Observes your problem-solving approach in real-time.', status: 'planned' as const },
+const instrumentFamilies = [
+  {
+    id: 'INS-001',
+    title: 'Semantic Cartography',
+    description: 'Instruments for mapping how you navigate conceptual space—how you encode meaning, transmit it to others, and reconstruct it from sparse signals.',
+    status: 'live' as const,
+    href: 'https://instruments.phronos.org/ins-001/',
+    instruments: [
+      { id: 'INS-001.1', title: 'Signal', status: 'live' as const, href: 'https://instruments.phronos.org/ins-001/signal/' },
+      { id: 'INS-001.2', title: 'Common Ground', status: 'live' as const, href: 'https://instruments.phronos.org/ins-001/common-ground/' },
+    ]
+  },
+  {
+    id: 'INS-002',
+    title: 'Reasoning Trace',
+    description: 'Observes your problem-solving approach in real-time.',
+    status: 'planned' as const,
+    instruments: []
+  },
 ];
 ---
 
@@ -121,18 +138,52 @@ const instrumentItems = [
   <!-- Instruments Section (Dark Mode) -->
   <section class="section instruments-section" id="instruments">
     <div class="container">
-      <SectionHeader id="04" title="Instruments" dark />
+      <SectionHeader id="01" title="Available Instruments" dark />
       <div class="card-grid">
-        {instrumentItems.map((item) => (
-          <Card
-            id={item.id}
-            title={item.title}
-            description={item.description}
-            status={item.status}
-            href={'href' in item ? item.href : undefined}
-            mode="dark"
-          />
-        ))}
+        {instrumentFamilies.map((family) => {
+          const liveCount = family.instruments.filter(i => i.status === 'live').length;
+          const isClickable = family.status === 'live';
+          return (
+            <article class="instrument-card">
+              <div class="instrument-card-header">
+                <div class="card-meta">
+                  <span class="card-id">{family.id}</span>
+                  <div class="card-status-group">
+                    <span class={`status-badge ${family.status}`}>{family.status}</span>
+                  </div>
+                </div>
+                <h3 class="card-title">{family.title}</h3>
+                <p class="card-description">{family.description}</p>
+                {family.instruments.length > 0 && (
+                  <div class="instrument-stats">
+                    <span>INSTRUMENTS: {family.instruments.length}</span>
+                    <span>LIVE: {liveCount}</span>
+                  </div>
+                )}
+              </div>
+
+              {family.instruments.length > 0 && (
+                <div class="instruments-compact">
+                  {family.instruments.map((instrument) => (
+                    <a
+                      href={instrument.href}
+                      class="instrument-compact-row"
+                    >
+                      <span class="instrument-compact-id">{instrument.id}</span>
+                      <span class="instrument-compact-title">{instrument.title}</span>
+                      <span class={`status-dot small ${instrument.status}`}></span>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <a href={family.href} class={`instrument-card-footer ${!isClickable ? 'disabled' : ''}`}>
+                <span>VIEW FAMILY</span>
+                <span class="footer-arrow">&rarr;</span>
+              </a>
+            </article>
+          );
+        })}
       </div>
     </div>
   </section>
@@ -164,5 +215,169 @@ const instrumentItems = [
     color: var(--faded);
     text-align: center;
     padding: var(--space-xl);
+  }
+
+  /* Instrument Card Styles (Dark Mode) */
+  .instrument-card {
+    background: var(--card-bg);
+    border: 1px solid var(--faded-light-dark);
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-default), box-shadow var(--transition-default);
+  }
+
+  .instrument-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px rgba(176, 141, 85, 0.3);
+  }
+
+  .instrument-card-header {
+    padding: 1.5rem;
+  }
+
+  .instrument-card .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .instrument-card .card-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+  }
+
+  .status-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--success);
+    color: var(--success);
+  }
+
+  .status-badge.planned {
+    border-color: var(--faded-dark);
+    color: var(--faded-dark);
+  }
+
+  .instrument-card .card-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .instrument-card .card-description {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: rgba(242, 240, 233, 0.6);
+    margin: 0;
+  }
+
+  .instrument-stats {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded-dark);
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  /* Compact Instruments List */
+  .instruments-compact {
+    border-top: 1px solid var(--faded-light-dark);
+  }
+
+  .instrument-compact-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--faded-light-dark);
+    transition: background var(--transition-fast);
+  }
+
+  .instrument-compact-row:last-child {
+    border-bottom: none;
+  }
+
+  .instrument-compact-row:hover {
+    background: rgba(176, 141, 85, 0.15);
+    cursor: pointer;
+  }
+
+  .instrument-compact-id {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+
+  .instrument-compact-title {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    color: var(--text-light);
+    flex: 1;
+  }
+
+  .status-dot.small {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* Instrument Card Footer */
+  .instrument-card-footer {
+    border-top: 1px solid var(--faded-light-dark);
+    padding: 0.75rem 1.5rem;
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color var(--transition-fast);
+  }
+
+  .instrument-card-footer:hover {
+    color: var(--text-light);
+  }
+
+  .instrument-card-footer.disabled {
+    color: var(--faded-dark);
+    pointer-events: none;
+  }
+
+  .footer-arrow {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .instrument-card-header {
+      padding: 1.25rem 1rem;
+    }
+
+    .instrument-card .card-title {
+      font-size: 1.25rem;
+    }
+
+    .instrument-compact-row {
+      padding: 0.5rem 1rem;
+    }
+
+    .instrument-card-footer {
+      padding: 0.6rem 1rem;
+    }
   }
 </style>

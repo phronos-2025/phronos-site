@@ -479,8 +479,8 @@ Status: Researching · v0.1
 ```yaml
 ---
 id: INS-001
-title: "Semantic Associations"
-description: "Maps how your mind connects ideas through word association chains."
+title: "Semantic Cartography"
+description: "Instruments for mapping how you navigate conceptual space."
 status: calibrating  # live | calibrating | planned | archived
 order: 1
 related_method: MTH-001

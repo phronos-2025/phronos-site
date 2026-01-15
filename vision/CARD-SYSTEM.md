@@ -406,9 +406,9 @@ The status text and dot are grouped together in the upper right corner of the ca
             <span class="status-dot live"></span>
         </div>
     </div>
-    <h3 class="card-title">Semantic Associations</h3>
+    <h3 class="card-title">Semantic Cartography</h3>
     <p class="card-body">
-        Maps how your mind connects ideas through word association chains.
+        Instruments for mapping how you navigate conceptual space.
     </p>
     <div class="card-footer">
         v1.0
