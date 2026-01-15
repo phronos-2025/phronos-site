@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/library/:path*",
-      "destination": "https://phronos-library.vercel.app/library/:path*"
+      "destination": "https://phronos-library.vercel.app/:path*"
     }
   ]
 }
