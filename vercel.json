@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/library",
+      "destination": "https://phronos-library.vercel.app/"
+    },
+    {
+      "source": "/library/",
+      "destination": "https://phronos-library.vercel.app/"
+    },
+    {
       "source": "/library/:path*",
       "destination": "https://phronos-library.vercel.app/:path*"
     }
