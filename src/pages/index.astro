@@ -144,8 +144,8 @@ const instrumentFamilies = [
           const liveCount = family.instruments.filter(i => i.status === 'live').length;
           const isClickable = family.status === 'live';
           return (
-            <article class="instrument-card">
-              <div class="instrument-card-header">
+            <article class={`instrument-card ${isClickable ? 'clickable' : ''}`}>
+              <a href={isClickable ? family.href : undefined} class={`instrument-card-header ${isClickable ? 'clickable' : ''}`}>
                 <div class="card-meta">
                   <span class="card-id">{family.id}</span>
                   <div class="card-status-group">
@@ -160,7 +160,7 @@ const instrumentFamilies = [
                     <span>LIVE: {liveCount}</span>
                   </div>
                 )}
-              </div>
+              </a>
 
               {family.instruments.length > 0 && (
                 <div class="instruments-compact">
@@ -177,7 +177,7 @@ const instrumentFamilies = [
                 </div>
               )}
 
-              <a href={family.href} class={`instrument-card-footer ${!isClickable ? 'disabled' : ''}`}>
+              <a href={isClickable ? family.href : undefined} class={`instrument-card-footer ${!isClickable ? 'disabled' : ''}`}>
                 <span>VIEW FAMILY</span>
                 <span class="footer-arrow">&rarr;</span>
               </a>
@@ -233,6 +233,17 @@ const instrumentFamilies = [
 
   .instrument-card-header {
     padding: 1.5rem;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .instrument-card-header.clickable {
+    cursor: pointer;
+  }
+
+  .instrument-card.clickable {
+    cursor: pointer;
   }
 
   .instrument-card .card-meta {

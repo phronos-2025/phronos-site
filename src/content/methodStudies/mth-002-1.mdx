@@ -1,0 +1,364 @@
+---
+# === IDENTIFICATION ===
+id: MTH-002.1
+slug: relevance-divergence-scoring
+type: study
+family: MTH-002
+family_slug: semantic-association-metrics
+order: 1
+
+# === CONTENT ===
+title: "Relevance and Divergence Scoring"
+subtitle: "Core metrics for semantic association assessment"
+abstract: |
+  Documents the core scoring algorithms for INS-001 Semantic Cartography instruments.
+  Implements two orthogonal metrics: relevance (semantic connection to prompt) and
+  divergence (spread across conceptual space). Divergence follows the Divergent
+  Association Task methodology validated by Olson et al. (2021). Includes threshold
+  calibration, interpretation bands, and normalization procedures for converting
+  raw scores to population-relative percentiles.
+
+# === METADATA ===
+date: 2026-01-15
+version: "1.0"
+status: published
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: executive-summary
+    title: "Executive Summary"
+  - anchor: 1-metric-overview
+    title: "Metric Overview"
+  - anchor: 2-relevance
+    title: "Relevance"
+  - anchor: 3-divergence
+    title: "Divergence"
+  - anchor: 4-interpretation-thresholds
+    title: "Interpretation Thresholds"
+  - anchor: 5-score-normalization
+    title: "Score Normalization"
+  - anchor: 6-comparison-functions
+    title: "Comparison Functions"
+  - anchor: 7-implementation
+    title: "Implementation"
+  - anchor: 8-limitations
+    title: "Limitations"
+  - anchor: 9-code
+    title: "Code"
+
+# === SEO ===
+description: "Core scoring algorithms for INS-001 instruments: relevance (semantic connection) and divergence (DAT-style spread). Includes thresholds, normalization, and implementation details."
+keywords:
+  - semantic scoring
+  - cosine similarity
+  - divergent association task
+  - DAT
+  - relevance
+  - divergence
+  - word embeddings
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Executive Summary
+
+This study documents the scoring algorithms underlying INS-001 Semantic Cartography instruments. The framework measures two orthogonal properties of word associations:
+
+1. **Relevance** — semantic connection between participant responses and the prompt
+2. **Divergence** — spread of responses across conceptual space (DAT methodology)
+
+Key design decisions:
+
+- **Unified divergence**: Both INS-001.1 (Radiation) and INS-001.2 (Union) use identical divergence calculation—mean pairwise cosine distance across all words
+- **Task-specific relevance**: INS-001.1 uses similarity to seed; INS-001.2 uses minimum similarity to both endpoints (ensuring bridging)
+- **DAT scaling**: Divergence scores follow 0-100 convention from [Olson et al. (2021)](https://phronos.org/library/digital-validity/#dat-methodology) for interpretability
+
+---
+
+## 1. Metric Overview
+
+### 1.1 Two-Metric Framework
+
+Both instruments evaluate submissions using exactly two metrics:
+
+| Metric | Purpose | Range |
+|--------|---------|-------|
+| **Relevance** | Distinguish signal from noise | 0–1 (cosine similarity) |
+| **Divergence** | Measure creativity/spread | 0–100 (DAT scale) |
+
+### 1.2 Orthogonality
+
+Relevance and divergence capture independent properties:
+
+| Pattern | Relevance | Divergence | Interpretation |
+|---------|-----------|------------|----------------|
+| Creative but valid | High | High | Wide-ranging associations that remain connected to prompt |
+| Predictable/conventional | High | Low | Clustered near prompt, limited exploration |
+| Noise | Low | (any) | Responses unconnected to prompt; divergence meaningless |
+
+### 1.3 Literature Basis
+
+**Divergence**: The Divergent Association Task (DAT) validated mean pairwise semantic distance as a creativity measure. [Olson et al. (2021)](https://phronos.org/library/digital-validity/#dat-methodology) found DAT correlates r ≈ 0.40 with composite creativity scores and takes only minutes to administer.
+
+**Relevance**: Standard information retrieval approach using distributional semantics. For multi-term queries (INS-001.2), relevance aggregates proximity to all reference points.
+
+---
+
+## 2. Relevance
+
+Relevance measures how semantically connected a participant's clues are to the prompt. The calculation differs by instrument.
+
+### 2.1 INS-001.1 (Radiation): Similarity to Seed
+
+For single-seed tasks, relevance is the mean cosine similarity between each clue and the seed:
+
+$$
+\text{relevance}_{\text{radiation}} = \frac{1}{n} \sum_{i=1}^{n} \cos(\mathbf{c}_i, \mathbf{s})
+$$
+
+Where:
+- $\mathbf{c}_i$ = embedding vector for clue $i$
+- $\mathbf{s}$ = embedding vector for seed
+- $n$ = number of clues
+
+### 2.2 INS-001.2 (Union): Minimum Similarity to Both Endpoints
+
+For anchor-target tasks, relevance uses the minimum similarity to ensure clues bridge both concepts rather than clustering near one:
+
+$$
+\text{relevance}_{\text{union}} = \frac{1}{n} \sum_{i=1}^{n} \min\left(\cos(\mathbf{c}_i, \mathbf{a}), \cos(\mathbf{c}_i, \mathbf{t})\right)
+$$
+
+Where:
+- $\mathbf{a}$ = embedding vector for anchor
+- $\mathbf{t}$ = embedding vector for target
+
+**Rationale for min()**: Using minimum rather than mean penalizes clues that are close to one endpoint but distant from the other. This enforces the task goal of finding semantic "common ground" between concepts.
+
+### 2.3 Cosine Similarity
+
+The fundamental building block for both metrics:
+
+$$
+\cos(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{|\mathbf{a}| \cdot |\mathbf{b}|}
+$$
+
+For normalized embeddings (which OpenAI text-embedding-3-small provides), this equals the dot product.
+
+---
+
+## 3. Divergence
+
+Divergence measures how much semantic territory a submission covers. The calculation is identical for both instruments.
+
+### 3.1 DAT-Style Mean Pairwise Distance
+
+Divergence is the mean cosine distance between all word pairs (clues + prompt words), scaled to 0-100:
+
+$$
+\text{divergence} = 100 \times \frac{1}{\binom{N}{2}} \sum_{i < j} \left(1 - \cos(\mathbf{w}_i, \mathbf{w}_j)\right)
+$$
+
+Where:
+- $N$ = total words (clues + prompt words)
+- $\mathbf{w}_i$ = embedding for word $i$
+
+### 3.2 Word Sets by Instrument
+
+| Instrument | Prompt Words | With 3 Clues | Total Pairs |
+|------------|--------------|--------------|-------------|
+| INS-001.1 | [seed] | seed + 3 clues | 6 pairs |
+| INS-001.2 | [anchor, target] | anchor + target + 3 clues | 10 pairs |
+
+### 3.3 Why Include Prompt Words
+
+Including prompt words in the divergence calculation captures:
+
+1. **Clue spread from each other** — how dispersed the responses are
+2. **Clue distance from prompt** — how far participants range from the starting point
+3. **Pair difficulty** (INS-001.2) — distant anchor-target pairs contribute to baseline divergence
+
+---
+
+## 4. Interpretation Thresholds
+
+### 4.1 Relevance Thresholds
+
+Calibrated from embedding space geometry:
+
+| Score | Label | Description |
+|-------|-------|-------------|
+| < 0.15 | Noise | Responses unrelated to prompt |
+| 0.15–0.30 | Weak | Tangential connection |
+| 0.30–0.45 | Moderate | Meaningful connection |
+| > 0.45 | Strong | Core semantic neighborhood |
+
+**Validity threshold**: Submissions with relevance < 0.15 are flagged as invalid. Divergence scores for invalid submissions should not be interpreted.
+
+### 4.2 Divergence Thresholds
+
+Based on DAT norms from [Olson et al. (2021)](https://phronos.org/library/digital-validity/#dat-methodology):
+
+| Score | Label | Description |
+|-------|-------|-------------|
+| < 50 | Low | Often indicates misunderstanding (e.g., listing synonyms) |
+| 50–65 | Below average | Limited exploration |
+| 65–80 | Average | Typical range |
+| 80–90 | Above average | Wide-ranging associations |
+| > 90 | High | Maximally distant associations |
+
+Per Olson et al.: divergence scores "can be intuitively thought of as a grade on an examination; under 50 is poor, the average is between 75 and 80, and 95 is a very high score."
+
+---
+
+## 5. Score Normalization
+
+Raw scores are difficult to interpret without context. Different prompts have different baseline geometries—some anchor-target pairs are naturally closer in embedding space.
+
+### 5.1 Bootstrap Null Distributions
+
+For each prompt configuration, sample random word sets from vocabulary to establish baselines:
+
+1. Sample $n$ random words (matching submission size) without replacement
+2. Score this random set using the same relevance/divergence functions
+3. Repeat 500+ times to build distribution
+4. Store mean, std, and raw samples for percentile calculation
+
+This provides prompt-specific baselines: "How does this submission compare to random word sets for this particular prompt?"
+
+### 5.2 Percentile Normalization
+
+For user-facing display, convert raw scores to percentiles:
+
+$$
+\text{percentile} = 100 \times \frac{|\{s \in S_{\text{null}} : \text{raw} > s\}|}{|S_{\text{null}}|}
+$$
+
+| Percentile | Interpretation |
+|------------|----------------|
+| < 25th | Below average (worse than random) |
+| 25th–50th | Low average |
+| 50th–75th | Above average |
+| 75th–90th | Good |
+| 90th–99th | Excellent |
+| > 99th | Exceptional |
+
+### 5.3 Z-Score Normalization
+
+For statistical analysis, use standard deviations from null mean:
+
+$$
+z = \frac{\text{raw} - \mu_{\text{null}}}{\sigma_{\text{null}}}
+$$
+
+| Z-score | Interpretation |
+|---------|----------------|
+| < 0 | Below null mean |
+| 0–1 | Slightly above average |
+| 1–2 | Notably above average |
+| > 2 | Significantly above average (p < 0.05) |
+| > 3 | Highly significant (p < 0.001) |
+
+---
+
+## 6. Comparison Functions
+
+### 6.1 Participant vs. Baseline
+
+Compare a participant's submission against an LLM-generated or population baseline:
+
+$$
+\Delta_{\text{relevance}} = \text{relevance}_{\text{participant}} - \text{relevance}_{\text{baseline}}
+$$
+
+$$
+\Delta_{\text{divergence}} = \text{divergence}_{\text{participant}} - \text{divergence}_{\text{baseline}}
+$$
+
+A participant is considered "more creative" if:
+1. Both submissions are valid (relevance ≥ 0.15), AND
+2. Participant divergence exceeds baseline divergence
+
+### 6.2 Bridge Similarity
+
+For comparing two different submissions to the same prompt, compute centroid-based similarity:
+
+1. Calculate centroid of each submission's clue embeddings
+2. Return cosine similarity between centroids
+3. Map from [-1, 1] to [0, 1] for interpretability
+
+---
+
+## 7. Implementation
+
+### 7.1 Core Functions
+
+The scoring module implements:
+
+| Function | Purpose |
+|----------|---------|
+| `cosine_similarity()` | Fundamental similarity calculation |
+| `calculate_divergence()` | DAT-style mean pairwise distance |
+| `score_radiation()` | INS-001.1 complete scoring |
+| `score_union()` | INS-001.2 complete scoring |
+| `bootstrap_null_distribution()` | Generate prompt-specific baselines |
+| `normalize_scores()` | Convert raw to percentile/z-score |
+| `compare_submissions()` | Participant vs. baseline comparison |
+
+### 7.2 Return Schema
+
+Both `score_radiation()` and `score_union()` return:
+
+```python
+{
+    "relevance": float,            # Overall relevance (0-1)
+    "relevance_individual": list,  # Per-clue relevance scores
+    "divergence": float,           # Overall divergence (0-100)
+    "valid": bool                  # Whether relevance >= 0.15
+}
+```
+
+### 7.3 Embedding Model
+
+Scores depend on the embedding model used. The implementation uses:
+
+- **Model**: OpenAI text-embedding-3-small (1536 dimensions)
+- **Normalization**: L2-normalized vectors
+- **Implications**: Results may differ with other embedding models
+
+---
+
+## 8. Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Embedding model dependence** | Different models yield different scores | Standardize on single model; document in methods |
+| **Cultural bias** | Embeddings encode Western/English associations | Note reference population; limit generalization claims |
+| **Threshold calibration** | Interpretation bands derived from limited data | Update thresholds with empirical distributions |
+| **Vocabulary scope** | Null distributions depend on vocabulary set | Use consistent vocabulary across comparisons |
+| **Single-submission design** | No test-retest reliability data | See [LIB-002 gaps](https://phronos.org/library/digital-validity/#gaps) |
+
+---
+
+## 9. Code
+
+Implementation available at:
+
+- **Primary module**: [`scoring.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/services/scoring.py)
+- **Specification**: [`INS-001-scoring-metrics-v2.md`](https://github.com/phronos-2025/phronos-instruments/blob/main/INS-001%20v0.3.2/INS-001-scoring-metrics-v2.md)
+
+Test suite verifies:
+- Cosine similarity edge cases (identical, orthogonal, opposite vectors)
+- Relevance calculation for both instruments
+- Divergence behavior (identical clues, orthogonal clues, clustered clues)
+- Normalization (percentile and z-score methods)
+- Comparison functions
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-15 | Initial publication |

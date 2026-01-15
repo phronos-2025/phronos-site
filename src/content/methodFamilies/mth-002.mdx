@@ -1,0 +1,112 @@
+---
+# === IDENTIFICATION ===
+id: MTH-002
+slug: semantic-association-metrics
+type: family
+
+# === CONTENT ===
+title: "Semantic Association Metrics"
+subtitle: "Measurement framework for semantic divergence and relevance"
+abstract: |
+  A methodology for measuring semantic properties of word associations using
+  embedding-based metrics. Implements the Divergent Association Task (DAT)
+  framework for divergence scoring and cosine similarity for relevance assessment.
+  Provides the scoring foundation for the INS-001 Semantic Cartography instrument
+  family, enabling measurement of how participants navigate conceptual space.
+
+# === METADATA ===
+date: 2026-01-15
+version: "1.0"
+status: published
+
+# === RELATIONSHIPS ===
+related_instruments:
+  - INS-001
+studies:
+  - MTH-002.1
+  - MTH-002.2
+  - MTH-002.3
+  - MTH-002.4
+
+# === SEO ===
+description: "Measurement framework for semantic divergence and relevance using embedding-based metrics. Foundation for INS-001 Semantic Cartography instruments."
+keywords:
+  - semantic association
+  - divergent thinking
+  - cosine similarity
+  - word embeddings
+  - DAT
+  - creativity measurement
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+contributors: []
+---
+
+## Core Constructs
+
+This methodology operationalizes four constructs from the [INS-001 Semantic Cartography](/instruments/semantic-cartography/) instrument family:
+
+| Construct | Definition | Operationalization |
+|-----------|------------|-------------------|
+| **Divergence** | How much conceptual territory responses cover | Mean pairwise semantic distance (DAT methodology) |
+| **Relevance** | How connected responses are to the prompt | Mean cosine similarity to target concept(s) |
+| **Communicability** | Whether meaning survives transmission to another agent | Reconstruction accuracy by partner or LLM |
+| **Surprisal** | How unexpected a semantic transition is | Negative log-probability against reference network |
+
+## Theoretical Foundation
+
+The scoring framework draws on two established research traditions:
+
+**Divergent Association Task (DAT)**
+[Olson et al. (2021)](https://phronos.org/library/digital-validity/#dat-methodology) demonstrated that mean pairwise semantic distance between unrelated words correlates r ≈ 0.40 with composite creativity measures. This provides empirical validation for using semantic spread as a proxy for divergent thinking capacity.
+
+**Distributional Semantics**
+Cosine similarity in embedding space serves as a standard measure of semantic relatedness. [Hill, Reichart & Korhonen (2015)](https://phronos.org/library/digital-validity/#embedding-validity) distinguish between similarity (categorical membership) and relatedness (associative connection)—embeddings capture the latter more reliably.
+
+For caveats regarding embedding validity and cultural bias, see [LIB-002: Digital Validity](https://phronos.org/library/digital-validity/).
+
+## Metric Architecture
+
+Both INS-001.1 (Radiation) and INS-001.2 (Union) use exactly **two primary metrics**:
+
+1. **Relevance** — Are the clues semantically connected to the prompt?
+2. **Divergence** — How spread out are the clues from each other?
+
+These metrics are orthogonal:
+
+| Pattern | Relevance | Divergence | Interpretation |
+|---------|-----------|------------|----------------|
+| Creative but valid | High | High | Wide-ranging associations that stay connected |
+| Predictable | High | Low | Conventional, clustered responses |
+| Noise | Low | (any) | Divergence becomes meaningless |
+
+## Studies in This Family
+
+| Study | Title | Focus | Status |
+|-------|-------|-------|--------|
+| MTH-002.1 | Relevance and Divergence Scoring | Core scoring algorithms and thresholds | Published |
+| MTH-002.2 | Communicability Metrics | Reconstruction accuracy measurement | Calibrating |
+| MTH-002.3 | Surprisal Scoring | Transition probability against reference networks | Calibrating |
+| MTH-002.4 | Population Normalization | Bootstrap null distributions and percentile ranking | Calibrating |
+
+## Implementation
+
+The scoring algorithms are implemented in:
+
+- **Primary**: [`scoring.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/services/scoring.py)
+- **Specification**: [`INS-001-scoring-metrics-v2.md`](https://github.com/phronos-2025/phronos-instruments/blob/main/INS-001%20v0.3.2/INS-001-scoring-metrics-v2.md)
+
+## Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Embedding model bias** | Cultural and frequency effects in word representations | Document reference model; note Western/English bias |
+| **Threshold calibration** | Interpretation bands require empirical validation | Derive from observed distributions; update with data |
+| **Single embedding model** | Results depend on specific model choice | Use standardized model (text-embedding-3-small); note in methods |
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-01-15 | Initial publication |

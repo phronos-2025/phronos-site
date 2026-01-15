@@ -1,0 +1,76 @@
+---
+# === IDENTIFICATION ===
+id: MTH-002.3
+slug: surprisal
+type: study
+family: MTH-002
+family_slug: semantic-association-metrics
+order: 3
+
+# === CONTENT ===
+title: "Surprisal Scoring"
+subtitle: "Measuring unexpected semantic transitions"
+abstract: |
+  Methodology for measuring surprisal—how unexpected a semantic transition is
+  relative to reference networks. Uses negative log-probability against Small
+  World of Words (SWOW) and LLM World of Words (LWOW) association norms.
+  Distinguishes between typical (predictable) and atypical (creative) associations.
+
+# === METADATA ===
+date: 2026-01-15
+version: "0.1"
+status: researching
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: overview
+    title: "Overview"
+
+# === SEO ===
+description: "Methodology for measuring surprisal in semantic associations using reference networks (SWOW, LWOW). Quantifies how unexpected word associations are."
+keywords:
+  - surprisal
+  - association norms
+  - SWOW
+  - LWOW
+  - transition probability
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Overview
+
+This study is currently calibrating. Content will document:
+
+1. **Reference networks** — Small World of Words (SWOW) and LLM World of Words (LWOW) association databases
+2. **Transition probability** — computing association strength from frequency data
+3. **Surprisal calculation** — negative log-probability of observed transitions
+4. **Interpretation** — distinguishing creative (high surprisal, high relevance) from random (high surprisal, low relevance)
+
+### Definition
+
+$$
+\text{surprisal}(w_1 \to w_2) = -\log P(w_2 | w_1)
+$$
+
+Where $P(w_2 | w_1)$ is the conditional probability of associating $w_2$ given $w_1$, estimated from reference network frequencies.
+
+### Reference Networks
+
+| Network | Source | Coverage |
+|---------|--------|----------|
+| SWOW-EN | De Deyne et al. (2019) | Human association norms, ~12K cues |
+| LWOW | Abramski et al. (2025) | LLM association norms for comparison |
+
+### Theoretical Foundation
+
+Surprisal distinguishes:
+
+- **Low surprisal + high relevance** = conventional, expected associations
+- **High surprisal + high relevance** = creative, unexpected but connected
+- **High surprisal + low relevance** = random, noise
+
+---
+
+*This methodology is under development. Check back for updates.*

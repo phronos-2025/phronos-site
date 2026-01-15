@@ -1,0 +1,79 @@
+---
+# === IDENTIFICATION ===
+id: MTH-002.4
+slug: normalization
+type: study
+family: MTH-002
+family_slug: semantic-association-metrics
+order: 4
+
+# === CONTENT ===
+title: "Population Normalization"
+subtitle: "Converting raw scores to population-relative measures"
+abstract: |
+  Methodology for normalizing raw semantic scores against population baselines.
+  Covers bootstrap null distribution generation, percentile ranking, z-score
+  conversion, and prompt-specific calibration. Enables fair comparison across
+  prompts with different baseline geometries.
+
+# === METADATA ===
+date: 2026-01-15
+version: "0.1"
+status: researching
+
+# === SECTIONS (for deep linking) ===
+sections:
+  - anchor: overview
+    title: "Overview"
+
+# === SEO ===
+description: "Methodology for normalizing semantic association scores against population baselines. Covers bootstrap distributions, percentile ranking, and prompt-specific calibration."
+keywords:
+  - score normalization
+  - percentile ranking
+  - bootstrap distribution
+  - population baseline
+
+# === AUTHORSHIP ===
+author: "Vishal Patel"
+---
+
+## Overview
+
+This study is currently calibrating. Content will document:
+
+1. **Prompt-specific baselines** — why different prompts require different null distributions
+2. **Bootstrap procedure** — generating null distributions by sampling random word sets
+3. **Percentile normalization** — converting raw scores to population-relative ranks
+4. **Z-score normalization** — standard deviations from null mean for statistical analysis
+5. **Caching strategies** — precomputation and storage for production systems
+
+### The Problem
+
+Raw relevance and divergence scores are difficult to interpret:
+
+- A relevance of 0.35 may be excellent for a distant anchor-target pair but mediocre for a close pair
+- Divergence depends on how many words are included and their baseline geometry
+
+### Solution: Prompt-Specific Null Distributions
+
+For each prompt configuration:
+
+1. Sample $n$ random words from vocabulary (matching submission size)
+2. Score this random set using the same functions
+3. Repeat 500+ times to build distribution
+4. Store for percentile/z-score conversion
+
+This answers: "How does this submission compare to random word sets for *this specific prompt*?"
+
+### Optimization Considerations
+
+For production systems:
+
+- **Precompute** null distributions for all stimulus pairs
+- **Cache** results keyed by `(prompt, n_clues)` tuple
+- **Parametric approximation** possible (Beta for relevance, truncated normal for divergence)
+
+---
+
+*This methodology is under development. Check back for updates.*
