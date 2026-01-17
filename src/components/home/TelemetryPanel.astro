@@ -1,187 +1,508 @@
 ---
-// Power User Activity Sparklines - from DSP-001 analysis
-const powerUsers = [
-  { count: '384,406', bursts: [{ left: 5, width: 8, height: 45 }, { left: 15, width: 12, height: 55 }, { left: 30, width: 15, height: 70 }, { left: 48, width: 12, height: 65 }, { left: 65, width: 10, height: 75 }, { left: 80, width: 15, height: 100 }] },
-  { count: '38,830', bursts: [{ left: 35, width: 20, height: 60 }, { left: 60, width: 35, height: 85 }] },
-  { count: '27,496', bursts: [{ left: 55, width: 15, height: 90 }, { left: 75, width: 10, height: 50 }] },
-  { count: '18,477', bursts: [{ left: 60, width: 12, height: 95 }] },
-  { count: '13,530', bursts: [{ left: 65, width: 10, height: 85 }] },
-  { count: '11,169', bursts: [{ left: 70, width: 12, height: 80 }] },
-  { count: '10,671', bursts: [{ left: 55, width: 8, height: 70 }, { left: 68, width: 10, height: 90 }] },
-  { count: '9,458', bursts: [{ left: 50, width: 15, height: 85 }, { left: 70, width: 8, height: 60 }] },
-  { count: '8,812', bursts: [{ left: 75, width: 12, height: 90 }] },
-  { count: '8,542', bursts: [{ left: 78, width: 10, height: 85 }] },
-  { count: '7,553', bursts: [{ left: 80, width: 8, height: 80 }] },
-  { count: '7,017', bursts: [{ left: 48, width: 15, height: 75 }, { left: 68, width: 8, height: 55 }] },
+// INS-001.2 Common Ground - Hero visualization
+// Drives click-through to assessment with placeholder "YOU" row
+
+const baselines = [
+  {
+    label: 'AI',
+    words: ['investigation', 'evidence', 'truth', 'clarity', 'knowledge'],
+    relevance: 34,
+    spread: 62,
+  },
+  {
+    label: 'EMBEDDING',
+    words: ['assurance', 'doubtless', 'mystique', 'suspense', 'insecurity'],
+    relevance: 36,
+    spread: 55,
+  },
 ];
 ---
 
-<a href="/dispatches/dsp-001#figure-4" class="telemetry-panel-link">
-<div class="telemetry-panel">
-  <div class="telemetry-annotation">DSP-001 — Power Users</div>
-  <div class="telemetry-header">
-    <span>Dataset: WildChat (N=4.8M)</span>
-    <span>Top 12 Power Users</span>
-  </div>
+<a href="https://instruments.phronos.org/ins-001/ins-001-2/" class="ins-panel-link">
+  <div class="ins-panel">
+    <!-- Header -->
+    <div class="ins-header">
+      <span class="ins-id">INS-001.2 — COMMON GROUND</span>
+      <span class="ins-live-badge">Live</span>
+    </div>
 
-  <div class="sparklines-container">
-    {powerUsers.map((user) => (
-      <div class="spark-row">
-        <span class="spark-label">{user.count}</span>
-        <div class="spark-line">
-          {user.bursts.map((burst) => (
-            <div 
-              class="spark-burst" 
-              style={`left: ${burst.left}%; width: ${burst.width}%; height: ${burst.height}%`}
-            />
-          ))}
+    <!-- Axis header -->
+    <div class="ins-axis">
+      <span class="ins-axis-label">mystery</span>
+      <div class="ins-axis-line">
+        <svg width="8" height="10" viewBox="0 0 8 10" class="ins-arrow">
+          <polygon points="0,5 6,0 6,10" />
+        </svg>
+        <div class="ins-axis-dash"></div>
+        <svg width="8" height="10" viewBox="0 0 8 10" class="ins-arrow">
+          <polygon points="8,5 2,0 2,10" />
+        </svg>
+      </div>
+      <span class="ins-axis-label">certainty</span>
+    </div>
+
+    <!-- Legend -->
+    <div class="ins-legend">
+      <div class="ins-legend-item">
+        <div class="ins-legend-dot filled"></div>
+        <span>RELEVANCE</span>
+      </div>
+      <div class="ins-legend-item">
+        <div class="ins-legend-dot outline"></div>
+        <span>SPREAD</span>
+      </div>
+    </div>
+
+    <!-- Scale -->
+    <div class="ins-scale">
+      <span>0</span>
+      <span>25</span>
+      <span>50</span>
+      <span>75</span>
+      <span>100</span>
+    </div>
+
+    <!-- Rows -->
+    <div class="ins-rows">
+      <!-- YOU row - placeholder state -->
+      <div class="ins-row placeholder">
+        <div class="ins-words placeholder-words">? · ? · ? · ? · ?</div>
+        <div class="ins-row-inner">
+          <div class="ins-label-group highlight">
+            <div class="ins-accent-bar"></div>
+            <span class="ins-label highlight">YOU</span>
+          </div>
+          <div class="ins-track placeholder-track">
+            <div class="ins-connection placeholder-connection"></div>
+            <div class="ins-dot placeholder-dot" style="left: 20%;"></div>
+            <div class="ins-dot placeholder-dot outline" style="left: 60%;"></div>
+            <span class="ins-value" style="left: 20%;">?</span>
+            <span class="ins-value" style="left: 60%;">?</span>
+          </div>
         </div>
       </div>
-    ))}
-  </div>
 
-  <div class="axis-labels">
-    <span>2023-04</span>
-    <span>2024-01</span>
-    <span>2024-10</span>
-    <span>2025-07</span>
-  </div>
+      <!-- Baseline rows -->
+      {baselines.map((row) => (
+        <div class="ins-row">
+          <div class="ins-words">{row.words.join(' · ')}</div>
+          <div class="ins-row-inner">
+            <div class="ins-label-group">
+              <span class="ins-label">{row.label}</span>
+            </div>
+            <div class="ins-track">
+              <div
+                class="ins-connection"
+                style={`left: ${row.relevance}%; width: ${row.spread - row.relevance}%;`}
+              ></div>
+              <div class="ins-dot filled" style={`left: ${row.relevance}%;`}></div>
+              <div class="ins-dot outline" style={`left: ${row.spread}%;`}></div>
+              <span class="ins-value" style={`left: ${row.relevance}%;`}>{row.relevance}</span>
+              <span class="ins-value" style={`left: ${row.spread}%;`}>{row.spread}</span>
+            </div>
+          </div>
+        </div>
+      ))}
 
-  <div class="telemetry-footer">
-    <strong>Observation:</strong> Power users (0.1% of population) engage in concerted bursts, accounting for 26% of all traffic and 36% of toxic conversations.
+      <!-- OTHERS row - calibrating -->
+      <div class="ins-row">
+        <div class="ins-row-inner">
+          <div class="ins-label-group">
+            <span class="ins-label">OTHERS</span>
+          </div>
+          <div class="ins-track calibrating">
+            <div class="ins-pulsing-dot">
+              <div class="ins-pulse-ring"></div>
+              <div class="ins-pulse-core"></div>
+            </div>
+            <span class="ins-calibrating-text">Calibrating...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom invitation -->
+    <div class="ins-invitation">
+      <p>Where do you stand relative to the machine?</p>
+    </div>
+
+    <!-- Footer CTA -->
+    <div class="ins-cta">
+      <span>Begin assessment</span>
+      <span class="ins-arrow-right">&rarr;</span>
+    </div>
   </div>
-</div>
 </a>
 
 <style>
-  .telemetry-panel-link {
+  .ins-panel-link {
     text-decoration: none;
     color: inherit;
     display: block;
-    transition: transform var(--transition-default), box-shadow var(--transition-default);
+    transition: transform var(--transition-default);
   }
 
-  .telemetry-panel-link:hover {
+  .ins-panel-link:hover {
     transform: translate(-2px, -2px);
   }
 
-  .telemetry-panel-link:hover .telemetry-panel {
-    box-shadow: 14px 14px 0px rgba(26, 26, 26, 0.08);
+  .ins-panel-link:hover .ins-panel {
+    box-shadow: 14px 14px 0px rgba(26, 26, 26, 0.1);
   }
 
-  .telemetry-panel {
+  .ins-panel-link:hover .ins-cta {
+    color: var(--ink);
+  }
+
+  .ins-panel {
     background: var(--white);
     border: 1px solid var(--ink);
     padding: 1.5rem;
     box-shadow: 12px 12px 0px rgba(26, 26, 26, 0.05);
-    position: relative;
-    max-width: 480px;
+    max-width: 420px;
+    transition: box-shadow var(--transition-default);
   }
 
-  .telemetry-annotation {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    position: absolute;
-    right: -10px;
-    top: -10px;
-    background: var(--paper);
-    border: 1px solid var(--ink);
-    padding: 2px 6px;
-    letter-spacing: 0.5px;
-  }
-
-  .telemetry-header {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    color: var(--faded);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+  /* Header */
+  .ins-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  .ins-id {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--faded);
     letter-spacing: 0.5px;
   }
 
-  .sparklines-container {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .ins-live-badge {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--success);
+    border: 1px solid var(--success);
+    padding: 2px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  .spark-row {
+  /* Axis */
+  .ins-axis {
     display: flex;
     align-items: center;
-    height: 18px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-left: 5.5rem;
+  }
+
+  .ins-axis-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink);
+  }
+
+  .ins-axis-line {
+    display: flex;
+    align-items: center;
+  }
+
+  .ins-arrow {
+    fill: var(--ink);
+  }
+
+  .ins-axis-dash {
+    width: 4rem;
+    margin: 0 0.25rem;
+    border-top: 1px dashed var(--faded);
+  }
+
+  /* Legend */
+  .ins-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 5.5rem;
+  }
+
+  .ins-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--faded);
+  }
+
+  .ins-legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .ins-legend-dot.filled {
+    background: var(--gold);
+  }
+
+  .ins-legend-dot.outline {
+    border: 1.5px solid var(--gold);
+    background: transparent;
+  }
+
+  /* Scale */
+  .ins-scale {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 5.5rem;
+    margin-bottom: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--faded);
+  }
+
+  /* Rows */
+  .ins-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .ins-row {
     position: relative;
   }
 
-  .spark-row:last-child {
-    border-bottom: none;
+  .ins-words {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.3px;
+    padding-left: 5.5rem;
+    margin-bottom: 0.4rem;
+    text-align: center;
   }
 
-  .spark-label {
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
+  .ins-words.placeholder-words {
     color: var(--faded);
-    width: 52px;
-    text-align: right;
-    padding-right: 8px;
+  }
+
+  .ins-row-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .ins-label-group {
+    width: 5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     flex-shrink: 0;
   }
 
-  .spark-line {
-    flex-grow: 1;
-    height: 100%;
-    position: relative;
-    background: rgba(0, 0, 0, 0.01);
+  .ins-label-group.highlight {
+    gap: 0.35rem;
   }
 
-  .spark-burst {
-    position: absolute;
-    bottom: 0;
+  .ins-accent-bar {
+    width: 3px;
+    height: 14px;
     background: var(--gold);
-    opacity: 0.7;
-    border-radius: 1px 1px 0 0;
+    border-radius: 1px;
   }
 
-  .spark-row:hover .spark-burst {
-    opacity: 0.9;
-  }
-
-  .spark-row:hover .spark-label {
+  .ins-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
     color: var(--ink);
+    letter-spacing: 0.5px;
   }
 
-  .axis-labels {
+  .ins-label.highlight {
+    color: var(--gold);
+  }
+
+  /* Track */
+  .ins-track {
+    flex: 1;
+    height: 16px;
+    position: relative;
+    background: #F0EEE6;
+    border: 1px solid var(--faded-light);
+    border-radius: 2px;
+  }
+
+  .ins-track.placeholder-track {
+    background: #F5F0E6;
+    border: 1px dashed var(--gold);
+  }
+
+  .ins-track.calibrating {
     display: flex;
-    justify-content: space-between;
-    padding-left: 52px;
-    margin-top: 6px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .ins-connection {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .ins-connection.placeholder-connection {
+    left: 20%;
+    width: 40%;
+    border-top: 2px dashed var(--gold);
+    background: transparent;
+    height: 0;
+    opacity: 0.5;
+  }
+
+  .ins-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transition: transform 0.15s ease;
+  }
+
+  .ins-dot.filled {
+    background: var(--gold);
+  }
+
+  .ins-dot.outline {
+    background: transparent;
+    border: 2px solid var(--gold);
+  }
+
+  .ins-dot.placeholder-dot {
+    opacity: 0.5;
+    border: 2px dashed var(--gold);
+    background: transparent;
+  }
+
+  .ins-row:hover .ins-dot {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  .ins-value {
+    position: absolute;
+    top: calc(100% + 4px);
+    transform: translateX(-50%);
     font-family: var(--font-mono);
     font-size: 0.5rem;
     color: var(--faded);
   }
 
-  .telemetry-footer {
-    margin-top: 1rem;
+  /* Pulsing dot for calibrating */
+  .ins-pulsing-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+  }
+
+  .ins-pulse-ring {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.4;
+    animation: pulse-ring 2s ease-out infinite;
+  }
+
+  .ins-pulse-core {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  .ins-calibrating-text {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--faded);
+  }
+
+  /* Invitation */
+  .ins-invitation {
+    margin-top: 1.25rem;
     padding-top: 0.75rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--faded-light);
+  }
+
+  .ins-invitation p {
     font-family: var(--font-serif);
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.95rem;
+    font-style: italic;
     color: var(--ink);
+    margin: 0;
+    line-height: 1.4;
   }
 
-  .telemetry-footer strong {
-    font-weight: 600;
+  /* CTA */
+  .ins-cta {
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--faded-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color var(--transition-fast);
   }
 
+  .ins-arrow-right {
+    font-size: 0.9rem;
+  }
+
+  /* Responsive */
   @media (max-width: 767px) {
-    .telemetry-panel {
+    .ins-panel {
       max-width: 100%;
+      padding: 1.25rem;
+    }
+
+    .ins-axis,
+    .ins-legend,
+    .ins-scale,
+    .ins-words {
+      padding-left: 4.5rem;
+    }
+
+    .ins-label-group {
+      width: 4rem;
+    }
+
+    .ins-axis-dash {
+      width: 3rem;
     }
   }
 </style>
-
