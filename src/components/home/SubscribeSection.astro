@@ -55,7 +55,7 @@
       messageEl.className = 'subscribe-message';
 
       try {
-        const response = await fetch('https://instruments.phronos.org/api/v1/mailing/subscribe', {
+        const response = await fetch('https://api.instruments.phronos.org/api/v1/mailing/subscribe', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

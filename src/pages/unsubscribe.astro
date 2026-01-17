@@ -61,7 +61,7 @@ import Footer from '../components/global/Footer.astro';
     }
 
     try {
-      const response = await fetch('https://instruments.phronos.org/api/v1/mailing/unsubscribe', {
+      const response = await fetch('https://api.instruments.phronos.org/api/v1/mailing/unsubscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
