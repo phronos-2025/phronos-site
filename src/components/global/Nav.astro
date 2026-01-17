@@ -15,8 +15,8 @@ import Logo from './Logo.astro';
     <li><a href="https://instruments.phronos.org" class="nav-link">Instruments</a></li>
   </ul>
 
-  <a href="https://phronos.substack.com/subscribe" class="nav-subscribe nav-subscribe-desktop">
-    Subscribe
+  <a href="#updates" class="nav-subscribe nav-subscribe-desktop">
+    Updates
   </a>
 
   <button class="nav-hamburger" aria-label="Open menu">
@@ -43,8 +43,8 @@ import Logo from './Logo.astro';
     <a href="https://instruments.phronos.org" class="nav-mobile-link">Instruments</a>
   </div>
 
-  <a href="https://phronos.substack.com/subscribe" class="nav-mobile-subscribe">
-    Subscribe
+  <a href="#updates" class="nav-mobile-subscribe">
+    Updates
   </a>
 </div>
 
@@ -65,7 +65,7 @@ import Logo from './Logo.astro';
     });
 
     // Close menu when clicking a link
-    const mobileLinks = document.querySelectorAll('.nav-mobile-link:not(.disabled)');
+    const mobileLinks = document.querySelectorAll('.nav-mobile-link:not(.disabled), .nav-mobile-subscribe');
     mobileLinks.forEach((link) => {
       link.addEventListener('click', () => {
         mobileMenu?.classList.remove('is-open');

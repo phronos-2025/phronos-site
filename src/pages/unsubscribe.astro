@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
+---
+
+<BaseLayout title="Unsubscribe">
+  <Nav slot="nav" />
+
+  <main class="unsubscribe-page">
+    <div class="container">
+      <div class="unsubscribe-content">
+        <h1 class="unsubscribe-title">Unsubscribe</h1>
+
+        <div id="unsubscribe-loading" class="unsubscribe-state">
+          <p>Processing your request...</p>
+        </div>
+
+        <div id="unsubscribe-success" class="unsubscribe-state" hidden>
+          <p>You've been successfully unsubscribed from Phronos updates.</p>
+          <p class="unsubscribe-note">Sorry to see you go. You can always resubscribe from our <a href="/#updates">home page</a>.</p>
+        </div>
+
+        <div id="unsubscribe-already" class="unsubscribe-state" hidden>
+          <p>You're already unsubscribed from Phronos updates.</p>
+          <p class="unsubscribe-note">Want to subscribe again? Visit our <a href="/#updates">home page</a>.</p>
+        </div>
+
+        <div id="unsubscribe-error" class="unsubscribe-state" hidden>
+          <p>We couldn't process your unsubscribe request.</p>
+          <p class="unsubscribe-note">The link may have expired or is invalid. Please contact <a href="mailto:interest@phronos.org">interest@phronos.org</a> for assistance.</p>
+        </div>
+
+        <div id="unsubscribe-no-token" class="unsubscribe-state" hidden>
+          <p>No unsubscribe token provided.</p>
+          <p class="unsubscribe-note">Please use the unsubscribe link from your email, or contact <a href="mailto:interest@phronos.org">interest@phronos.org</a>.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<script>
+  async function handleUnsubscribe() {
+    const loadingEl = document.getElementById('unsubscribe-loading');
+    const successEl = document.getElementById('unsubscribe-success');
+    const alreadyEl = document.getElementById('unsubscribe-already');
+    const errorEl = document.getElementById('unsubscribe-error');
+    const noTokenEl = document.getElementById('unsubscribe-no-token');
+
+    // Get token from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      loadingEl?.setAttribute('hidden', '');
+      noTokenEl?.removeAttribute('hidden');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://instruments.phronos.org/api/v1/mailing/unsubscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+      loadingEl?.setAttribute('hidden', '');
+
+      if (response.ok && data.success) {
+        if (data.message.includes('already')) {
+          alreadyEl?.removeAttribute('hidden');
+        } else {
+          successEl?.removeAttribute('hidden');
+        }
+      } else {
+        errorEl?.removeAttribute('hidden');
+      }
+    } catch (error) {
+      loadingEl?.setAttribute('hidden', '');
+      errorEl?.removeAttribute('hidden');
+    }
+  }
+
+  handleUnsubscribe();
+</script>
+
+<style>
+  .unsubscribe-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding: var(--space-3xl) 0;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+  }
+
+  .unsubscribe-content {
+    text-align: center;
+  }
+
+  .unsubscribe-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: var(--space-xl);
+  }
+
+  .unsubscribe-state {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .unsubscribe-state p {
+    margin-bottom: var(--space-md);
+  }
+
+  .unsubscribe-note {
+    font-size: var(--text-md);
+    color: var(--faded);
+  }
+
+  .unsubscribe-note a {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .unsubscribe-note a:hover {
+    color: var(--ink);
+  }
+</style>
