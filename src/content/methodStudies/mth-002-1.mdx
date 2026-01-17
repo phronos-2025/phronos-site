@@ -19,8 +19,8 @@ abstract: |
   raw scores to population-relative percentiles.
 
 # === METADATA ===
-date: 2026-01-15
-version: "1.0"
+date: 2026-01-16
+version: "1.1"
 status: published
 
 # === SECTIONS (for deep linking) ===
@@ -294,7 +294,7 @@ For comparing two different submissions to the same prompt, compute centroid-bas
 
 ### 7.1 Core Functions
 
-The scoring module implements:
+The scoring module (`scoring.py`) implements:
 
 | Function | Purpose |
 |----------|---------|
@@ -306,7 +306,33 @@ The scoring module implements:
 | `normalize_scores()` | Convert raw to percentile/z-score |
 | `compare_submissions()` | Participant vs. baseline comparison |
 
-### 7.2 Return Schema
+The embeddings module (`embeddings.py`) implements:
+
+| Function | Purpose |
+|----------|---------|
+| `get_vocabulary_sample()` | Fetch random vocabulary embeddings for null distribution bootstrap |
+
+### 7.2 Vocabulary Sampling
+
+The `get_vocabulary_sample()` function fetches random embeddings from the vocabulary database for bootstrap null distribution generation:
+
+```python
+async def get_vocabulary_sample(supabase: Client, n: int = 1000) -> list[list[float]]:
+    """
+    Fetch a random sample of vocabulary embeddings for null distribution bootstrap.
+
+    Args:
+        supabase: Authenticated Supabase client
+        n: Number of embeddings to sample (default 1000)
+
+    Returns:
+        List of embedding vectors (1536-dimensional each)
+    """
+```
+
+This function queries the `vocabulary_embeddings` table and returns parsed embedding vectors for use with `bootstrap_null_distribution()`.
+
+### 7.3 Return Schema
 
 Both `score_radiation()` and `score_union()` return:
 
@@ -319,7 +345,28 @@ Both `score_radiation()` and `score_union()` return:
 }
 ```
 
-### 7.3 Embedding Model
+API response models include the normalized percentile:
+
+```python
+{
+    "relevance": float,                    # Raw relevance (0-1)
+    "divergence": float,                   # Raw divergence (0-100)
+    "valid": bool,                         # Whether relevance >= 0.15
+    "relevance_percentile": Optional[float] # Percentile rank (0-100)
+}
+```
+
+### 7.4 Normalization Pipeline
+
+The game endpoints integrate normalization as follows:
+
+1. Score participant clues using `score_radiation()` or `score_union()`
+2. Fetch vocabulary sample via `get_vocabulary_sample(supabase, n=1000)`
+3. Build null distribution via `bootstrap_null_distribution()` with 500 samples
+4. Convert to percentile via `normalize_scores(scores, null_dist, method="percentile")`
+5. Return `relevance_percentile` in API response
+
+### 7.5 Embedding Model
 
 Scores depend on the embedding model used. The implementation uses:
 
@@ -345,7 +392,9 @@ Scores depend on the embedding model used. The implementation uses:
 
 Implementation available at:
 
-- **Primary module**: [`scoring.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/services/scoring.py)
+- **Scoring module**: [`scoring.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/services/scoring.py)
+- **Embeddings module**: [`embeddings.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/services/embeddings.py)
+- **Game endpoints**: [`games.py`](https://github.com/phronos-2025/phronos-instruments/blob/main/ins-001/api/app/routes/games.py)
 - **Specification**: [`INS-001-scoring-metrics-v2.md`](https://github.com/phronos-2025/phronos-instruments/blob/main/INS-001%20v0.3.2/INS-001-scoring-metrics-v2.md)
 
 Test suite verifies:
@@ -361,4 +410,5 @@ Test suite verifies:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2026-01-16 | Added `get_vocabulary_sample()` documentation, normalization pipeline details, updated API response schema with `relevance_percentile` |
 | 1.0 | 2026-01-15 | Initial publication |
