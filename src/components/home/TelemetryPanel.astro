@@ -66,7 +66,6 @@ const baselines = [
     <div class="ins-rows">
       <!-- YOU row - placeholder state -->
       <div class="ins-row placeholder">
-        <div class="ins-words placeholder-words">? · ? · ? · ? · ?</div>
         <div class="ins-row-inner">
           <div class="ins-label-group highlight">
             <div class="ins-accent-bar"></div>
@@ -74,10 +73,10 @@ const baselines = [
           </div>
           <div class="ins-track placeholder-track">
             <div class="ins-connection placeholder-connection"></div>
-            <div class="ins-dot placeholder-dot" style="left: 20%;"></div>
-            <div class="ins-dot placeholder-dot outline" style="left: 60%;"></div>
-            <span class="ins-value" style="left: 20%;">?</span>
-            <span class="ins-value" style="left: 60%;">?</span>
+            <div class="ins-dot placeholder-dot" style="left: 25%;"></div>
+            <div class="ins-dot placeholder-dot outline" style="left: 65%;"></div>
+            <span class="ins-value" style="left: 25%;">?</span>
+            <span class="ins-value" style="left: 65%;">?</span>
           </div>
         </div>
       </div>
@@ -85,7 +84,6 @@ const baselines = [
       <!-- Baseline rows -->
       {baselines.map((row) => (
         <div class="ins-row">
-          <div class="ins-words">{row.words.join(' · ')}</div>
           <div class="ins-row-inner">
             <div class="ins-label-group">
               <span class="ins-label">{row.label}</span>
@@ -277,20 +275,6 @@ const baselines = [
     position: relative;
   }
 
-  .ins-words {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--gold);
-    letter-spacing: 0.3px;
-    padding-left: 5.5rem;
-    margin-bottom: 0.4rem;
-    text-align: center;
-  }
-
-  .ins-words.placeholder-words {
-    color: var(--faded);
-  }
-
   .ins-row-inner {
     display: flex;
     align-items: center;
@@ -359,7 +343,7 @@ const baselines = [
   }
 
   .ins-connection.placeholder-connection {
-    left: 20%;
+    left: 25%;
     width: 40%;
     border-top: 2px dashed var(--gold);
     background: transparent;
@@ -492,8 +476,7 @@ const baselines = [
 
     .ins-axis,
     .ins-legend,
-    .ins-scale,
-    .ins-words {
+    .ins-scale {
       padding-left: 4.5rem;
     }
 
