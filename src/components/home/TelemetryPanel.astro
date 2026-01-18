@@ -6,13 +6,13 @@ const baselines = [
   {
     label: 'AI',
     words: ['investigation', 'evidence', 'truth', 'clarity', 'knowledge'],
-    relevance: 34,
+    fidelity: 34,
     spread: 62,
   },
   {
     label: 'EMBEDDING',
     words: ['assurance', 'doubtless', 'mystique', 'suspense', 'insecurity'],
-    relevance: 36,
+    fidelity: 36,
     spread: 55,
   },
 ];
@@ -45,7 +45,7 @@ const baselines = [
     <div class="ins-legend">
       <div class="ins-legend-item">
         <div class="ins-legend-dot filled"></div>
-        <span>RELEVANCE</span>
+        <span>FIDELITY</span>
       </div>
       <div class="ins-legend-item">
         <div class="ins-legend-dot outline"></div>
@@ -91,11 +91,11 @@ const baselines = [
             <div class="ins-track">
               <div
                 class="ins-connection"
-                style={`left: ${row.relevance}%; width: ${row.spread - row.relevance}%;`}
+                style={`left: ${row.fidelity}%; width: ${row.spread - row.fidelity}%;`}
               ></div>
-              <div class="ins-dot filled" style={`left: ${row.relevance}%;`}></div>
+              <div class="ins-dot filled" style={`left: ${row.fidelity}%;`}></div>
               <div class="ins-dot outline" style={`left: ${row.spread}%;`}></div>
-              <span class="ins-value" style={`left: ${row.relevance}%;`}>{row.relevance}</span>
+              <span class="ins-value" style={`left: ${row.fidelity}%;`}>{row.fidelity}</span>
               <span class="ins-value" style={`left: ${row.spread}%;`}>{row.spread}</span>
             </div>
           </div>
