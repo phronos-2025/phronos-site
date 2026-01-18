@@ -1,6 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
-import ProseLayout from '../layouts/ProseLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/global/Nav.astro';
+import Footer from '../components/global/Footer.astro';
 
 // Get the research agenda from the governance collection
 const governanceEntries = await getCollection('governance');
@@ -11,92 +13,474 @@ if (!entry) {
 }
 
 const { Content } = await render(entry);
+
+const formattedDate = entry.data.lastUpdated
+  ? new Date(entry.data.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : undefined;
 ---
 
-<ProseLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  id="GOV-004"
-  version={entry.data.version}
-  date={entry.data.lastUpdated ? new Date(entry.data.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined}
-  status="Living"
-  type="Research"
->
-  <Content />
-</ProseLayout>
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <Nav slot="nav" />
+
+  <article class="research-agenda">
+    <!-- Header -->
+    <header class="ra-header">
+      <div class="ra-meta-bar">
+        <div class="ra-meta-row">
+          <span class="ra-meta-id">GOV-004</span>
+          <span class="ra-meta-type">Research</span>
+          <div class="ra-meta-status-group">
+            <span class="ra-meta-status">Living</span>
+            <span class="status-dot living"></span>
+          </div>
+        </div>
+        <div class="ra-meta-row">
+          {entry.data.version && <span class="ra-meta-version">v{entry.data.version}</span>}
+          {formattedDate && <span class="ra-meta-date">{formattedDate}</span>}
+        </div>
+      </div>
+      <div class="ra-title-container">
+        <h1 class="ra-title">{entry.data.title}</h1>
+      </div>
+    </header>
+
+    <!-- Legend near header -->
+    <div class="ra-legend-wrapper">
+      <div class="ra-legend">
+        <span class="ra-legend-label">Status Key</span>
+        <dl class="ra-legend-list">
+          <div class="ra-legend-item">
+            <dt>Supported</dt>
+            <dd>Moderate-to-strong evidence</dd>
+          </div>
+          <div class="ra-legend-item">
+            <dt>Partial</dt>
+            <dd>Evidence with caveats</dd>
+          </div>
+          <div class="ra-legend-item">
+            <dt>Gap</dt>
+            <dd>Needed but no evidence</dd>
+          </div>
+          <div class="ra-legend-item">
+            <dt>Untested</dt>
+            <dd>Requires new research</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ra-content-wrapper">
+      <div class="ra-content">
+        <Content />
+      </div>
+    </div>
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
 
 <style>
-  /* Table styles for research agenda */
-  :global(.prose-content .table-wrapper) {
-    overflow-x: auto;
-    margin: var(--space-md) 0;
+  .research-agenda {
+    padding-bottom: var(--space-2xl);
   }
 
-  :global(.prose-content table) {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
+  /* ============================================
+     HEADER - mirrors ProseLayout
+     ============================================ */
+  .ra-header {
+    margin-bottom: var(--space-md);
   }
 
-  :global(.prose-content th),
-  :global(.prose-content td) {
-    padding: var(--space-sm) var(--space-md);
-    text-align: left;
+  .ra-meta-bar {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem 1.5rem;
     border-bottom: 1px solid var(--faded-light);
   }
 
-  :global(.prose-content th) {
+  .ra-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ra-meta-row + .ra-meta-row {
+    margin-top: 0.25rem;
+  }
+
+  .ra-meta-id {
     font-family: var(--font-mono);
     font-size: 0.75rem;
+    color: var(--gold);
+  }
+
+  .ra-meta-version {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faded);
+  }
+
+  .ra-meta-type {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .ra-meta-status-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .ra-meta-status {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+  }
+
+  .ra-meta-date {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .ra-title-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-lg) 2rem;
+  }
+
+  .ra-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  /* ============================================
+     LEGEND - Near header, horizontal layout
+     ============================================ */
+  .ra-legend-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem var(--space-lg);
+  }
+
+  .ra-legend {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--warm-white);
+    border: 1px solid var(--faded-light);
+    border-radius: 4px;
+  }
+
+  .ra-legend-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .ra-legend-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-lg);
+    margin: 0;
+    padding: 0;
+  }
+
+  .ra-legend-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .ra-legend-item dt {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ra-legend-item dt::after {
+    content: ':';
+  }
+
+  .ra-legend-item dd {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--faded);
+    margin: 0;
+  }
+
+  /* ============================================
+     CONTENT WRAPPER
+     ============================================ */
+  .ra-content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .ra-content {
+    font-family: var(--font-body);
+  }
+
+  /* Hide the "Status Key" h2 and its table from main content */
+  .ra-content :global(#status-key),
+  .ra-content :global(#status-key + table),
+  .ra-content :global(#status-key + p + table) {
+    display: none;
+  }
+
+  /* Typography - mirrors ProseLayout */
+  .ra-content :global(h1) {
+    display: none; /* Title already in header */
+  }
+
+  .ra-content :global(h2) {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-top: 2.5rem;
+    margin-bottom: var(--space-md);
+    scroll-margin-top: 5rem;
+  }
+
+  .ra-content :global(h3) {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 2rem;
+    margin-bottom: var(--space-sm);
+    scroll-margin-top: 5rem;
+  }
+
+  .ra-content :global(h4) {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 1.5rem;
+    margin-bottom: var(--space-sm);
+    scroll-margin-top: 5rem;
+  }
+
+  .ra-content :global(p) {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: var(--space-md);
+  }
+
+  .ra-content :global(strong) {
+    font-weight: 600;
+  }
+
+  .ra-content :global(em) {
+    font-style: italic;
+  }
+
+  .ra-content :global(a) {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .ra-content :global(a:hover) {
+    color: var(--ink);
+  }
+
+  .ra-content :global(hr) {
+    border: none;
+    height: 1px;
+    background: var(--faded-light);
+    margin: var(--space-xl) 0;
+  }
+
+  .ra-content :global(ul),
+  .ra-content :global(ol) {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-lg);
+  }
+
+  .ra-content :global(ul) {
+    list-style: disc;
+  }
+
+  .ra-content :global(ol) {
+    list-style: decimal;
+  }
+
+  .ra-content :global(li) {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 400;
+    margin-bottom: var(--space-sm);
+    line-height: 1.8;
+  }
+
+  /* Table styles */
+  .ra-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    margin: var(--space-md) 0;
+  }
+
+  .ra-content :global(th),
+  .ra-content :global(td) {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--faded-light);
+    vertical-align: top;
+  }
+
+  .ra-content :global(th) {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--faded);
-    background: var(--paper);
+    background: var(--warm-white);
   }
 
-  :global(.prose-content td) {
+  .ra-content :global(td) {
     color: var(--ink);
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
-  :global(.prose-content tr:last-child td) {
+  .ra-content :global(tr:last-child td) {
     border-bottom: none;
   }
 
-  /* Section styling for hypothesis blocks */
-  :global(.prose-content section) {
+  /* Section styling for detailed hypothesis blocks */
+  .ra-content :global(section) {
     margin: var(--space-lg) 0;
-    padding: var(--space-md) 0;
-    border-top: 1px solid var(--faded-light);
-  }
-
-  :global(.prose-content section:first-of-type) {
-    border-top: none;
-  }
-
-  /* Status indicator styling */
-  :global(.prose-content strong) {
-    font-weight: 600;
-  }
-
-  /* Scroll margin for anchor links */
-  :global(.prose-content section[id]) {
-    scroll-margin-top: 5rem;
-  }
-
-  :global(.prose-content h2),
-  :global(.prose-content h3) {
-    scroll-margin-top: 5rem;
-  }
-
-  /* Code/mono styling for notation */
-  :global(.prose-content code) {
-    font-family: var(--font-mono);
-    font-size: 0.9em;
+    padding: var(--space-md) var(--space-md);
     background: var(--warm-white);
+    border-radius: 4px;
+    border-left: 3px solid var(--faded-light);
+  }
+
+  .ra-content :global(section[id]) {
+    scroll-margin-top: 5rem;
+  }
+
+  .ra-content :global(section h4) {
+    margin-top: 0;
+  }
+
+  .ra-content :global(section table) {
+    margin-bottom: 0;
+  }
+
+  /* Code styling */
+  .ra-content :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--paper);
     padding: 0.1em 0.3em;
     border-radius: 3px;
   }
+
+  /* Status dot animation */
+  :global(.status-dot) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--faded);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  :global(.status-dot.living) {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ============================================
+     RESPONSIVE
+     ============================================ */
+  @media (max-width: 768px) {
+    .ra-meta-bar,
+    .ra-title-container,
+    .ra-legend-wrapper,
+    .ra-content-wrapper {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .ra-legend {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+
+    .ra-legend-label {
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--faded-light);
+      width: 100%;
+    }
+
+    .ra-legend-list {
+      gap: var(--space-xs) var(--space-md);
+    }
+  }
 </style>
+
+<script>
+  // Hide the Status Key section from the rendered MDX content
+  function hideStatusKey() {
+    const statusKeyHeading = document.getElementById('status-key');
+    if (statusKeyHeading) {
+      // Hide the heading
+      statusKeyHeading.style.display = 'none';
+
+      // Hide the table that follows it
+      let sibling = statusKeyHeading.nextElementSibling;
+      while (sibling) {
+        if (sibling.tagName === 'TABLE') {
+          sibling.style.display = 'none';
+          break;
+        }
+        if (sibling.tagName === 'HR') {
+          sibling.style.display = 'none';
+          break;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+
+      // Also hide any hr right before the status key
+      let prev = statusKeyHeading.previousElementSibling;
+      if (prev && prev.tagName === 'HR') {
+        prev.style.display = 'none';
+      }
+    }
+  }
+
+  hideStatusKey();
+  document.addEventListener('astro:after-swap', hideStatusKey);
+</script>
