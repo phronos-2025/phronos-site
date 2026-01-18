@@ -1,0 +1,526 @@
+---
+title: "Research Agenda"
+description: "Phronos research hypotheses organized by theoretical foundation"
+version: "0.4"
+lastUpdated: "2026-01-18"
+---
+
+# Research Agenda
+
+This document translates Phronos research goals into testable hypotheses, organized by theoretical foundation. Each hypothesis is stated with dependencies, evidence requirements, and confidence assessments.
+
+Our research program investigates whether stable patterns of cognition—"cognitive phenotypes"—can be reliably measured from behavioral traces in human-AI interaction data. This agenda makes explicit what we believe, what we've tested, and what remains uncertain.
+
+---
+
+## Reading This Document
+
+**Status Values:**
+- **Supported** — Library article establishes moderate-to-strong evidence
+- **Partial** — Some evidence exists with significant caveats
+- **Gap** — Identified as needed but no direct evidence
+- **Untested** — Empirical question requiring new research
+
+**Notation:**
+- **H[n]** — Hypothesis number (sequential within article)
+- **→** — Depends on
+- **⇒** — Unlocks/enables
+
+---
+
+## Foundational Claims
+
+These claims underlie the entire research program. They must be defensible before downstream work proceeds.
+
+<section id="F1">
+
+### F1: Cognitive Phenotypes Are Real and Measurable
+
+**Claim:** Stable patterns of cognition—"cognitive phenotypes"—exist as individual differences that can be reliably measured from behavioral traces in human-AI interaction data.
+
+**Unpacked:**
+- Cognitive phenotypes are not artifacts of measurement
+- They reflect genuine variation in how people think, not just how they write
+- They are stable enough to be meaningful (not purely situational)
+- They can be distinguished from LLM-generated patterns
+
+**Evidence needed:**
+- Convergent validity with established cognitive measures
+- Discriminant validity from linguistic style alone
+- Test-retest reliability across sessions
+- Distinguishability from LLM outputs on same tasks
+
+**Status:** Partial  
+**Confidence:** Low-to-Moderate  
+**Library coverage:** [LIB-001](/library/linguistic-markers) (semantic networks), [LIB-002](/library/digital-validity) (stability gap)  
+**Key gap:** Test-retest reliability ([H2.3](#H2.3))
+
+</section>
+
+<section id="F2">
+
+### F2: Chat Data Reveals Cognition, Not Just Communication
+
+**Claim:** What people type in conversations with AI systems encodes cognitive processes (reasoning, association, belief structures) beyond mere communicative intent.
+
+**Unpacked:**
+- Text is a window into thought, not just social performance
+- The cognitive signal is extractable despite communicative noise
+- Human-AI interaction reduces some social filtering present in human-human text
+
+**Evidence needed:**
+- Correlation between chat-derived measures and cognitive task performance
+- Demonstration that chat features predict outcomes beyond self-report
+- Analysis of what chat captures that surveys miss (and vice versa)
+
+**Status:** Partial  
+**Confidence:** Low-to-Moderate  
+**Library coverage:** [LIB-001](/library/linguistic-markers), [LIB-002](/library/digital-validity)  
+**Key gap:** Task-naturalistic convergence ([H2.6](#H2.6))
+
+</section>
+
+---
+
+## LIB-001: Linguistic Markers of Cognition
+
+**Question:** What features of language reliably encode cognitive processes, and which are measurable at scale?
+
+**Library Confidence:** Low-to-Moderate
+
+<section id="H1.1">
+
+### H1.1: Pronoun Patterns Encode Psychological States
+
+First-person pronoun usage patterns (frequency, shifts, I/we ratio) correlate with measurable psychological states including self-focus, distress, and relational orientation.
+
+**Status:** Supported  
+**Confidence:** High  
+**Evidence:** LIWC tradition, clinical validation studies
+
+</section>
+
+<section id="H1.2">
+
+### H1.2: Semantic Network Structure Varies Across Individuals
+
+The structure of associations between concepts in memory—measurable through word associations or embedding distances—shows stable individual differences that correlate with cognitive style and creative ability.
+
+**Status:** Supported  
+**Confidence:** Moderate  
+**Evidence:** Kenett et al. 2014 (network topology predicts creativity), Beaty & Kenett 2023 (theoretical synthesis), Kenett et al. 2018 (flexibility of thought)  
+**Limitations:** Most studies use small samples; brief tasks may not capture full structure  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H1.3">
+
+### H1.3: Semantic Networks Can Be Assessed via Chat
+
+An individual's semantic network structure can be inferred from their chat behavior—prompt content, associative patterns, topic transitions—without explicit association tasks.
+
+**Status:** Gap  
+**Confidence:** Low  
+**Evidence needed:** Correlation between chat-derived and task-derived semantic measures  
+**Dependency:** → [H2.6](#H2.6)
+
+</section>
+
+<section id="H1.4">
+
+### H1.4: Chat Captures Identity Constructs
+
+Self-concept, values, and beliefs can be reliably measured from chat interactions, with validity comparable to or exceeding traditional self-report instruments.
+
+**Status:** Untested  
+**Confidence:** Low  
+**Evidence needed:** Convergent/discriminant validity studies  
+**Dependency:** → [F1](#F1), [F2](#F2)
+
+</section>
+
+<section id="H1.5">
+
+### H1.5: Chat Captures Personality
+
+Big Five personality traits and related constructs can be reliably inferred from chat interaction patterns.
+
+**Status:** Partial  
+**Confidence:** Moderate (for text generally), Low (for chat specifically)  
+**Evidence:** Some validation of text-based personality inference  
+**Gap:** Chat-specific validation
+
+</section>
+
+<section id="H1.6">
+
+### H1.6: Chat Captures Reasoning Style
+
+Individual differences in reasoning (analytical vs. intuitive, logical structure, metacognitive accuracy) are detectable from chat interaction patterns.
+
+**Status:** Untested  
+**Confidence:** Low  
+**Evidence needed:** Correlation with reasoning tasks, think-aloud protocols
+
+</section>
+
+<section id="H1.7">
+
+### H1.7: Embedding Validity for Semantic Distance
+
+Semantic distances computed from word embeddings correlate with human judgments of semantic similarity and predict performance on semantic tasks.
+
+**Status:** Partial (population-level supported; individual-level untested)  
+**Confidence:** Low-to-Moderate  
+**Evidence:** Hill et al. 2015 (SimLex-999, r ≈ 0.44-0.56 for aggregate judgments), Auguste et al. 2017 (priming RT prediction at population level)  
+**Critical caveat:** Validated for population-level semantics only. Individual-difference validity untested.  
+**Empirical finding:** Different embedding models produce substantially different scores (GloVe vs. OpenAI: r = 0.60; 20.7-point systematic difference). Scores are model-dependent.  
+**Limitation:** Cultural/linguistic bias in embeddings  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H1.8">
+
+### H1.8: Divergent Thinking via Semantic Spread
+
+Divergent thinking—the capacity to generate varied responses to open prompts—is measurable via mean pairwise semantic distance and correlates with broader creative ability.
+
+**Status:** Supported (for 10-word unconstrained task); transfer to brief constrained format calibrated but not validated  
+**Confidence:** Moderate (with transfer caveat)  
+**Evidence:** Olson et al. 2021 (r = 0.40 with composite creativity, r = 0.40 with AUT, r = 0.28 with RAT; N = 8,914)  
+**Critical caveat:** Original DAT uses 10 words unconstrained; INS-001 uses 2-5 words under constraint.  
+**Empirical finding:** INS-001.1 produces 8.6 points lower spread than DAT; INS-001.2 produces 8.0 points lower. Gap is documented but not validated against external creativity criteria.  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H1.9">
+
+### H1.9: Constraint-Construct Relationship
+
+Task constraints (free vs. goal-directed association, relevance requirements, communicability demands) determine which aspect of semantic cognition is measured. Different constraint structures yield related but distinct constructs.
+
+**Status:** Supported  
+**Confidence:** Moderate  
+**Evidence:** Beaty & Kenett 2023 (free vs. goal-directed distinction), Merseal et al. 2025 (artists exceed scientists in free but not goal-directed association)  
+**Empirical finding:** Constraint effects are large (Cohen's d = 1.02 between unconstrained DAT and constrained INS-001.2).  
+**Design implication:** INS-001.1 and INS-001.2 measure related but distinct constructs  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+---
+
+## LIB-002: Digital Validity
+
+**Question:** Under what conditions can digital interactions serve as valid proxies for cognitive states?
+
+**Library Confidence:** Low
+
+<section id="H2.1">
+
+### H2.1: Digital Tasks Have Ecological Validity
+
+Cognitive abilities measured through digital games and tasks predict performance on traditional laboratory assessments, establishing that digital contexts can yield valid cognitive measurement.
+
+**Status:** Supported (for memory/attention); untested for creativity  
+**Confidence:** Moderate (domain-limited)  
+**Evidence:** Pedersen et al. 2023 (N = 10,725; game-based measures correlate with traditional tests; 5x faster)  
+**Critical caveat:** Validated for memory/attention/processing speed, not creativity/semantic constructs. We are extrapolating precedent without direct validation.
+
+</section>
+
+<section id="H2.2">
+
+### H2.2: Anonymity Alters Disclosure
+
+Anonymous chat interactions elicit different—potentially more authentic—self-disclosure than identified interactions.
+
+**Status:** Partial  
+**Confidence:** Moderate  
+**Evidence:** Online disinhibition literature
+
+</section>
+
+<section id="H2.3">
+
+### H2.3: Measurements Are Stable Within Individuals
+
+Cognitive phenotype measurements from chat show acceptable test-retest reliability (r > 0.7) across measurement occasions separated by meaningful time intervals.
+
+**Status:** Gap (Critical)  
+**Confidence:** Unknown  
+**Evidence needed:** Longitudinal measurement study with INS-001  
+**Note:** No published test-retest data for DAT or semantic spread measures.  
+**Empirical acknowledgment:** Single-trial variance is high; multiple trials and aggregates are recommended. This addresses precision, not construct stability.  
+**Priority:** Critical — blocks trait interpretation of INS-001
+
+</section>
+
+<section id="H2.4">
+
+### H2.4: Measurements Generalize Across Platforms
+
+Cognitive phenotypes identified in one AI system (e.g., ChatGPT) are detectable in interactions with other systems (Claude, Gemini) and modalities (voice, code).
+
+**Status:** Untested  
+**Confidence:** Unknown  
+**Evidence needed:** Cross-platform validation study
+
+</section>
+
+<section id="H2.5">
+
+### H2.5: Selection Effects Are Characterizable
+
+The population that generates chat data (particularly power users) differs systematically from the general population in ways that can be measured and adjusted for.
+
+**Status:** Partial  
+**Confidence:** High (that differences exist), Low (that they're characterized)  
+**Evidence:** Pedersen et al. 2023 (sample gender skew), Thompson et al. 2020 (cultural/linguistic bias)
+
+</section>
+
+<section id="H2.6">
+
+### H2.6: Task-Naturalistic Convergence
+
+Task-based semantic assessments (structured prompts with embedding-scored responses) and naturalistic chat-derived measures of the same constructs show convergent validity.
+
+**Status:** Gap  
+**Confidence:** Low (hypothesis with zero supporting evidence)  
+**Evidence needed:** Convergent validity between task-based (INS-001) and chat-derived measures  
+**Note:** No published studies compare these modalities for semantic constructs. If task and naturalistic measures diverge, INS-001 measures task performance rather than cognitive style.  
+**Priority:** High — determines measurement strategy  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H2.7">
+
+### H2.7: AI Interaction Doesn't Invalidate Measurement
+
+The presence of AI as interlocutor, judge, or baseline in cognitive assessment doesn't systematically distort measurement of the target construct.
+
+**Status:** Partial  
+**Confidence:** Low  
+**Evidence:** Vicente & Matute 2023 (AI bias inheritance demonstrated for classification); Cazalets & Dambre 2025, Stephenson et al. 2024 (human-AI comparison methodologies exist)  
+**Gap:** Reflexivity effects demonstrated for bias, not for creativity/semantic measures  
+**Concern:** Unknown if AI interaction affects divergent thinking specifically  
+**Note:** Human validation pending. Current scoring uses Claude Haiku 4.5 as standardized reference; human-AI divergence unquantified.  
+**Instruments:** INS-001.1 (Haiku as guesser), INS-001.2 (Haiku as baseline)
+
+</section>
+
+<section id="H2.8">
+
+### H2.8: Task Constraints Affect Spread Measurement
+
+Task constraints systematically affect measured semantic spread, requiring calibration when comparing across task formats.
+
+**Status:** Supported (empirically documented)  
+**Confidence:** Moderate  
+**Empirical finding:** DAT pairwise distances vs. INS-001.2 bridging clue distances: Cohen's d = 1.02 (large effect). Constraint genuinely compresses associative range; calibration assumption not validated.  
+**Implication:** Scores from different task formats are not directly comparable without calibration  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+---
+
+## LIB-003: Reflexive Identity
+
+**Question:** How do AI interactions shape cognition while purporting to measure it?
+
+<section id="H3.1">
+
+### H3.1: AI Interaction Alters Reasoning
+
+Extended interaction with LLMs changes measurable aspects of human reasoning—potentially including analytical depth, source reliance, or metacognitive calibration.
+
+**Status:** Partial  
+**Confidence:** Low  
+**Evidence:** Vicente & Matute 2023 (bias inheritance persists after AI removed)  
+**Evidence needed:** Pre-post or longitudinal design for reasoning specifically  
+**Dependency:** → [H1.6](#H1.6)
+
+</section>
+
+<section id="H3.2">
+
+### H3.2: AI Interaction Alters Identity
+
+Extended interaction with LLMs changes measurable aspects of self-concept, values, or beliefs—beyond what would occur through other information sources.
+
+**Status:** Untested  
+**Confidence:** Low  
+**Evidence needed:** Pre-post or longitudinal design with control condition  
+**Dependency:** → [H1.4](#H1.4)
+
+</section>
+
+---
+
+## LIB-008: Instrument Design
+
+**Question:** How can cognitive instruments be designed to be engaging, valid, and interpretable without causing harm?
+
+**Library Confidence:** Low-to-Moderate
+
+<section id="H8.1">
+
+### H8.1: Game-Based Assessment Validity
+
+Game-based and gamified cognitive assessment formats maintain measurement validity while increasing engagement and reducing assessment time.
+
+**Status:** Supported (for memory/attention); creativity-specific gamification not validated  
+**Confidence:** Moderate (domain-limited)  
+**Evidence:** Pedersen et al. 2023 (8 abilities, 5x faster, convergent validity), Lumsden et al. 2016 (systematic review of 33 tasks)  
+**Critical caveat:** Validated for memory/attention, not creativity/divergent thinking. INS-001 represents extrapolation.  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H8.2">
+
+### H8.2: Word Association Games Reveal Cognition
+
+Word association games—requiring generation of clues connecting concepts—reveal semantic memory structure and associative processes in measurable ways.
+
+**Status:** Supported  
+**Confidence:** Moderate  
+**Evidence:** Kumar et al. 2021 (Connector game; associative models predict performance), Cazalets & Dambre 2025 (Word Synchronization Challenge), Stephenson et al. 2024 (Codenames benchmark), Xu et al. 2025 (CK-Arena)  
+**Limitation:** Games designed for entertainment may elicit different processes than assessment  
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H8.3">
+
+### H8.3: Task Constraints Affect Measured Constructs
+
+Design parameters—clue count, time pressure, explicit constraints—systematically affect what constructs are measured and how scores should be interpreted.
+
+**Status:** Supported (empirically documented)  
+**Confidence:** Moderate  
+**Empirical findings:**
+- Optimal clue counts: INS-001.1 = 2 clues; INS-001.2 = 4 clues
+- Relevance-spread redundancy required metric redesign (r = -0.77 in INS-001.1, r = -0.61 in INS-001.2). Solution: replaced relevance with fidelity (r = +0.06 with spread).
+- Constraint calibration vs. validation: documented but construct preservation assumed, not tested  
+
+**Instruments:** INS-001.1, INS-001.2
+
+</section>
+
+<section id="H8.4">
+
+### H8.4: Results Can Be Presented Without Harm
+
+Cognitive assessment results can be presented to participants in ways that inform without causing psychological harm.
+
+**Status:** Gap (Critical)  
+**Confidence:** Unknown  
+**Evidence needed:** Study of psychological effects of creativity assessment feedback  
+**Concern:** Labeling effects, misinterpretation as stable trait, comparison anxiety. Creativity may be more identity-linked than memory or attention.  
+**Priority:** High (ethical obligation)  
+**Note:** Until studied, use precautionary approach: avoid trait language, frame as snapshot, provide context
+
+</section>
+
+<section id="H8.5">
+
+### H8.5: Self-Location Is Possible
+
+Individuals can meaningfully locate themselves within distributions of cognitive traits using appropriately designed instruments.
+
+**Status:** Untested  
+**Confidence:** Moderate (the goal is achievable)  
+**Dependency:** → [H8.1](#H8.1), [H8.4](#H8.4)
+
+</section>
+
+<section id="H8.6">
+
+### H8.6: Phenotypes Associate with Performance
+
+Cognitive phenotypes measured from chat predict performance (task success relative to peers) on external criteria.
+
+**Status:** Partial  
+**Confidence:** Low  
+**Evidence:** Said-Metwaly et al. 2024 (DT-CA meta-analysis r = 0.18)  
+**Note:** Effect sizes are modest; creativity measures explain ~3% of creative achievement variance  
+**Evidence needed:** INS-001-specific predictive validity studies
+
+</section>
+
+<section id="H8.7">
+
+### H8.7: Phenotypes Associate with Fitness
+
+Cognitive phenotypes measured from chat correlate with cognitive fitness measures.
+
+**Status:** Untested  
+**Confidence:** Low  
+**Dependency:** → H5.3, H5.4 (fitness framework)
+
+</section>
+
+<section id="H8.8">
+
+### H8.8: Phenotype Change Is Measurable
+
+Changes in cognitive phenotype over time can be reliably detected, distinguishing true change from measurement error.
+
+**Status:** Gap  
+**Confidence:** Unknown  
+**Evidence needed:** Longitudinal tracking with reliability assessment  
+**Dependency:** → [H2.3](#H2.3)
+
+</section>
+
+---
+
+## Research Priorities
+
+| Priority | Hypothesis | Status | Rationale |
+|----------|------------|--------|-----------|
+| **Critical** | [F1](#F1), [F2](#F2) | Partial | Foundation—everything else depends on these |
+| **Critical** | [H2.3](#H2.3) | Gap | Test-retest reliability blocks trait interpretation |
+| **Critical** | [H8.4](#H8.4) | Gap | Feedback safety is ethical prerequisite |
+| **High** | [H1.7](#H1.7) | Partial | Embedding validity—individual-level untested |
+| **High** | [H1.8](#H1.8) | Supported (with caveat) | DAT validity—transfer to brief format calibrated but not validated |
+| **High** | [H2.6](#H2.6) | Gap | Task vs. naturalistic validity determines strategy |
+| **High** | [H8.1](#H8.1) | Supported (domain-limited) | Game-based format validity—creativity untested |
+| **Medium** | [H1.2](#H1.2), [H1.9](#H1.9) | Supported | Semantic networks and constraint effects |
+| **Medium** | [H2.7](#H2.7), [H2.8](#H2.8) | Partial/Supported | AI interaction validity, constraint effects |
+| **Medium** | [H8.3](#H8.3) | Supported | Task parameter effects documented |
+
+---
+
+## Joint Confidence Assessment
+
+Individual hypothesis confidence ratings treat claims as independent. When combined for instrument development (e.g., INS-001 depends on LIB-001, LIB-002, and LIB-008), joint confidence is substantially lower.
+
+**Key compounding uncertainties for INS-001:**
+
+| Component | Hypothesis | Status | Confidence |
+|-----------|------------|--------|------------|
+| Embedding validity for individuals | [H1.7](#H1.7) | Partial | Low-to-Moderate |
+| Brief-task validity | [H1.8](#H1.8) | Calibrated, not validated | Moderate (with caveat) |
+| Test-retest reliability | [H2.3](#H2.3) | Gap | Unknown |
+| Creativity-game transfer | [H8.1](#H8.1) | Domain extrapolation | Moderate (domain-limited) |
+
+**Joint interpretation:** Until these are independently validated, INS-001 confidence should be interpreted as **Low** despite moderate ratings on component claims.
+
+---
+
+## Version History
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 0.4 | 2026-01-18 | Consistency update with revised library articles; integrated MTH-002.1 empirical findings; added Joint Confidence section |
+| 0.3 | 2026-01-18 | Updated based on LIB-001, LIB-002, LIB-008 synthesis |
+| 0.2 | 2026-01-15 | Added H1.7, H1.8, H2.6 per INS-001 gap analysis |
+| 0.1 | 2026-01-15 | Initial hypothesis specification |

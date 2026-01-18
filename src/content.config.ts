@@ -111,11 +111,23 @@ const instruments = defineCollection({
   }),
 });
 
-export const collections = { 
-  dispatches, 
-  library, 
+// Governance documents (GOV-NNN) - Foundational governance and research documents
+const governance = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.mdx', base: './content/governance' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    version: z.string().optional(),
+    lastUpdated: z.string().optional(),
+  }),
+});
+
+export const collections = {
+  dispatches,
+  library,
   methodFamilies,
   methodStudies,
-  instruments 
+  instruments,
+  governance,
 };
 

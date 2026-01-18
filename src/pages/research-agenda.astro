@@ -1,0 +1,102 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProseLayout from '../layouts/ProseLayout.astro';
+
+// Get the research agenda from the governance collection
+const governanceEntries = await getCollection('governance');
+const entry = governanceEntries.find(e => e.id === 'research-agenda');
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+const { Content } = await render(entry);
+---
+
+<ProseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  id="GOV-004"
+  version={entry.data.version}
+  date={entry.data.lastUpdated ? new Date(entry.data.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined}
+  status="Living"
+  type="Research"
+>
+  <Content />
+</ProseLayout>
+
+<style>
+  /* Table styles for research agenda */
+  :global(.prose-content .table-wrapper) {
+    overflow-x: auto;
+    margin: var(--space-md) 0;
+  }
+
+  :global(.prose-content table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+  }
+
+  :global(.prose-content th),
+  :global(.prose-content td) {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--faded-light);
+  }
+
+  :global(.prose-content th) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--faded);
+    background: var(--paper);
+  }
+
+  :global(.prose-content td) {
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  :global(.prose-content tr:last-child td) {
+    border-bottom: none;
+  }
+
+  /* Section styling for hypothesis blocks */
+  :global(.prose-content section) {
+    margin: var(--space-lg) 0;
+    padding: var(--space-md) 0;
+    border-top: 1px solid var(--faded-light);
+  }
+
+  :global(.prose-content section:first-of-type) {
+    border-top: none;
+  }
+
+  /* Status indicator styling */
+  :global(.prose-content strong) {
+    font-weight: 600;
+  }
+
+  /* Scroll margin for anchor links */
+  :global(.prose-content section[id]) {
+    scroll-margin-top: 5rem;
+  }
+
+  :global(.prose-content h2),
+  :global(.prose-content h3) {
+    scroll-margin-top: 5rem;
+  }
+
+  /* Code/mono styling for notation */
+  :global(.prose-content code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--warm-white);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+</style>
