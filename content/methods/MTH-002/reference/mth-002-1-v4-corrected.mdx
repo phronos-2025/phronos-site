@@ -541,15 +541,147 @@ Participants receive an anchor-target word pair and generate clues that connect 
 Fidelity measures how well clues collectively identify the anchor-target pair by eliminating plausible alternatives.
 
 **Intuition**: Good bridging clues should:
-- **Coverage**: Eliminate most alternative endpoints
-- **Efficiency**: Be non-redundant (different clues eliminate different alternatives)
+- **Coverage**: Eliminate most alternative endpoints (each clue rules out some wrong answers)
+- **Efficiency**: Be non-redundant (different clues eliminate different wrong answers)
 
-**Algorithm**:
-1. Generate 50 "foil" words for each endpoint (nearest neighbors)
-2. For each clue, determine which foils it eliminates (clue more similar to true endpoint than foil)
-3. Coverage = fraction of foils eliminated by at least one clue
-4. Efficiency = 1 - (intersection / union) of elimination sets
-5. Fidelity = Coverage × Efficiency
+Bad clues either:
+- Eliminate nothing (uninformative—too far from endpoints)
+- All eliminate the same foils (redundant—no complementary information)
+
+#### 6.2.1 Mathematical Formulation
+
+Let $\mathbf{a}$ be the anchor embedding, $\mathbf{t}$ the target embedding, and $\{\mathbf{c}_1, ..., \mathbf{c}_n\}$ the clue embeddings.
+
+**Foil sets**: For each endpoint, generate the 50 nearest neighbors in embedding space:
+- $F_a = \{f_1^a, ..., f_{50}^a\}$ — foils for anchor
+- $F_t = \{f_1^t, ..., f_{50}^t\}$ — foils for target
+
+**Elimination**: A clue $\mathbf{c}_i$ eliminates foil $f_j$ if the clue is more similar to the true endpoint than to the foil:
+
+$$
+\text{eliminates}(\mathbf{c}_i, f_j^a) = \mathbb{1}\left[\cos(\mathbf{c}_i, \mathbf{a}) > \cos(\mathbf{c}_i, f_j^a)\right]
+$$
+
+**Elimination sets**: For each clue, compute the set of foils it eliminates:
+
+$$
+E_i^a = \{j : \text{eliminates}(\mathbf{c}_i, f_j^a)\}
+$$
+
+**Coverage**: Fraction of foils eliminated by at least one clue:
+
+$$
+\text{coverage}_a = \frac{|\bigcup_{i=1}^{n} E_i^a|}{|F_a|}
+$$
+
+**Efficiency**: Non-redundancy of elimination (1 minus the Jaccard-like redundancy):
+
+$$
+\text{efficiency}_a = 1 - \frac{|\bigcap_{i=1}^{n} E_i^a|}{|\bigcup_{i=1}^{n} E_i^a|}
+$$
+
+**Combined fidelity**:
+
+$$
+\text{fidelity} = \frac{\text{coverage}_a + \text{coverage}_t}{2} \times \frac{\text{efficiency}_a + \text{efficiency}_t}{2}
+$$
+
+#### 6.2.2 Algorithm Implementation
+
+```python
+def calculate_fidelity(
+    clue_embeddings: list[list[float]],
+    anchor_embedding: list[float],
+    target_embedding: list[float],
+    foil_anchors: list[list[float]],  # 50 nearest neighbors of anchor
+    foil_targets: list[list[float]],  # 50 nearest neighbors of target
+) -> dict:
+    """
+    Measure how well clues jointly constrain the solution space.
+    
+    A foil is "eliminated" by a clue if that clue is more similar to the
+    true endpoint than to the foil.
+    """
+    
+    def get_eliminations(clue_emb, true_emb, foil_embs):
+        """Return set of foil indices eliminated by this clue."""
+        true_sim = cosine_similarity(clue_emb, true_emb)
+        eliminated = set()
+        for i, foil in enumerate(foil_embs):
+            foil_sim = cosine_similarity(clue_emb, foil)
+            if true_sim > foil_sim:
+                eliminated.add(i)
+        return eliminated
+    
+    # Compute eliminations for each clue
+    anchor_elims = [get_eliminations(c, anchor_embedding, foil_anchors) 
+                    for c in clue_embeddings]
+    target_elims = [get_eliminations(c, target_embedding, foil_targets) 
+                    for c in clue_embeddings]
+    
+    # Coverage: fraction of foils eliminated by at least one clue
+    anchor_union = set.union(*anchor_elims) if anchor_elims else set()
+    target_union = set.union(*target_elims) if target_elims else set()
+    anchor_coverage = len(anchor_union) / len(foil_anchors)
+    target_coverage = len(target_union) / len(foil_targets)
+    
+    # Efficiency: 1 - (intersection / union)
+    def compute_efficiency(elim_sets):
+        if len(elim_sets) < 2:
+            return 1.0
+        union = set.union(*elim_sets)
+        if not union:
+            return 0.0
+        intersection = set.intersection(*elim_sets)
+        redundancy = len(intersection) / len(union)
+        return 1 - redundancy
+    
+    anchor_efficiency = compute_efficiency(anchor_elims)
+    target_efficiency = compute_efficiency(target_elims)
+    
+    # Combined metrics
+    overall_coverage = (anchor_coverage + target_coverage) / 2
+    overall_efficiency = (anchor_efficiency + target_efficiency) / 2
+    fidelity = overall_coverage * overall_efficiency
+    
+    return {
+        "fidelity": fidelity,
+        "coverage": overall_coverage,
+        "efficiency": overall_efficiency
+    }
+```
+
+#### 6.2.3 Foil Generation
+
+Foils are the 50 nearest neighbors of each endpoint in embedding space:
+
+```python
+def generate_endpoint_foils(
+    endpoint_embedding: list[float],
+    vocabulary_embeddings: dict[str, list[float]],
+    n_foils: int = 50
+) -> list[list[float]]:
+    """
+    Generate hard-to-distinguish foils using nearest neighbors.
+    """
+    vocab_embs = list(vocabulary_embeddings.values())
+    similarities = [cosine_similarity(endpoint_embedding, v) for v in vocab_embs]
+    sorted_indices = np.argsort(similarities)[::-1]
+    # Skip index 0 (might be the word itself)
+    foil_indices = sorted_indices[1:n_foils+1]
+    return [vocab_embs[i] for i in foil_indices]
+```
+
+**Why nearest neighbors?** These are the hardest foils to distinguish—words semantically similar to the true endpoint. If clues can eliminate these, they carry strong signal about the true pair.
+
+#### 6.2.4 Component Interpretation
+
+| Component | Meaning | Low Value | High Value |
+|-----------|---------|-----------|------------|
+| Coverage | Fraction of foils eliminated | Clues too distant from endpoints | Clues in right neighborhood |
+| Efficiency | Non-redundancy of elimination | All clues eliminate same foils | Complementary information |
+
+Both components contribute to fidelity. A score can be high-coverage but low-efficiency (redundant conventional clues) or low-coverage but high-efficiency (sparse but complementary).
 
 ### 6.3 Why Fidelity Replaced Relevance
 
