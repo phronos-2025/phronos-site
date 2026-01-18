@@ -382,19 +382,19 @@ def calculate_unconventionality(
 ) -> dict:
     """
     Compare user associations against the predictable neighborhood.
-
+    
     The noise floor contains the N most common/predictable associations
     for the seed word (e.g., nearest neighbors in embedding space,
     or empirically frequent human responses).
     """
-
+    
     def is_match(user_word: str, floor_word: str) -> bool:
         """Check exact match or morphological variants."""
         # Normalize: lowercase, stem
         user_stem = stem(user_word.lower())
         floor_stem = stem(floor_word.lower())
         return user_stem == floor_stem
-
+    
     # Count overlaps with noise floor
     overlaps = []
     for user_word in user_associations:
@@ -402,9 +402,9 @@ def calculate_unconventionality(
             if is_match(user_word, floor_word):
                 overlaps.append(user_word)
                 break
-
+    
     overlap_count = len(overlaps)
-
+    
     # Classify unconventionality
     if overlap_count == 0:
         level = "high"
@@ -415,7 +415,7 @@ def calculate_unconventionality(
     else:
         level = "low"
         description = f"{overlap_count} of your associations appeared in the predictable neighborhood."
-
+    
     return {
         "level": level,
         "overlap_count": overlap_count,
