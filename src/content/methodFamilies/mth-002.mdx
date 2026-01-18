@@ -6,17 +6,17 @@ type: family
 
 # === CONTENT ===
 title: "Semantic Association Metrics"
-subtitle: "Measurement framework for semantic divergence and relevance"
+subtitle: "Measurement framework for semantic spread and fidelity"
 abstract: |
   A methodology for measuring semantic properties of word associations using
   embedding-based metrics. Implements the Divergent Association Task (DAT)
-  framework for divergence scoring and cosine similarity for relevance assessment.
+  framework for spread scoring and a novel fidelity metric for task validity.
   Provides the scoring foundation for the INS-001 Semantic Cartography instrument
   family, enabling measurement of how participants navigate conceptual space.
 
 # === METADATA ===
-date: 2026-01-15
-version: "1.0"
+date: 2026-01-18
+version: "2.0"
 status: published
 
 # === RELATIONSHIPS ===
@@ -29,11 +29,12 @@ studies:
   - MTH-002.4
 
 # === SEO ===
-description: "Measurement framework for semantic divergence and relevance using embedding-based metrics. Foundation for INS-001 Semantic Cartography instruments."
+description: "Measurement framework for semantic spread and fidelity using embedding-based metrics. Foundation for INS-001 Semantic Cartography instruments."
 keywords:
   - semantic association
   - divergent thinking
-  - cosine similarity
+  - spread
+  - fidelity
   - word embeddings
   - DAT
   - creativity measurement
@@ -49,8 +50,8 @@ This methodology operationalizes four constructs from the [INS-001 Semantic Cart
 
 | Construct | Definition | Operationalization |
 |-----------|------------|-------------------|
-| **Divergence** | How much conceptual territory responses cover | Mean pairwise semantic distance (DAT methodology) |
-| **Relevance** | How connected responses are to the prompt | Mean cosine similarity to target concept(s) |
+| **Spread** | How much conceptual territory responses cover | Mean pairwise semantic distance (DAT methodology) |
+| **Fidelity** | How well clues jointly identify the bridging task | Coverage × efficiency of foil elimination |
 | **Communicability** | Whether meaning survives transmission to another agent | Reconstruction accuracy by partner or LLM |
 | **Surprisal** | How unexpected a semantic transition is | Negative log-probability against reference network |
 
@@ -68,24 +69,25 @@ For caveats regarding embedding validity and cultural bias, see [LIB-002: Digita
 
 ## Metric Architecture
 
-Both INS-001.1 (Radiation) and INS-001.2 (Union) use exactly **two primary metrics**:
+Both INS-001.1 (Signal) and INS-001.2 (Common Ground) use exactly **two primary metrics**:
 
-1. **Relevance** — Are the clues semantically connected to the prompt?
-2. **Divergence** — How spread out are the clues from each other?
+1. **Spread** — How much semantic territory do the clues cover?
+2. **Fidelity** — How well do clues jointly identify the bridging task?
 
-These metrics are orthogonal:
+These metrics are orthogonal (r = 0.055):
 
-| Pattern | Relevance | Divergence | Interpretation |
-|---------|-----------|------------|----------------|
-| Creative but valid | High | High | Wide-ranging associations that stay connected |
-| Predictable | High | Low | Conventional, clustered responses |
-| Noise | Low | (any) | Divergence becomes meaningless |
+| Pattern | Spread | Fidelity | Interpretation |
+|---------|--------|----------|----------------|
+| Creative & precise | High | High | Wide-ranging associations that triangulate the target |
+| Divergent but off-task | High | Low | Scattered responses that don't constrain the solution |
+| Conventional but effective | Low | High | Clustered but accurate identification |
+| Constrained & off-task | Low | Low | Limited exploration, poor task engagement |
 
 ## Studies in This Family
 
 | Study | Title | Focus | Status |
 |-------|-------|-------|--------|
-| MTH-002.1 | Relevance and Divergence Scoring | Core scoring algorithms and thresholds | Published |
+| MTH-002.1 | Spread and Fidelity Scoring | Core scoring algorithms and thresholds | Published |
 | MTH-002.2 | Communicability Metrics | Reconstruction accuracy measurement | Calibrating |
 | MTH-002.3 | Surprisal Scoring | Transition probability against reference networks | Calibrating |
 | MTH-002.4 | Population Normalization | Bootstrap null distributions and percentile ranking | Calibrating |
@@ -109,4 +111,5 @@ The scoring algorithms are implemented in:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.0 | 2026-01-18 | Updated terminology: "relevance" → "fidelity", "divergence" → "spread"; updated metric architecture to reflect orthogonal metrics |
 | 1.0 | 2026-01-15 | Initial publication |
