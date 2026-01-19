@@ -32,21 +32,20 @@ family:
       - "Abramski et al. (2025). LLM World of Words free association norms."
   
   core_constructs:
-    - name: "Divergence"
-      definition: "How much conceptual territory your responses cover."
-      operationalization: "Mean pairwise semantic distance (DAT methodology)."
-    
-    - name: "Relevance"
-      definition: "How connected your responses are to the prompt."
-      operationalization: "Mean cosine similarity to target concept(s)."
-    
-    - name: "Communicability"
-      definition: "Whether meaning survives transmission to another agent."
-      operationalization: "Reconstruction accuracy by partner or LLM."
-    
-    - name: "Surprisal"
-      definition: "How unexpected a semantic transition is."
+    - name: "Spread"
+      definition: "How far your associations venture from each other."
+      operationalization: "Mean pairwise semantic distance (DAT methodology), scaled 0-100."
+      interpretation: "High spread is correlated with divergent, creative thinking."
+
+    - name: "Unconventionality"
+      definition: "How unexpected your associations are relative to lexical norms."
       operationalization: "Negative log-probability against reference network (SWOW/LWOW)."
+      interpretation: "Measures whether associations appeared in the predictable neighborhood."
+
+    - name: "Communicability"
+      definition: "How accurately others can decode your associations."
+      operationalization: "Reconstruction accuracy by partner or LLM."
+      interpretation: "High communicability indicates effective transmission of meaning."
 
 # =============================================================================
 # INSTRUMENTS
@@ -59,24 +58,24 @@ instruments:
     code: "001.1"
     name: "Signal"
     headline: "Map a signal."
-    
+
     task:
       short: "Describe a concept divergently—can it still be reconstructed?"
       expanded: "Given a seed concept, provide clues that are semantically diverse yet sufficient for reconstruction. Measures the tension between divergence and communicability."
-    
+
     what_it_measures:
-      - "Divergence: spread of your clues from each other"
-      - "Relevance: connection of clues to the seed"
+      - "Spread: how far your associations venture from each other"
+      - "Unconventionality: how unexpected your associations are relative to lexical norms"
       - "Communicability: whether LLM or human partner can reconstruct the seed"
-    
+
     vocabulary:
       prompt_word: "seed"
-      user_input: "clues"
+      user_input: "associations"
       success_event: "reconstruction"
-    
+
     ui_copy:
       instruction: "Name concepts that describe the seed—as many directions as you can."
-      completion: "See what emerges."
+      completion: "Spread. Unconventionality. Communicability."
       no_correct_answers: "There are no correct answers—only your signal."
 
   INS-001.2:
@@ -229,22 +228,22 @@ glossary:
 
   # Technical terms (methods documentation)
   technical:
-    divergence:
-      plain: "How spread out your clues are from each other."
+    spread:
+      plain: "How far your associations venture from each other."
       technical: "Mean pairwise cosine distance across all words, scaled 0-100 (DAT convention)."
-    
-    relevance:
-      plain: "How connected your clues are to the prompt."
-      technical: "Mean cosine similarity to prompt embedding(s)."
-    
-    surprisal:
-      plain: "How unexpected a word association is."
-      technical: "Negative log-probability of transition under reference network."
-    
+
+    unconventionality:
+      plain: "How unexpected your associations are relative to lexical norms."
+      technical: "Negative log-probability of transition under reference network (SWOW/LWOW)."
+
+    communicability:
+      plain: "How accurately others can decode your associations."
+      technical: "Reconstruction accuracy by partner or LLM."
+
     percolation:
       plain: "Removing links from a network to test its resilience."
       technical: "Sequential edge removal measuring giant component survival."
-    
+
     alignment:
       plain: "How much your associations overlap with another's."
       technical: "Jaccard similarity or embedding-space overlap between response sets."
@@ -258,7 +257,7 @@ messaging:
 
   principles:
     - "The instrument reveals. Interpretation belongs to the participant."
-    - "Divergence is not creativity. Relevance is not correctness."
+    - "Spread is not creativity. Unconventionality is not correctness."
     - "High scores are not better. They are different."
     - "We measure deviation from norms, not deviation from truth."
   
@@ -266,9 +265,10 @@ messaging:
     results_page:
       - "These results indicate deviation from population norms—not better or worse, but different."
       - "Reference norms reflect predominantly English-speaking, internet-using populations."
-    
+      - "Scale calibrating as we gather participant data."
+
     methodology_page:
-      - "Surprisal measures typicality against a reference network, not inherent creativity or value."
+      - "Unconventionality measures typicality against a reference network, not inherent creativity or value."
   
   forbidden_phrases:
     value_judgments:
@@ -296,11 +296,11 @@ messaging:
   
   preferred_phrasing:
     instead_of: "Your creativity score"
-    use: "Your divergence relative to population norms"
-    
+    use: "Your spread relative to population norms"
+
     instead_of: "More creative associations"
-    use: "Higher surprisal associations"
-    
+    use: "Higher unconventionality associations"
+
     instead_of: "Correct answer"
     use: "Successful reconstruction" # for 001.3
 
@@ -323,9 +323,9 @@ ui_patterns:
     time_estimate: "~{n} minutes"
   
   results_headers:
-    divergence: "Divergence"
-    relevance: "Relevance"
-    reconstruction: "Reconstruction"
+    spread: "Spread"
+    unconventionality: "Unconventionality"
+    communicability: "Communicability"
     alignment: "Alignment"
   
   empty_states:
@@ -345,46 +345,38 @@ ui_patterns:
 
 metric_display:
 
-  divergence:
+  spread:
     scale: "0-100"
-    display_format: "numeric"
+    display_format: "numeric with slider"
     interpretation_bands:
       - range: [0, 50]
-        label: "Clustered"
-        description: "Your clues occupy nearby semantic territory."
+        label: "Low"
+        description: "Your associations clustered in a narrow semantic region. This pattern indicates focused, convergent thinking."
       - range: [50, 70]
-        label: "Moderate spread"
-        description: "Your clues cover moderate semantic distance."
-      - range: [70, 90]
-        label: "Wide spread"
-        description: "Your clues span distant regions of semantic space."
-      - range: [90, 100]
-        label: "Highly dispersed"
-        description: "Your clues are maximally distant from each other."
-  
-  relevance:
-    scale: "0-1"
-    display_format: "numeric or bar"
+        label: "Medium"
+        description: "Your associations cover moderate semantic distance."
+      - range: [70, 100]
+        label: "High"
+        description: "Your associations span distant regions of semantic space. High spread is correlated with divergent, creative thinking."
+
+  unconventionality:
+    scale: "categorical"
+    display_format: "label"
     interpretation_bands:
-      - range: [0, 0.15]
-        label: "Weak connection"
-        description: "Clues have limited semantic connection to prompt."
-      - range: [0.15, 0.30]
-        label: "Tangential"
-        description: "Clues are loosely connected to prompt."
-      - range: [0.30, 0.45]
-        label: "Connected"
-        description: "Clues are meaningfully connected to prompt."
-      - range: [0.45, 1.0]
-        label: "Core neighborhood"
-        description: "Clues are strongly connected to prompt."
-  
-  reconstruction:
+      - label: "Low"
+        description: "Most of your associations appeared in the predictable neighborhood."
+      - label: "Moderate"
+        description: "Some of your associations appeared in the predictable neighborhood. A mix of conventional and unexpected associations."
+      - label: "High"
+        description: "Your associations ventured outside the predictable neighborhood."
+
+  communicability:
     scale: "binary or ranked"
-    display_format: "success/failure or rank position"
+    display_format: "success/failure with alternatives"
     interpretation:
-      success: "The signal was reconstructed."
-      failure: "The signal was lost."
+      success: "The AI successfully reconstructed the seed from your associations."
+      failure: "The AI could not reconstruct the seed from your associations."
+    notes: "Also shows what the AI considered as alternatives."
 
 # =============================================================================
 # CROSS-REFERENCES

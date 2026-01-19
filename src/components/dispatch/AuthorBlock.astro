@@ -4,7 +4,7 @@ interface Props {
   credentials?: string;
 }
 
-const { name, credentials = 'MD · PhD (Genetics)' } = Astro.props;
+const { name, credentials = 'MD · PhD' } = Astro.props;
 
 // Generate initials from name
 const initials = name
