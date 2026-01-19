@@ -1,5 +1,6 @@
 ---
 id: DSP-003
+slug: semantic-cartography
 title: "Semantic Cartography"
 subtitle: "Challenging our Semantic Associations Through Games with AI"
 date: 2026-01-19
@@ -15,10 +16,27 @@ topics:
   - Creativity
 references:
   methods:
-    - MTH-002
+    - MTH-002.1
   library: []
   instruments:
     - INS-001
+sections:
+  - anchor: i-the-information-cognition-loop
+    title: "I. Information-Cognition Loop"
+  - anchor: ii-the-atomic-unit-of-thought
+    title: "II. Atomic Unit of Thought"
+  - anchor: iii-the-core-construct-semantic-divergence-and-fidelity-under-constraint
+    title: "III. Core Construct"
+  - anchor: iv-two-instruments-two-constraint-types
+    title: "IV. Two Instruments"
+  - anchor: v-towards-cognitive-fitness
+    title: "V. Cognitive Fitness"
+  - anchor: vi-a-double-edged-sword
+    title: "VI. Double-Edged Sword"
+  - anchor: vii-invitation
+    title: "VII. Invitation"
+  - anchor: references
+    title: "References"
 ---
 
 ## I. The Information-Cognition Loop
@@ -120,7 +138,7 @@ In addition, INS-001.1 (Signal) measures the "unconventionality" and "communicab
 
 As we are still collecting human data, Claude Haiku 4.5 served as the calibration reference. Its performance was as follows:
 
-<Table caption="Table 1: Claude Haiku 4.5 Calibration Baselines">
+<Table tableNumber="TABLE 1" caption="Claude Haiku 4.5 Calibration Baselines" footer="Note: The ~10-point gap between human Divergence Association Task (average between 75-80) and our 'spread' metric reflects how the task constraints imposed a bound on divergent thinking. This gap was found consistently across Haiku temperatures and task difficulty.">
 
 | Metric | INS-001.1 | INS-001.2 |
 |--------|-----------|-----------|
@@ -129,15 +147,13 @@ As we are still collecting human data, Claude Haiku 4.5 served as the calibratio
 
 </Table>
 
-<Caption>Note: The ~10-point gap between human Divergence Association Task (average between 75-80) and our "spread" metric reflects how the task constraints imposed a bound on divergent thinking. This gap was found consistently across Haiku temperatures and task difficulty.</Caption>
-
 We used Haiku's performance to scale the spread on INS-001.1, such that the visualization spans the range 20-80 of the raw score.
 
 #### Alternative Measures
 
 While spread has empirical precedent in the literature, a measure of relevance was less straightforward. A measure of relevance would be orthogonal to spread, assessing whether a participant's submitted concepts are on task - neither gibberish, nor random words - and how well balanced their concepts are to both the target and anchor. We explored 4 metrics: A-T distance (Relevance), Discriminative Relevance, Joint Constraint (Fidelity), and Balance. Details are in the Appendix of MTH-002.1.
 
-<Table caption="Table 2: Comparison of Alternative Relevance Measures">
+<Table tableNumber="TABLE 2" caption="Comparison of Alternative Relevance Measures">
 
 | Algorithm | Core Question | Key Formula | Requires Foils? | Output Range |
 |-----------|---------------|-------------|-----------------|--------------|
@@ -148,7 +164,7 @@ While spread has empirical precedent in the literature, a measure of relevance w
 
 </Table>
 
-<Table caption="Table 3: What Each Metric Captures">
+<Table tableNumber="TABLE 3" caption="What Each Metric Captures">
 
 | Algorithm | Measures | Ignores |
 |-----------|----------|---------|
