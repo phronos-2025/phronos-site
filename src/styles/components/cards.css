@@ -110,7 +110,8 @@
 }
 
 .status-dot.researching,
-.status-dot.calibrating {
+.status-dot.calibrating,
+.status-dot.editing {
   background: var(--gold);
   animation: pulse 3s infinite;
 }
