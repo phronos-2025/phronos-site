@@ -5,11 +5,12 @@ interface Props {
   description: string;
   status: 'published' | 'live' | 'researching' | 'calibrating' | 'planned' | 'editing';
   version?: string;
+  footer?: string;
   href?: string;
   mode?: 'light' | 'dark';
 }
 
-const { id, title, description, status, version, href, mode = 'light' } = Astro.props;
+const { id, title, description, status, version, footer, href, mode = 'light' } = Astro.props;
 const isClickable = status === 'published' || status === 'live';
 const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 const Tag = isClickable && href ? 'a' : 'div';
@@ -33,7 +34,7 @@ const Tag = isClickable && href ? 'a' : 'div';
   </div>
   <h3 class="card-title">{title}</h3>
   <p class="card-body">{description}</p>
-  <div class="card-footer">{version || '—'}</div>
+  <div class="card-footer">{footer || version || '—'}</div>
 </Tag>
 
 <style>
