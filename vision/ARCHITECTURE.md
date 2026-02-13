@@ -1,10 +1,10 @@
 # Phronos Site Architecture
 
-**Version:** 1.4.0  
-**Date:** 2026-01-05  
-**Status:** Ready for implementation  
-**Alignment:** BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0, DISPATCH-PAGE.md v1.1.0, METHODS-SCHEMA.md v2.0.0  
-**Changes:** Hierarchical methods architecture (families + studies), semantic URLs, updated content schemas
+**Version:** 1.5.0
+**Date:** 2026-01-24
+**Status:** Production
+**Alignment:** BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0, DISPATCH-PAGE.md v1.1.0, METHODS-SCHEMA.md v2.0.0
+**Changes:** Multi-repo architecture documentation, Astro 5.x upgrade, instruments architecture, updated schemas
 
 ---
 
@@ -20,15 +20,86 @@ Phronos.org is a static-first website designed as a digital observatory. It prio
 
 ---
 
-## Tech Stack (Recommended)
+## Multi-Repository Architecture
 
-### Astro
+Phronos is deployed as three separate repositories, each with its own build and deployment:
+
+| Repository | Domain | Purpose | Tech Stack |
+|------------|--------|---------|------------|
+| **phronos-site** | `phronos.org` | Main site, dispatches, methods, static pages | Astro 5.x |
+| **phronos-library** | `phronos.org/library` | Research synthesis articles (LIB-NNN) | Astro 5.x |
+| **phronos-instruments** | `instruments.phronos.org` | Interactive cognitive assessments | Astro 5.x + React 19 + FastAPI |
+
+### Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         phronos.org (Vercel)                        │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  phronos-site                                                │   │
+│  │  /, /dispatches, /methods, /about, /constitution, etc.      │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                              │                                      │
+│                    Vercel Rewrite (/library/*)                     │
+│                              ↓                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  phronos-library (separate Vercel deployment)                │   │
+│  │  /library, /library/[slug]                                   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                  instruments.phronos.org                            │
+│  ┌──────────────────────┐    ┌──────────────────────────────────┐  │
+│  │  Frontend (Vercel)   │ ←→ │  Backend (Railway)               │  │
+│  │  Astro + React       │    │  FastAPI + Supabase + OpenAI     │  │
+│  └──────────────────────┘    └──────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Vercel Configuration (phronos-site)
+
+The main site proxies library requests to the separate deployment:
+
+```json
+{
+  "rewrites": [
+    { "source": "/library", "destination": "https://phronos-library.vercel.app/library" },
+    { "source": "/library/:path*", "destination": "https://phronos-library.vercel.app/library/:path*" }
+  ]
+}
+```
+
+### Shared Resources
+
+Design tokens are **duplicated** across repositories (not shared as a package). When updating tokens, changes must be synchronized manually across:
+- `phronos-site/src/styles/tokens.css`
+- `phronos-library/src/styles/tokens.css`
+- `phronos-instruments/shared/design-system/tokens.css`
+
+---
+
+## Tech Stack
+
+### Astro (phronos-site, phronos-library)
 ```text
-Framework:     Astro 4.x
+Framework:     Astro 5.x
 Styling:       CSS Custom Properties (no Tailwind, per Brutalist specs)
 Content:       Markdown/MDX (for Dispatches, Methods, Library)
-Interactivity: React (for Instrument tools only)
-Deployment:    Vercel or Cloudflare Pages
+Integrations:  @astrojs/mdx, @astrojs/sitemap, rehype-katex, remark-math
+Analytics:     @vercel/analytics
+Deployment:    Vercel
+```
+
+### Instruments Stack (phronos-instruments)
+```text
+Frontend:      Astro 5.x + React 19
+Backend:       FastAPI (Python) on Railway
+Database:      Supabase PostgreSQL with pgvector
+Auth:          Supabase Auth (anonymous + magic link)
+Embeddings:    OpenAI text-embedding-3-small
+LLM:           Claude Haiku 4.5
+Deployment:    Vercel (frontend) + Railway (backend)
 ```
 
 ### Fonts
@@ -128,8 +199,8 @@ All design tokens should be defined in a central CSS file (`/styles/tokens.css`)
   --grid-major: rgba(26, 26, 26, 0.1);
 
   /* === TYPOGRAPHY === */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Lora', Georgia, serif;  /* For dispatch body text */
+  --font-display: 'Cormorant Garamond', Georgia, serif;  /* Headers, titles */
+  --font-body: 'Lora', Georgia, serif;  /* Dispatch body text */
   --font-mono: 'Fira Code', Consolas, Monaco, monospace;
 
   /* === SCALE === */
@@ -205,16 +276,26 @@ phronos.org/
 ├── /                                    # Homepage (Field Journal style)
 ├── /dispatches/                         # Dispatch listing (card grid)
 │   └── /dispatches/[slug]               # Individual dispatch (DSP-###)
-├── /library/                            # The Evidence Base (card grid)
+├── /library/                            # The Evidence Base (proxied to phronos-library)
 │   └── /library/[slug]                  # Individual synthesis (LIB-###)
 ├── /methods/                            # Methods listing (grouped by family)
 │   ├── /methods/[family-slug]/          # Method family overview (MTH-###)
 │   └── /methods/[family-slug]/[study-slug]/  # Individual study (MTH-###.N)
-├── /instruments/                        # Active Research Tools (Dark Mode)
-│   └── /instruments/[slug]              # Individual instrument (INS-###)
 ├── /about                               # Founder bio, observatory philosophy
 ├── /constitution                        # The seven axioms
-└── /soul                                # Founder's statement
+├── /soul                                # Founder's statement
+├── /research-agenda                     # Research agenda
+├── /privacy                             # Privacy policy
+├── /terms                               # Terms of service
+└── /unsubscribe                         # Newsletter unsubscribe
+
+instruments.phronos.org/
+├── /                                    # Instrument selector
+├── /ins-001/                            # INS-001 family
+│   ├── /ins-001/ins-001-1/              # Signal variant
+│   └── /ins-001/ins-001-2/              # Common Ground variant
+├── /auth/                               # Authentication flows
+└── /profile/                            # User profile page
 ```
 
 **Example Methods URLs:**
@@ -367,22 +448,25 @@ references:
 ### 5. Library Entry (`/library/[slug]`)
 **Mode:** Light (Academic Register)
 **Purpose:** Deep syntheses of peer-reviewed literature
+**Note:** Library is deployed as a separate Astro site (phronos-library repo) and proxied via Vercel rewrites. Architecture details are maintained in that repository and may evolve independently.
 
 **Layout:**
-- Left Rail (Sticky): Dynamic Table of Contents (TOC)
-- Main Column: Dense typographic layout (serif)
-- Right Rail (Desktop): Sidenotes/Citations (Tufte-style) to avoid footer jumping
-- Footer: "Connected Nodes" — Graph view showing which Methods or Dispatches cite this entry
+- Header: Article title, central research question, confidence badge
+- Metadata bar: ID, status, source count, last updated
+- Main Column: MDX content with synthesis sections
+- Footer: Links back to library index
 
 **Frontmatter:**
 ```yaml
 ---
 id: LIB-001
-title: "Cognitive Effects of LLM Interaction"
-date: 2025-12-20
-status: researching  # published | researching | planned | archived
-abstract: "A synthesis of peer-reviewed literature..."
-version: "0.1"
+articleSlug: linguistic-markers
+title: "Linguistic Markers"
+question: "What linguistic features reliably indicate cognitive traits?"
+status: published  # drafting | editing | published | archived
+confidence: moderate  # low | moderate | high | mixed
+sources: 12
+updated: "2026-01-20"
 ---
 ```
 
@@ -455,40 +539,60 @@ Status: Researching · v0.1
 
 **Frontmatter:** See METHODS-SCHEMA.md Section 2.2
 
-### 9. Instrument Listing (`/instruments/`)
+### 9. Instruments (instruments.phronos.org)
 **Mode:** Dark
+**Note:** Instruments are deployed as a separate fullstack application (phronos-instruments repo) at `instruments.phronos.org`. This section documents the integration points; full architecture is maintained in that repository.
 
-**Layout:**
-- Page header with section title
-- Card grid of all instruments
-- Cards use unified Card component (dark variant)
+#### Architecture Overview
 
-### 10. Instrument Page (`/instruments/[slug]`)
-**Mode:** Dark
+The instruments platform is a fullstack application:
 
-**Layout:**
-- Status indicator: Pulsing dot (Calibrating vs Live)
-- Title + description
-- Interface: Interactive React component
-- Time estimate
-- Requirements (Guild membership, etc.)
-- CTA (Begin assessment / Join Guild)
-- Related method
+| Layer | Technology | Deployment |
+|-------|------------|------------|
+| Frontend | Astro 5.x + React 19 | Vercel |
+| Backend | FastAPI (Python) | Railway |
+| Database | Supabase PostgreSQL + pgvector | Supabase |
+| Auth | Supabase Auth | Supabase |
+| AI Services | OpenAI (embeddings), Claude (LLM guesser) | API |
 
-**Frontmatter:**
+#### Current Instruments
+
+**INS-001: Semantic Cartography**
+A family of assessments measuring semantic creativity and communicability:
+
+| Variant | Name | Purpose | Duration |
+|---------|------|---------|----------|
+| INS-001.1 | Signal | Measures divergent thinking via clue generation | ~5 min |
+| INS-001.2 | Common Ground | Measures semantic bridging between concepts | ~5 min |
+
+**Scoring Metrics:**
+- **Divergence** (INS-001.1): How far clues venture from predictable associations
+- **Convergence** (INS-001.1): How accurately guesses reconstruct the seed
+- **Fidelity** (INS-001.2): How well clues jointly identify anchor-target pairs
+- **Spread** (INS-001.2): How distributed clues are across semantic space
+
+**Player Modes:**
+- Network (friends via share link)
+- Stranger (matched with other users)
+- LLM (Claude Haiku as guesser)
+
+#### Integration with Main Site
+
+The homepage instruments section links out to `instruments.phronos.org`. Card data is maintained in the main site's instruments content collection for display purposes:
+
 ```yaml
 ---
 id: INS-001
 title: "Semantic Cartography"
 description: "Instruments for mapping how you navigate conceptual space."
-status: calibrating  # live | calibrating | planned | archived
+status: live  # live | calibrating | planned | archived
 order: 1
 related_method: MTH-001
-version: "0.1"
+version: "0.3"
 ---
 ```
 
-### 11. Constitution (`/constitution`)
+### 10. Constitution (`/constitution`)
 **Mode:** Light
 
 **Layout:**
@@ -500,7 +604,7 @@ version: "0.1"
 - Footer note about living document
 - Backronym
 
-### 12. Soul (`/soul`)
+### 11. Soul (`/soul`)
 **Mode:** Light
 
 **Layout:**
@@ -508,7 +612,7 @@ version: "0.1"
 - Founder byline
 - Backronym
 
-### 13. About (`/about`)
+### 12. About (`/about`)
 **Mode:** Light
 
 **Layout:**
@@ -616,11 +720,13 @@ Then in Substack (Settings → Publication details → Custom domain), enter `di
 |-----------|-------------|------|
 | `Nav` | Sticky navigation with animated ouroboros logo | Light |
 | `Footer` | Centered layout with tagline, links, copyright | Both |
+| `Logo` | PhronosLens canvas animation (ouroboros) | Both |
 | `SectionHeader` | Section number + title | Both |
 | `DataArtifact` | Renders CSS Sparklines/Bars (Cartographic Style) | Light |
 | `Citation` | Hoverable tooltip for references | Light |
 | `ConnectedNodes` | Footer block showing links between content types | Light |
-| `ObservatoryPanel` | Hero telemetry panel with sample metrics | Light |
+| `TelemetryPanel` | Hero panel with INS-001.2 visualization | Light |
+| `JsonLd` | SEO structured data (Organization schema) | N/A |
 
 ### Card Component
 
@@ -643,14 +749,35 @@ All content types use a **unified Card component**. See **CARD-SYSTEM.md** for c
 └─────────────────────────────────────────┘
 ```
 
-### Content Components
+### Content Components (MDX)
 | Component | Description | Mode |
 |-----------|-------------|------|
-| `Callout` | Methodology note, warning | Light |
-| `PullQuote` | Large inline quote | Light |
+| `Callout` | Methodology note, warning (with label prop) | Light |
+| `PullQuote` | Large inline quote with gold left border | Light |
 | `Figure` | Data visualization container | Light |
+| `Caption` | Image/figure captions | Light |
+| `Table` | Markdown table styling | Light |
 | `TemplateBlock` | Code/template display | Light |
 | `SectionDivider` | Diamond separator | Light |
+
+### Dispatch Components
+| Component | Description | Mode |
+|-----------|-------------|------|
+| `DispatchHeader` | Meta bar + title + subtitle | Light |
+| `AuthorBlock` | Author avatar + credentials | Light |
+| `DispatchFooter` | 3-column grid: topics/data-source/related | Light |
+| `SubscribeCTA` | 2-column grid CTA with box shadow | Light |
+| `RelatedMethods` | Method card grid for cross-references | Light |
+
+### Method Components
+| Component | Description | Mode |
+|-----------|-------------|------|
+| `MethodHeader` | Meta bar + title (similar to dispatch) | Light |
+| `MethodMetaBar` | Metadata display for methods | Light |
+| `AbstractBlock` | Left border accent + abstract text | Light |
+| `Changelog` | Version timeline | Light |
+| `NotebookLink` | Link to Jupyter notebook | Light |
+| `RelatedWork` | Related method cards | Light |
 
 ### Interactive Components
 | Component | Description |
@@ -824,6 +951,7 @@ const dispatches = defineCollection({
   type: 'content',
   schema: z.object({
     id: z.string(),
+    slug: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
     date: z.date(),
@@ -833,6 +961,10 @@ const dispatches = defineCollection({
     version: z.string().optional(),
     data_source: z.string().optional(),
     topics: z.array(z.string()).optional(),
+    sections: z.array(z.object({           // For deep linking anchors
+      anchor: z.string(),
+      title: z.string(),
+    })).optional(),
     references: z.object({
       methods: z.array(z.string()).optional(),      // Can reference MTH-001, MTH-001.3, or MTH-001.3#section
       library: z.array(z.string()).optional(),
@@ -841,17 +973,8 @@ const dispatches = defineCollection({
   }),
 });
 
-const library = defineCollection({
-  type: 'content',
-  schema: z.object({
-    id: z.string(),
-    title: z.string(),
-    date: z.date(),
-    status: z.enum(['published', 'researching', 'planned', 'archived']),
-    abstract: z.string().optional(),
-    version: z.string().optional(),
-  }),
-});
+// Library collection is maintained in phronos-library repo
+// See that repository for current schema (includes question, confidence, sources, etc.)
 
 // Method Families (MTH-NNN) - Framework-level methodology documents
 const methodFamilies = defineCollection({
@@ -950,29 +1073,34 @@ Status changes propagate automatically. No manual syncing.
 /src/content/
 ├── config.ts                  # Schema definitions
 ├── dispatches/
-│   ├── dsp-001.mdx            # status: published
-│   └── dsp-002.mdx            # status: researching
-├── library/
-│   └── lib-001.mdx            # status: planned
-├── method-families/
-│   ├── mth-001-observational-chat-analysis.mdx    # MTH-001
-│   ├── mth-002-conversational-assessment.mdx      # MTH-002
-│   └── mth-003-relationship-dynamics.mdx          # MTH-003
-├── method-studies/
-│   ├── mth-001-1-engagement-prediction.mdx        # MTH-001.1
-│   ├── mth-001-2-semantic-exploration.mdx         # MTH-001.2
-│   ├── mth-001-3-model-upgrade-impact.mdx         # MTH-001.3
-│   ├── mth-001-4-concerning-sessions.mdx          # MTH-001.4
-│   ├── mth-002-1-verbal-fluency.mdx               # MTH-002.1
-│   └── mth-002-2-belief-rigidity.mdx              # MTH-002.2
-└── instruments/
-    ├── ins-001.mdx            # status: calibrating
-    └── ins-002.mdx            # status: calibrating
+│   ├── dsp-001/index.mdx      # Each dispatch in its own folder
+│   ├── dsp-002/index.mdx
+│   └── dsp-003/index.mdx
+├── methodFamilies/
+│   ├── mth-001.mdx            # MTH-001 Observational Chat Analysis
+│   └── mth-002.mdx            # MTH-002 Conversational Assessment
+├── methodStudies/
+│   ├── mth-001-1.mdx          # MTH-001.1 through MTH-001.5
+│   ├── mth-001-2.mdx
+│   ├── mth-001-3.mdx
+│   ├── mth-001-4.mdx
+│   ├── mth-001-5.mdx
+│   ├── mth-002-1.mdx          # MTH-002.1 through MTH-002.4
+│   ├── mth-002-2.mdx
+│   ├── mth-002-3.mdx
+│   └── mth-002-4.mdx
+├── instruments/               # Card data for homepage display (actual app in phronos-instruments)
+│   └── ins-001.mdx
+├── governance/                # GOV-NNN foundational documents
+│   └── gov-001.mdx
+└── library/                   # Note: Actual library content in phronos-library repo
+    └── (placeholder)
 ```
 
 **File Naming Convention:**
-- Families: `mth-[NNN]-[slug].mdx` (e.g., `mth-001-observational-chat-analysis.mdx`)
-- Studies: `mth-[NNN]-[N]-[slug].mdx` (e.g., `mth-001-3-model-upgrade-impact.mdx`)
+- Dispatches: `dsp-NNN/index.mdx` (folder per dispatch for co-located assets)
+- Families: `mth-NNN.mdx` (e.g., `mth-001.mdx`)
+- Studies: `mth-NNN-N.mdx` (e.g., `mth-001-3.mdx`)
 
 ---
 
@@ -992,7 +1120,18 @@ PUBLIC_SITE_URL=https://phronos.org
 
 ### Deployment
 - **Primary:** Vercel (automatic from GitHub)
-- **Fallback:** Cloudflare Pages
+
+### Sitemap Configuration
+
+The sitemap is generated with priority rules via `@astrojs/sitemap`:
+
+| Content Type | Priority |
+|--------------|----------|
+| Homepage | 1.0 |
+| Individual dispatches | 0.9 |
+| Individual methods | 0.8 |
+| Dispatch/methods index | 0.7 |
+| Other pages | 0.5 |
 
 ---
 
@@ -1057,6 +1196,7 @@ All are living documents maintained alongside this architecture.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.5.0 | 2026-01-24 | Multi-repo architecture documentation (phronos-site, phronos-library, phronos-instruments); Astro 5.x upgrade; instruments fullstack architecture; updated component library; font token naming (`--font-display`); sitemap configuration; additional pages (privacy, terms, research-agenda); governance collection |
 | 1.4.0 | 2026-01-05 | Hierarchical methods architecture: two-tier structure (families + studies), semantic URLs, updated content schemas, added METHODS-SCHEMA.md reference |
 | 1.3.0 | 2025-12-27 | Added Font Loading (V1), MDX Component Registration, CSS Import Order, and Image Path Convention sections per RECONCILIATION-PLAN.md |
 | 1.2.1 | 2025-12-28 | Added DISPATCH-PAGE.md reference; updated dispatch page section with Cartographic Suite requirement and references schema |

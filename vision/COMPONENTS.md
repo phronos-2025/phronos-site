@@ -1,9 +1,9 @@
 # Phronos Component Specifications
 
-**Version:** 1.1.0  
-**Date:** 2025-12-27  
-**Status:** Ready for implementation  
-**Alignment:** ARCHITECTURE.md v1.3.0, BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0
+**Version:** 1.2.0
+**Date:** 2026-01-24
+**Status:** Production
+**Alignment:** ARCHITECTURE.md v1.5.0, BRAND.yaml v1.3.0, CARD-SYSTEM.md v1.2.0
 
 ---
 
@@ -48,16 +48,16 @@ The navigation is a sticky horizontal bar with the animated ouroboros logo, text
 - **Nav Links (center-right):** Horizontal list, evenly spaced
 - **Subscribe Button (right):** Primary CTA, always visible
 
-### V1 Navigation State
+### Navigation State
 
-For the initial launch, some sections are not yet built. These appear grayed out and are not clickable:
+All primary sections are now active and clickable:
 
-| Link | Status | Clickable | Styling |
-|------|--------|-----------|---------|
-| Dispatches | Active | Yes | Normal (ink) |
-| Library | Coming Soon | No | Faded, no hover, `cursor: default` |
-| Methods | Coming Soon | No | Faded, no hover, `cursor: default` |
-| Instruments | Coming Soon | No | Faded, no hover, `cursor: default` |
+| Link | Status | Destination |
+|------|--------|-------------|
+| Dispatches | Active | `/dispatches` |
+| Library | Active | `/library` (proxied to phronos-library) |
+| Methods | Active | `/methods` |
+| Instruments | Active | `instruments.phronos.org` (external link) |
 
 **Note:** About has been removed from navigation. The About content lives in the homepage footer section.
 
@@ -80,11 +80,11 @@ For the initial launch, some sections are not yet built. These appear grayed out
 │                                          │
 │  Dispatches                              │
 │  ─────────────────────────────────────   │
-│  Library                        (soon)   │
+│  Library                                 │
 │  ─────────────────────────────────────   │
-│  Methods                        (soon)   │
+│  Methods                                 │
 │  ─────────────────────────────────────   │
-│  Instruments                    (soon)   │
+│  Instruments                       ↗     │
 │  ─────────────────────────────────────   │
 │                                          │
 │  ┌────────────────────────────────────┐  │
@@ -96,7 +96,7 @@ For the initial launch, some sections are not yet built. These appear grayed out
 
 - Full-screen overlay with paper background
 - Links stacked vertically with divider lines
-- "(soon)" label for inactive items (mono, faded)
+- External link indicator (↗) for Instruments (links to instruments.phronos.org)
 - Subscribe button at bottom, full width
 - Close icon replaces hamburger
 
@@ -241,9 +241,9 @@ For the initial launch, some sections are not yet built. These appear grayed out
     align-items: center;
 }
 
-.nav-mobile-menu .nav-link .soon-label {
-    font-size: var(--text-xs);
-    color: var(--faded);
+.nav-link--external::after {
+    content: ' ↗';
+    font-size: 0.8em;
 }
 ```
 
@@ -258,9 +258,9 @@ For the initial launch, some sections are not yet built. These appear grayed out
     
     <ul class="nav-links">
         <li><a href="/dispatches" class="nav-link">Dispatches</a></li>
-        <li><span class="nav-link disabled">Library</span></li>
-        <li><span class="nav-link disabled">Methods</span></li>
-        <li><span class="nav-link disabled">Instruments</span></li>
+        <li><a href="/library" class="nav-link">Library</a></li>
+        <li><a href="/methods" class="nav-link">Methods</a></li>
+        <li><a href="https://instruments.phronos.org" class="nav-link nav-link--external">Instruments</a></li>
     </ul>
     
     <a href="https://dispatches.phronos.org/subscribe" class="nav-subscribe">
@@ -446,7 +446,7 @@ The `html_rail_structure` snippet in BRAND.yaml is reference material for high-d
 
 ### Right Column: Telemetry Panel
 
-The telemetry panel is a self-contained card showing sample metrics from the observatory. It reinforces the "scientific instrument" aesthetic.
+The telemetry panel is a self-contained card showing the INS-001.2 "Common Ground" visualization. It displays real instrument data (Fidelity/Spread metrics) and reinforces the "scientific instrument" aesthetic.
 
 ```css
 .telemetry-panel {
@@ -854,248 +854,30 @@ When SVG is necessary, use sharp, geometric forms:
 
 ## Instrument Container (The Lab)
 
+**Note:** The instruments application is now a separate fullstack deployment at `instruments.phronos.org` (phronos-instruments repository). The design principles below still apply to the instruments UI, but the implementation details are maintained in that repository.
+
 ### Overview
 
 When an instrument is active, it displays within a "Lab" container—a dark-mode terminal-like environment that provides visual separation from narrative content and signals "you are now in an assessment."
 
-### Container Structure
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ ┌──────────────────────────────────────────────────────────────────────────┐ │
-│ │ INS-001 · SEMANTIC ASSOCIATIONS                              v0.1  [●]  │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                       [ REACT COMPONENT RENDERS HERE ]                   │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ │                                                                          │ │
-│ ├──────────────────────────────────────────────────────────────────────────┤ │
-│ │ Estimated time: 5 min                                        Begin →    │ │
-│ └──────────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────┘
-   ↑ Page background (dark, with grid)        ↑ Lab container (elevated surface)
-```
-
-### Layout
-
-The Lab container is a centered, elevated box within the full-width dark section:
+### Design Principles
 
 | Element | Specification |
 |---------|---------------|
 | Page background | `--bg-deep` (#1A1A1A) with 40px grid |
-| Container max-width | 800px (can expand for complex instruments) |
 | Container background | `--card-bg` (#252525) |
 | Container border | 1px solid `rgba(242, 240, 233, 0.15)` |
-| Container padding | 0 (header/body/footer have their own) |
+| Typography | Monospace for labels, serif for content |
+| Accent | Gold (`--gold`) for interactive elements |
 
-### Design Tokens
+### Current Instruments
 
-```css
-/* Page wrapper */
-.instrument-page {
-    min-height: 100vh;
-    background: var(--bg-deep);
-    position: relative;
-    padding: var(--space-2xl) var(--space-lg);
-}
+| Variant | Name | Status |
+|---------|------|--------|
+| INS-001.1 | Signal | Live |
+| INS-001.2 | Common Ground | Live |
 
-.instrument-page::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(242, 240, 233, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(242, 240, 233, 0.015) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-}
-
-/* Lab container */
-.lab-container {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-    margin: 0 auto;
-    background: var(--card-bg);
-    border: 1px solid rgba(242, 240, 233, 0.15);
-}
-
-/* Lab header */
-.lab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-sm) var(--space-md);
-    border-bottom: 1px solid rgba(242, 240, 233, 0.1);
-    background: rgba(242, 240, 233, 0.02);
-}
-
-.lab-header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.lab-id {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--gold);
-    text-transform: uppercase;
-}
-
-.lab-title {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--text-light);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.lab-header-right {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.lab-version {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--faded-dark);
-}
-
-.lab-status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-}
-
-.lab-status-dot.live {
-    background: var(--success);
-    animation: pulse 2s infinite;
-}
-
-.lab-status-dot.calibrating {
-    background: var(--gold);
-    animation: pulse 3s infinite;
-}
-
-/* Lab body - where React component mounts */
-.lab-body {
-    padding: var(--space-xl);
-    min-height: 400px;
-}
-
-/* Lab footer */
-.lab-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-sm) var(--space-md);
-    border-top: 1px solid rgba(242, 240, 233, 0.1);
-}
-
-.lab-meta {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--faded-dark);
-}
-
-.lab-action {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-light);
-    background: transparent;
-    border: 1px solid var(--text-light);
-    padding: var(--space-xs) var(--space-md);
-    cursor: pointer;
-    transition: all var(--transition-default);
-}
-
-.lab-action:hover {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--bg-deep);
-}
-
-.lab-action:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-```
-
-### HTML Structure
-
-```html
-<div class="instrument-page">
-    <div class="lab-container">
-        <header class="lab-header">
-            <div class="lab-header-left">
-                <span class="lab-id">INS-001</span>
-                <span class="lab-separator">·</span>
-                <span class="lab-title">Semantic Cartography</span>
-            </div>
-            <div class="lab-header-right">
-                <span class="lab-version">v0.1</span>
-                <span class="lab-status-dot calibrating"></span>
-            </div>
-        </header>
-        
-        <div class="lab-body" id="instrument-root">
-            <!-- React component mounts here -->
-        </div>
-        
-        <footer class="lab-footer">
-            <span class="lab-meta">Estimated time: 5 min</span>
-            <button class="lab-action">Begin →</button>
-        </footer>
-    </div>
-</div>
-```
-
-### States
-
-| State | Header Dot | Footer Button | Notes |
-|-------|------------|---------------|-------|
-| Calibrating | Gold, pulsing | "Coming Soon" (disabled) | Instrument in development |
-| Ready | Green, pulsing | "Begin →" | Ready to start |
-| In Progress | Green, solid | "Continue →" or "Submit" | Assessment active |
-| Complete | Green, solid | "View Results" | Assessment finished |
-
-### React Integration
-
-The Astro page passes props to the React component:
-
-```astro
----
-// pages/instruments/[slug].astro
-import { getEntry } from 'astro:content';
-import InstrumentLayout from '@/layouts/InstrumentLayout.astro';
-
-const { slug } = Astro.params;
-const instrument = await getEntry('instruments', slug);
----
-
-<InstrumentLayout 
-    id={instrument.data.id}
-    title={instrument.data.title}
-    version={instrument.data.version}
-    status={instrument.data.status}
->
-    <div id="instrument-root" data-instrument={slug}></div>
-</InstrumentLayout>
-
-<script>
-    // Hydrate React component
-    import { renderInstrument } from '@/instruments';
-    const root = document.getElementById('instrument-root');
-    const slug = root.dataset.instrument;
-    renderInstrument(slug, root);
-</script>
-```
+For full instrument architecture, see ARCHITECTURE.md "Instruments" section or the phronos-instruments repository documentation.
 
 ---
 
@@ -1416,5 +1198,6 @@ Add to `tokens.css` for consistency across all components:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-24 | Updated navigation to reflect all sections active; removed "Coming Soon" states; updated Instruments to link to external domain (instruments.phronos.org); simplified Instrument Container section (full implementation in phronos-instruments repo); updated TelemetryPanel description for INS-001.2 visualization |
 | 1.1.0 | 2025-12-27 | Updated footer tagline (mono/uppercase/faded). Simplified section headers to single-line layout. Added frame-rate independence note for logo animation. Per RECONCILIATION-PLAN.md |
 | 1.0.0 | 2025-12-28 | Initial specification: Nav, Footer, Hero, Section Headers, Iconography, Lab Container, Forms, States |
