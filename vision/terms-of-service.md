@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Epochal Health Solutions LLC, doing business as Phronos**
+**Phronos LLC**
 
 *Effective Date: January 13, 2026*
 
@@ -12,7 +12,7 @@
 
 These Terms of Service ("Terms") govern your access to and participation in instruments, methods, and services provided through phronos.org and associated platforms (collectively, "Phronos"). By accessing or using any Phronos instrument, you agree to be bound by these Terms.
 
-Phronos is operated by Epochal Health Solutions LLC, a California limited liability company ("we," "us," or "our").
+Phronos is operated by Phronos LLC, a California limited liability company ("we," "us," or "our").
 
 If you do not agree to these Terms, do not use our instruments.
 
@@ -89,7 +89,7 @@ We select third-party providers who commit to not training on API inputs. Howeve
 
 ## Intellectual Property
 
-All content, methods, instruments, code, and documentation produced by Phronos remain the intellectual property of Epochal Health Solutions LLC unless explicitly released under open-source or open-access terms.
+All content, methods, instruments, code, and documentation produced by Phronos remain the intellectual property of Phronos LLC unless explicitly released under open-source or open-access terms.
 
 Our commitment to open science means that methods and frameworks may be published for scrutiny and replication. Publication does not constitute transfer of ownership or license to commercialize.
 
@@ -138,7 +138,7 @@ These limitations apply regardless of the theory of liability and even if we hav
 
 ## Indemnification
 
-You agree to indemnify, defend, and hold harmless Epochal Health Solutions LLC and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from your use of Phronos instruments, your violation of these Terms, or your violation of any rights of a third party.
+You agree to indemnify, defend, and hold harmless Phronos LLC and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from your use of Phronos instruments, your violation of these Terms, or your violation of any rights of a third party.
 
 ---
 
@@ -166,7 +166,7 @@ If any provision of these Terms is found unenforceable, the remaining provisions
 
 ## Entire Agreement
 
-These Terms, together with our Privacy Policy and Data Constitution, constitute the entire agreement between you and Epochal Health Solutions LLC regarding your use of Phronos.
+These Terms, together with our Privacy Policy and Data Constitution, constitute the entire agreement between you and Phronos LLC regarding your use of Phronos.
 
 ---
 
@@ -174,7 +174,7 @@ These Terms, together with our Privacy Policy and Data Constitution, constitute 
 
 Questions about these Terms may be directed to:
 
-**Epochal Health Solutions LLC, dba Phronos**
+**Phronos LLC**
 Email: legal@phronos.org
 
 ---

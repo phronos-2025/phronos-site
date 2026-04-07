@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Epochal Health Solutions LLC, doing business as Phronos**
+**Phronos LLC**
 
 *Effective Date: January 13, 2026*
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-This Privacy Policy describes how Epochal Health Solutions LLC, doing business as Phronos ("we," "us," or "our"), collects, uses, shares, and protects information when you participate in instruments and services provided through phronos.org and associated platforms.
+This Privacy Policy describes how Phronos LLC ("we," "us," or "our"), collects, uses, shares, and protects information when you participate in instruments and services provided through phronos.org and associated platforms.
 
 Phronos is a cognitive research platform. Our approach to data is grounded in a core principle: **your data belongs to you.** Participation is voluntary. Consent is explicit. We lead with openness because openness is the only path to trust.
 
@@ -218,7 +218,7 @@ If any provision of this Privacy Policy conflicts with the Constitution, the Con
 
 Questions, concerns, or requests regarding this Privacy Policy may be directed to:
 
-**Epochal Health Solutions LLC, dba Phronos**
+**Phronos LLC**
 Email: privacy@phronos.org
 
 For general inquiries: interest@phronos.org
